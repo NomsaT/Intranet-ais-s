@@ -1,0 +1,1257 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">{{ actionDisplay }} <span [ngClass]="{'bg-close': statusDisplayLabel === 'Close','bg-open-approve': statusDisplayLabel === 'Approved','bg-draft': statusDisplayLabel === 'Draft','bg-new': statusDisplayLabel === 'New','bg-review': statusDisplayLabel === 'Review','bg-pending': statusDisplayLabel === 'Pending','bg-pending-price': statusDisplayLabel === 'Pending Price Approval'}">{{statusDisplayLabel}}</span></h4>
+        <div style="margin-right: auto; padding-left: 10px;">
+          <dx-button *ngIf="statusDisplayLabel  === 'Approved'" stylingMode="outlined"
+                     text="View PO"
+                     type="default"
+                     [width]="100"
+                     (onClick)="openPO($event)">
+          </dx-button>
+        </div>
+        <h5 style="font-size:16px;margin-top:10px">Company:</h5>
+        <div style="margin-right: 10px; padding-left: 10px;">
+          <dx-select-box [dataSource]="CompanyForeignDataSource"
+                         valueExpr="id"
+                         displayExpr="name"
+                         [searchEnabled]="true"
+                         [showClearButton]="true"
+                         [value]="defaultCompanyValue"
+                         dataField="companyId"
+                         (onValueChanged)="setCompany($event)"
+                         [readOnly]="!allowProcessedModify">
+            <dx-validator>
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dx-validator>
+          </dx-select-box>
+        </div>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">
+              Purchasing → Capture Internal Order
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align" [ngClass]="{'border-deny-left': statusDisplayLabel === 'Close','border-approve-left': statusDisplayLabel === 'Approved','border-draft-left': statusDisplayLabel === 'Draft','border-add-left': statusDisplayLabel === 'New','border-review-left': statusDisplayLabel === 'Review','border-pending-left': statusDisplayLabel === 'Pending','border-pending-price-left': statusDisplayLabel === 'Pending Price Approval'}">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Internal Order Details</h5>
+            <dx-form #mainform
+                     id="mainform"
+                     *ngIf="data != null; else DataLoading"
+                     [(formData)]="data"
+                     validationGroup="internalOrderData">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item dataField="id"
+                          [visible]="false"
+                          dataType="int"></dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="supplierId"
+                            editorType="dxSelectBox"
+                            [editorOptions]="{
+                      dataSource: SupplierForeignDataSource,
+                      displayExpr: 'companyName',
+                      valueExpr: 'id',
+                      searchEnabled: true,
+                      readOnly:!allowProcessedModify,
+                      showClearButton: true,
+                      onValueChanged: setStockValue,
+                      width: '240%'
+                    }">
+                    <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Supplier'"></dxo-label>
+                  </dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsS"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="requestedById"
+                          editorType="dxSelectBox"
+                          [editorOptions]="{
+                    dataSource: UsersForeignDataSource,
+                    displayExpr: 'fullName',
+                    valueExpr: 'id',
+                    searchEnabled: true,
+                    readOnly:!allowProcessedModify,
+                    showClearButton: 'true',
+                    onValueChanged: setRequested,
+                    onOptionChanged: setRequested
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Requested By'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="quotationNumber"></dxi-item>
+                <dxi-item dataField="placedById"
+                          editorType="dxSelectBox"
+                          [editorOptions]="{
+                    dataSource: UsersForeignDataSource,
+                    displayExpr: 'fullName',
+                    valueExpr: 'id',
+                    readOnly: true,
+                    onValueChanged: setPlaced,
+                    onOptionChanged: setPlaced
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Placed By'"></dxo-label>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="plantLocationId"
+                            editorType="dxSelectBox"
+                            [editorOptions]="{
+                      dataSource: PlantLocationForeignDataSource,
+                      displayExpr: 'name',
+                      valueExpr: 'id',
+                      searchEnabled: true,
+                      readOnly:!allowProcessedModify,
+                      showClearButton: true,
+                      width: '240%',
+                      onValueChanged: setPlantLocation
+                    }">
+                    <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Plant Location'"></dxo-label>
+                  </dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsP"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="approveById"
+                          editorType="dxSelectBox"
+                          [editorOptions]="{
+                    dataSource: DepartmentManagersForeignDataSource,
+                    displayExpr: 'fullName',
+                    valueExpr: 'id',
+                    searchEnabled: true,
+                    readOnly:!allowProcessedModify,
+                    showClearButton: 'true',
+                    onValueChanged: setApproved
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Approved By'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="followUpDate"
+                          editorType="dxDateBox"
+                          style="max-height: auto !important"[editorOptions]="{ min: currentDate}">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Follow Up Date'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="deliveryDate"
+                          editorType="dxDateBox"
+                          style="max-height: auto !important" [editorOptions]="{ min: currentDate}">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Delivery Date'"></dxo-label>
+                </dxi-item>
+
+
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="projectId"
+                            editorType="dxSelectBox"
+                            [editorOptions]="{
+                      dataSource: ProjectForeignDataSource,
+                      displayExpr: 'name',
+                      valueExpr: 'id',
+                      searchEnabled: true,
+                      readOnly:!allowProcessedModify,
+                      showClearButton: true,
+                      width: '240%',
+                      onValueChanged: setProject
+                    }">
+                    <dxo-label [text]="'Project'"></dxo-label>
+                  </dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsProj"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="companyId"
+                            editorType="dxSelectBox"
+                               [visible]="false"
+                            [editorOptions]="{
+                      dataSource: CompanyForeignDataSource,
+                      displayExpr: 'name',
+                      valueExpr: 'id',
+                      readOnly:!allowProcessedModify,
+                      searchEnabled: true,
+                      value:defaultCompanyValue,
+                      showClearButton: true,
+                      width: '240%',
+                      onValueChanged: setCompany
+                    }">
+                    <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Company'"></dxo-label>
+                  </dxi-item>
+                  <dxi-item itemType="button"
+                            [visible]="false"
+                            [buttonOptions]="buttonOptionsComp"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="currency"
+                          [visible]="false"
+                          [editorOptions]="{ readOnly: true }"></dxi-item>
+                <dxi-item dataField="total"
+                          [visible]="false"
+                          [editorOptions]="{
+                    readOnly: true,
+                    format: {
+                      type: 'currency',
+                      currency: currency,
+                      precision: 2
+                    },
+                    dataType: 'number'
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Total (Excl. VAT)'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="vat"
+                          [visible]="false"
+                          [editorOptions]="{
+                    readOnly: true,
+                    format: {
+                      type: 'currency',
+                      currency: currency,
+                      precision: 2
+                    },
+                    dataType: 'number'
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'VAT'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="totalinclvat"
+                          [visible]="false"
+                          [editorOptions]="{
+                    readOnly: true,
+                    format: {
+                      type: 'currency',
+                      currency: currency,
+                      precision: 2
+                    },
+                    dataType: 'number'
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Total (Incl. VAT)'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="supplierComment"
+                          editorType="dxTextArea"
+                          [editorOptions]="{ height: 70, stylingMode: 'filled',readOnly:!allowProcessedModify
+}">
+                  <dxo-label [text]="'Supplier Comment'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="comment"
+                          editorType="dxTextArea"
+                          [editorOptions]="{ height: 70, stylingMode: 'filled',readOnly:!allowProcessedModify }">
+                  <dxo-label [text]="'Internal Comment'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="internalComment"
+                          [visible]="hasComment"
+                          editorType="dxTextArea"
+                          [editorOptions]="{
+                    disabled: true,
+                    height: 70,
+                    stylingMode: 'filled'
+                  }">
+                  <dxo-label [text]="'Additional Comment'"></dxo-label>
+                </dxi-item>
+              </dxi-item>
+            </dx-form>
+          </div>
+        </div>
+      </div>
+      <div class="table-align" [ngClass]="{'border-deny-left': statusDisplayLabel === 'Close','border-approve-left': statusDisplayLabel === 'Approved','border-draft-left': statusDisplayLabel === 'Draft','border-add-left': statusDisplayLabel === 'New','border-review-left': statusDisplayLabel === 'Review','border-pending-left': statusDisplayLabel === 'Pending','border-pending-price-left': statusDisplayLabel === 'Pending Price Approval'}">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Line Items</h5>
+            <dx-tab-panel #tabPanel
+                          [dataSource]="tabs"
+                          [selectedIndex]="0"
+                          [loop]="false"
+                          [animationEnabled]="true"
+                          [deferRendering]="false"
+                          [swipeEnabled]="true">
+              <div *dxTemplate="let tab of 'title'">
+                <span>{{ tab.text }}</span>
+              </div>
+              <div>
+                <div *dxTemplate="let tab of 'item'" class="tabs">
+                  <div class="tabpanel-item">
+                    <div *ngIf="tab.text == 'Items'">
+                      <!--checbox-->
+                      <dx-form id="form" style="padding-bottom:10px">
+                        <dxi-item itemType="group" cssClass="first-group" [colCount]="4">
+                          <dxi-item itemType="group" [colSpan]="3">
+                            <br />
+                            <dx-check-box text=" Listed Items " hint=" Listed Items " [(value)]="showlistedItems" (onValueChanged)="handleListedItems($event)" [disabled]="!allowProcessedModify"></dx-check-box>
+                            <dx-check-box text=" Once Off Items " hint=" Once Off Items " [(value)]="showOnceOffItems" (onValueChanged)="handleOnceOffItems($event)" [disabled]="!allowProcessedModify"></dx-check-box>
+                            <dx-check-box text=" Services " hint=" Services " [(value)]="showServices" (onValueChanged)="handleServices($event)" [disabled]="!allowProcessedModify"></dx-check-box>
+                          </dxi-item>
+                        </dxi-item>
+                      </dx-form>
+                      <div style="width: auto; height: auto">
+                        <h5 class="io-view-heading" *ngIf="showlistedItems == true;"> Listed Items </h5>
+                        <dx-form id="form" class="invoice-form" *ngIf="data != null; else DataLoading" [(formData)]="data.internalOrderItems" validationGroup="internalOrderData">
+                          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                            <dx-data-grid [(visible)]="showlistedItems" #ordersitems id="ordersitems" [dataSource]="data.internalOrderItems"
+                                          [columnAutoWidth]="true"
+                                          [hoverStateEnabled]="true"
+                                          [rowAlternationEnabled]="true"
+                                          [showBorders]="true"
+                                          [allowColumnResizing]="true"
+                                          [wordWrapEnabled]="false"
+                                          (onFocusedCellChanged)="onFocusedCellChanged($event)"
+                                          (onSaved)="onSaved($event)"
+                                          (onRowRemoved)="onRowRemoved($event)"
+                                          (onEditorPreparing)="onEditorPreparingChild($event)"
+                                          (onInitNewRow)="onInitNewRowListedItems($event)"
+                                          (onCellPrepared)="OnCellPrepared($event)">
+                              <dxo-sorting mode="none"></dxo-sorting>
+                              <dxo-paging [enabled]="false"></dxo-paging>
+                              <dxo-search-panel [visible]="true"></dxo-search-panel>
+                              <dxo-editing mode="row"
+                                           [useIcons]="true"
+                                           [allowUpdating]="allowProcessedModify"
+                                           [allowDeleting]="allowProcessedModify"
+                                           [allowAdding]="canAdd">
+                              </dxo-editing>
+                              <dxi-column dataField="id"
+                                          [visible]="false"
+                                          dataType="int"></dxi-column>
+
+                              <dxi-column id="itemDescr"
+                                          dataField="stockId"
+                                          caption="Internal Desc"
+                                          [setCellValue]="setCellValueItemPrice">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup #stockId
+                                            [dataSource]="StockForeignDataSource"
+                                            displayExpr="internalProductNamePack"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="stockId"
+                                          caption="Item Code"
+                                          [visible]="false"
+                                          [editorOptions]="{ disabled: true }">
+                                <dxo-lookup #stockId
+                                            [dataSource]="StockForeignDataSource"
+                                            displayExpr="code"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="stockId"
+                                          caption="Supplier Desc"
+                                          [setCellValue]="setCellValueItemPrice">
+                                <dxo-lookup #stockId
+                                            [dataSource]="StockForeignDataSource"
+                                            displayExpr="productName"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="glcodeId" caption="GL Code" cssClass="cell-highlighted">
+                                <dxo-lookup [dataSource]="GLCodeForeignDataSource"
+                                            displayExpr="glfullname"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="departmentId" caption="Department" cssClass="cell-highlighted">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                                            displayExpr="name"
+                                            valueExpr="id">
+                                </dxo-lookup>
+
+                              </dxi-column>
+                              <dxi-column dataField="uomName" caption="UoM" [editorOptions]="{disabled: true}" [width]="70">
+                              </dxi-column>
+                              <dxi-column dataField="quantity" caption="Qty" dataType="number" [setCellValue]="setCellValueQuantity" cssClass="cell-highlighted">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-column>
+                              <dxi-column dataField="packSize" caption="Pack Size" [editorOptions]="{disabled: true}" dataType="number"></dxi-column>
+                              <dxi-column dataField="totalUnits" caption="Total (UoM)" [editorOptions]="{disabled: true}" dataType="number"></dxi-column>
+                              <dxi-column dataField="itemPrice" [visible]="false" caption="SKU Price" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{readOnly: true,format:{ type: 'currency',currency: currency, precision: 2 }}" dataType="number" [width]="100"></dxi-column>
+                              <dxi-column dataField="packQuantity" [visible]="false" caption="Pack Qty" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{readOnly: true,format:{ type: 'currency',currency: currency, precision: 2 }}" dataType="number" [width]="100"></dxi-column>
+                              <dxi-column dataField="packQuantity" [visible]="false" caption="Pack Qty" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{readOnly: true,format:{ type: 'currency',currency: currency, precision: 2 }}" dataType="number" [width]="100"></dxi-column>
+                              <dxi-column dataField="uomPrice" caption="UoM Price" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{readOnly: true,format:{ type: 'currency',currency: currency, precision: 2 }}" dataType="number" [width]="100"></dxi-column>
+                              <dxi-column dataField="originalValue" caption="List Price" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{readOnly: true,format:{ type: 'currency',currency: currency, precision: 2 }}" dataType="number" [width]="100"></dxi-column>
+                              <dxi-column dataField="value" caption="New Price" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{format:{ type: 'currency',currency: currency, precision: 2 }}" dataType="number" [setCellValue]="setCellValuePrice" [width]="100">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-column>
+                              <dxi-column dataField="vatAppl"
+                                          caption="VAT Appl"
+                                          dataType="boolean"
+                                          [width]="50">
+                                <dx-check-box [value]="false"></dx-check-box>
+                              </dxi-column>
+                              <dxi-column dataField="grnAppl"
+                                          caption="GRN Appl"
+                                          [editorOptions]="{ disabled: true }"
+                                          dataType="boolean"
+                                          [width]="50">
+                                <dx-check-box [value]="false"></dx-check-box>
+                              </dxi-column>
+                              <dxi-column dataField="total"
+                                          caption="Total (Vat Excl.)"
+                                          dataType="number"
+                                          [format]="{
+                                type: 'currency',
+                                currency: currency,
+                                precision: 2
+                              }"
+                                          [editorOptions]="{
+                                disabled: true,
+                                format: {
+                                  type: 'currency',
+                                  currency: currency,
+                                  precision: 2
+                                }
+                              }"></dxi-column>
+
+                              <dxo-summary>
+                                <dxi-total-item column="stockId"
+                                                displayFormat="Total Items: {0}"
+                                                summaryType="count">
+                                </dxi-total-item>
+                              </dxo-summary>
+                            </dx-data-grid>
+                          </dxi-item>
+                        </dx-form>
+                        <dx-tooltip [(visible)]="defaultVisible"
+                                    [closeOnOutsideClick]="false">
+                          <div *dxTemplate="let data = data; of: 'content'">
+                            {{ toolTipText }}
+                          </div>
+                        </dx-tooltip>
+                      </div>
+
+                      <!--<div *ngIf="tab.text == 'Once-Off Items'">-->
+                      <div style="width: auto; height: auto;padding-top:2px">
+                        <h5 class="io-view-heading" *ngIf="showOnceOffItems == true;"> Once-Off Items </h5>
+                        <dx-form id="form" class="invoice-form" *ngIf="data != null; else DataLoading" [(formData)]="data.onceOffItems" validationGroup="internalOrderData">
+                          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                            <dx-data-grid [(visible)]="showOnceOffItems" #ordersonceitems id="ordersonceitems" [dataSource]="data.onceOffItems"
+                                          [columnAutoWidth]="true"
+                                          [hoverStateEnabled]="true"
+                                          [rowAlternationEnabled]="true"
+                                          [showBorders]="true"
+                                          [wordWrapEnabled]="false"
+                                          (onInitNewRow)="onInitNewRowNotListedItems($event)"
+                                          (onSaved)="onSaved($event)"
+                                          (onEditorPreparing)="onEditorPreparingTemp($event)"
+                                          (onRowRemoved)="onRowRemoved($event)"
+                                          (onCellPrepared)="OnCellPrepared($event)">
+                              <dxo-sorting mode="none"></dxo-sorting>
+                              <dxo-paging [enabled]="false"></dxo-paging>
+                              <dxo-search-panel [visible]="true"></dxo-search-panel>
+                              <dxo-editing mode="cell"
+                                           [useIcons]="true"
+                                           [allowUpdating]="allowProcessedModify"
+                                           [allowDeleting]="allowProcessedModify"
+                                           [allowAdding]="allowProcessedModify">
+                              </dxo-editing>
+                              <dxi-column dataField="id" [visible]="false" dataType="int"></dxi-column>
+                              <dxi-column dataField="code" caption="Item Code"></dxi-column>
+                              <dxi-column dataField="description" caption="Supplier Desc">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-column>
+                              <dxi-column dataField="glcodeId" caption="GL Code">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="GLCodeForeignDataSource"
+                                            displayExpr="glfullname"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="departmentId" caption="Department">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                                            displayExpr="name"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="uomid" caption="UoM" [width]="70">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="UnitofMeasureForeignDataSource"
+                                            displayExpr="name"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="quantity" caption="Qty" dataType="number" [setCellValue]="setCellValueOnceQuantity">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-column>
+                              <dxi-column dataField="packSize" caption="Pack Size" dataType="number" [setCellValue]="setCellOncePackSize"></dxi-column>
+                              <dxi-column dataField="totalUnits" caption="Total (UoM)" [editorOptions]="{disabled: true}" dataType="number"></dxi-column>
+                              <dxi-column dataField="value" caption="Price" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{format:{ type: 'currency',currency: currency, precision: 2 }}" dataType="number" [setCellValue]="setCellValueOncePrice" [width]="100">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-column>
+                              <dxi-column dataField="vatAppl" caption="VAT Appl" dataType="boolean" [width]="50">
+                                <dx-check-box [value]="false"></dx-check-box>
+                              </dxi-column>
+                              <dxi-column dataField="grnAppl" caption="GRN Appl" dataType="boolean" [width]="50">
+                                <dx-check-box [value]="false"></dx-check-box>
+                              </dxi-column>
+                              <dxi-column dataField="total" caption="Total (Vat Excl.)" dataType="number" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{ disabled: true,format:{ type: 'currency',currency: currency, precision: 2 } }"></dxi-column>
+
+                              <dxo-summary>
+                                <dxi-total-item column="description" displayFormat="Total Items: {0}" summaryType="count"> </dxi-total-item>
+                              </dxo-summary>
+                            </dx-data-grid>
+                          </dxi-item>
+                        </dx-form>
+                        <dx-tooltip [(visible)]="defaultVisible"
+                                    [closeOnOutsideClick]="false">
+                          <div *dxTemplate="let dat = data; of: 'content'">{{toolTipText}}</div>
+
+                        </dx-tooltip>
+                      </div>
+
+                      <!--<div *ngIf="tab.text == 'Services'">-->
+                      <div style="width: auto; height: auto; padding-top: 3px">
+                        <h5 class="io-view-heading" *ngIf="showServices == true;"> Services </h5>
+                        <dx-form id="form" class="invoice-form" *ngIf="data != null; else DataLoading" [(formData)]="data.services" validationGroup="internalOrderData">
+                          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                            <dx-data-grid [(visible)]="showServices" #ordersservices id="ordersservices" [dataSource]="data.services"
+                                          [columnAutoWidth]="true"
+                                          [hoverStateEnabled]="true"
+                                          [rowAlternationEnabled]="true"
+                                          [showBorders]="true"
+                                          [wordWrapEnabled]="false"
+                                          (onInitNewRow)="onInitNewRowServiceItems($event)"
+                                          (onSaved)="onSaved($event)"
+                                          (onEditorPreparing)="onEditorPreparingService($event)"
+                                          (onRowRemoved)="onRowRemoved($event)"
+                                          (onCellPrepared)="OnCellPrepared($event)">
+                              <dxo-sorting mode="none"></dxo-sorting>
+                              <dxo-paging [enabled]="false"></dxo-paging>
+                              <dxo-search-panel [visible]="true"></dxo-search-panel>
+                              <dxo-editing mode="cell"
+                                           [useIcons]="true"
+                                           [allowUpdating]="allowProcessedModify"
+                                           [allowDeleting]="allowProcessedModify"
+                                           [allowAdding]="allowProcessedModify"
+                                           [confirmDelete]="false">
+                              </dxo-editing>
+                              <dxi-column dataField="id" [visible]="false" dataType="int"></dxi-column>
+                              <dxi-column dataField="code" caption="Code"></dxi-column>
+                              <dxi-column dataField="description" caption="Supplier Desc">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-column>
+                              <dxi-column dataField="glcodeId" caption="GL Code">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="GLCodeForeignDataSource"
+                                            displayExpr="glfullname"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="departmentId" caption="Department">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                                            displayExpr="name"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-column>
+                              <dxi-column dataField="quantity" caption="Qty" dataType="number" [setCellValue]="setServiceCellQty">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-column>
+                              <dxi-column dataField="value" caption="Price" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{format:{ type: 'currency',currency: currency, precision: 2 }}" dataType="number" [setCellValue]="setServiceCellValuePrice" [width]="100">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-column>
+                              <dxi-column dataField="vatAppl" caption="VAT Appl" dataType="boolean" [width]="50">
+                                <dx-check-box [value]="false"></dx-check-box>
+                              </dxi-column>
+                              <dxi-column dataField="grnAppl" [editorOptions]="{disabled: true}" caption="GRN Appl" dataType="boolean" [width]="50">
+                                <dx-check-box [value]="false"></dx-check-box>
+                              </dxi-column>
+                              <dxi-column dataField="total" caption="Total (Vat Excl.)" dataType="number" [format]="{ type: 'currency',currency: currency, precision: 2 }" [editorOptions]="{ disabled: true,format:{ type: 'currency',currency: currency, precision: 2 } }"></dxi-column>
+
+                              <dxo-summary>
+                                <dxi-total-item column="description" displayFormat="Total Items: {0}" summaryType="count"> </dxi-total-item>
+                              </dxo-summary>
+                            </dx-data-grid>
+                          </dxi-item>
+                        </dx-form>
+                        <dx-tooltip [(visible)]="defaultVisible"
+                                    [closeOnOutsideClick]="false">
+                          <div *dxTemplate="let data = data; of: 'content'">{{toolTipText}}</div>
+
+                        </dx-tooltip>
+                      </div>
+                    </div>
+                    <!--</div>-->
+                    <div *ngIf="tab.text == 'Summary'">
+                      <div style="width: auto; height: auto">
+                        <dx-form id="form"
+                                 class="invoice-form"
+                                 *ngIf="data != null; else DataLoading"
+                                 [(formData)]="data">
+                          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                            <dx-scroll-view width="100%" height="100%">
+                              <div style="width: auto; height: auto">
+                                <h5 class="io-view-heading-preview">
+                                  Internal Order Summary
+                                </h5>
+                                <div class="IO-Details">
+                                  <table class="table table-centered table-nowrap internalOrder">
+                                    <tbody>
+                                      <tr>
+                                        <td>
+                                          <strong>Supplier:</strong>
+                                          {{ supplierFullName }}
+                                        </td>
+                                        <td>
+                                          <strong>Requested By:</strong>
+                                          {{ requestedBy }}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td>
+                                          <strong>Quotation Number:</strong>
+                                          {{ data.quotationNumber }}
+                                        </td>
+                                        <td>
+                                          <strong>Placed By:</strong>
+                                          {{ placedBy }}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td>
+                                          <strong>Plant Location:</strong>
+                                          {{ plantLocation }}
+                                        </td>
+                                        <td>
+                                          <strong>Approved By:</strong>
+                                          {{ approvedBy }}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td>
+                                          <strong>Follow Up Date:</strong>
+                                          {{
+                                          data.followUpDate | date: "dd MMMM yy"
+                                          }}
+                                        </td>
+                                        <td>
+                                          <strong>Delivery Date:</strong>
+                                          {{
+                                          data.deliveryDate | date: "dd MMMM yy"
+                                          }}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td>
+                                          <strong>Project:</strong>
+                                          {{ project }}
+                                        </td>
+                                        <td>
+                                          <strong>Company:</strong>
+                                          {{ company }}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="white-space: pre-wrap">
+                                          <strong>Supplier Comment:</strong>
+                                          {{ data.supplierComment }}
+                                        </td>
+                                        <td style="white-space: pre-wrap">
+                                          <strong>Internal Comment:</strong>
+                                          {{ data.comment }}
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <!--Listed Items-->
+                                <h5 class="io-view-heading-preview" *ngIf="data.internalOrderItems.length > 0">Listed Items</h5>
+                                <dx-data-grid #ordersitems id="ordersitems" [dataSource]="data.internalOrderItems"
+                                              [columnAutoWidth]="true"
+                                              [hoverStateEnabled]="false"
+                                              [rowAlternationEnabled]="false"
+                                              [showBorders]="false"
+                                              [wordWrapEnabled]="true"
+                                              (onFocusedCellChanged)="onFocusedCellChanged($event)"
+                                              (onSaved)="onSaved($event)"
+                                              (onRowRemoved)="onRowRemoved($event)"
+                                              (onEditorPreparing)="onEditorPreparingChild($event)"
+                                              (onInitNewRow)="onInitNewRowListedItems($event)"
+                                              (onCellPrepared)="OnCellPrepared($event)"
+                                              *ngIf="data.internalOrderItems.length > 0">
+                                  <dxi-column dataField="id" [visible]="false" dataType="int"></dxi-column>
+
+                                  <dxi-column id="itemDescr"
+                                              dataField="stockId"
+                                              caption="Internal Desc"
+                                              [setCellValue]="setCellValueItemPrice">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                    <dxo-lookup #stockId
+                                                [dataSource]="StockForeignDataSource"
+                                                displayExpr="internalProductName"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="stockId"
+                                              caption="Item Code"
+                                              [visible]="false"
+                                              [editorOptions]="{ disabled: true }">
+                                    <dxo-lookup #stockId
+                                                [dataSource]="StockForeignDataSource"
+                                                displayExpr="code"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="stockId"
+                                              caption="Supplier Desc"
+                                              [setCellValue]="setCellValueItemPrice">
+                                    <dxo-lookup #stockId
+                                                [dataSource]="StockForeignDataSource"
+                                                displayExpr="productName"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="glcodeId"
+                                              caption="GL Code">
+                                    <dxo-lookup [dataSource]="GLCodeForeignDataSource"
+                                                displayExpr="glfullname"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="departmentId"
+                                              caption="Department">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                    <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                                                displayExpr="name"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="uomid"
+                                              caption="UoM"
+                                              [editorOptions]="{ disabled: true }"
+                                              [width]="70">
+                                    <dxo-lookup [dataSource]="
+                                      UnitofMeasureForeignDataSource
+                                    "
+                                                displayExpr="name"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="quantity"
+                                              caption="Qty"
+                                              dataType="number"
+                                              [setCellValue]="setCellValueQuantity">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                  </dxi-column>
+                                  <dxi-column dataField="packSize"
+                                              caption="Pack Size"
+                                              [editorOptions]="{ disabled: true }"
+                                              dataType="number"></dxi-column>
+                                  <dxi-column dataField="totalUnits"
+                                              caption="Total (UoM)"
+                                              [editorOptions]="{ disabled: true }"
+                                              dataType="number"></dxi-column>
+                                  <dxi-column dataField="originalValue"
+                                              caption="List Price"
+                                              [format]="{
+                                    type: 'currency',
+                                    currency: currency,
+                                    precision: 2
+                                  }"
+                                              [editorOptions]="{
+                                    readOnly: true,
+                                    format: {
+                                      type: 'currency',
+                                      currency: currency,
+                                      precision: 2
+                                    }
+                                  }"
+                                              dataType="number"
+                                              [width]="100"></dxi-column>
+                                  <dxi-column dataField="value"
+                                              caption="New Price"
+                                              [format]="{
+                                    type: 'currency',
+                                    currency: currency,
+                                    precision: 2
+                                  }"
+                                              [editorOptions]="{
+                                    format: {
+                                      type: 'currency',
+                                      currency: currency,
+                                      precision: 2
+                                    }
+                                  }"
+                                              dataType="number"
+                                              [setCellValue]="setCellValuePrice"
+                                              [width]="100">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                  </dxi-column>
+                                  <dxi-column dataField="vatAppl"
+                                              caption="VAT Appl"
+                                              dataType="boolean"
+                                              [width]="50">
+                                    <dx-check-box [value]="false"></dx-check-box>
+                                  </dxi-column>
+                                  <dxi-column dataField="grnAppl"
+                                              caption="GRN Appl"
+                                              [editorOptions]="{ disabled: true }"
+                                              dataType="boolean"
+                                              [width]="50">
+                                    <dx-check-box [value]="false"></dx-check-box>
+                                  </dxi-column>
+                                  <dxi-column dataField="total"
+                                              caption="Total (Vat Excl.)"
+                                              dataType="number"
+                                              [format]="{
+                                    type: 'currency',
+                                    currency: currency,
+                                    precision: 2
+                                  }"
+                                              [editorOptions]="{
+                                    disabled: true,
+                                    format: {
+                                      type: 'currency',
+                                      currency: currency,
+                                      precision: 2
+                                    }
+                                  }"></dxi-column>
+                                </dx-data-grid>
+                                <!--Once-Off Items-->
+                                <h5 class="io-view-heading-preview"
+                                    style="margin-top: 20px"
+                                    *ngIf="data.onceOffItems.length > 0">
+                                  Once-Off Items
+                                </h5>
+                                <dx-data-grid #ordersonceitems
+                                              id="ordersonceitems"
+                                              [dataSource]="data.onceOffItems"
+                                              [columnAutoWidth]="true"
+                                              [hoverStateEnabled]="false"
+                                              [rowAlternationEnabled]="false"
+                                              [showBorders]="false"
+                                              [wordWrapEnabled]="true"
+                                              (onInitNewRow)="
+                                  onInitNewRowNotListedItems($event)
+                                "
+                                              (onSaved)="onSaved($event)"
+                                              (onEditorPreparing)="
+                                  onEditorPreparingTemp($event)
+                                "
+                                              (onRowRemoved)="onRowRemoved($event)"
+                                              (onCellPrepared)="OnCellPrepared($event)"
+                                              *ngIf="data.onceOffItems.length > 0">
+                                  <dxi-column dataField="id"
+                                              [visible]="false"
+                                              dataType="int"></dxi-column>
+                                  <dxi-column dataField="code"
+                                              caption="Item Code"></dxi-column>
+                                  <dxi-column dataField="description"
+                                              caption="Supplier Desc"></dxi-column>
+                                  <dxi-column dataField="glcodeId"
+                                              caption="GL Code">
+                                    <dxo-lookup [dataSource]="GLCodeForeignDataSource"
+                                                displayExpr="glfullname"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="departmentId"
+                                              caption="Department">
+                                    <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                                                displayExpr="name"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="uomid"
+                                              caption="UoM"
+                                              [width]="70">
+                                    <dxo-lookup [dataSource]="
+                                      UnitofMeasureForeignDataSource
+                                    "
+                                                displayExpr="name"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="quantity"
+                                              caption="Qty"
+                                              dataType="number"
+                                              [setCellValue]="setCellValueQuantity">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                  </dxi-column>
+                                  <dxi-column dataField="packSize"
+                                              caption="Pack Size"
+                                              dataType="number"
+                                              [setCellValue]="setCellPackSize"></dxi-column>
+                                  <dxi-column dataField="totalUnits"
+                                              caption="Total (UoM)"
+                                              [editorOptions]="{ disabled: true }"
+                                              dataType="number"></dxi-column>
+                                  <dxi-column dataField="value"
+                                              caption="Price"
+                                              [format]="{
+                                    type: 'currency',
+                                    currency: currency,
+                                    precision: 2
+                                  }"
+                                              [editorOptions]="{
+                                    format: {
+                                      type: 'currency',
+                                      currency: currency,
+                                      precision: 2
+                                    }
+                                  }"
+                                              dataType="number"
+                                              [setCellValue]="setCellValuePrice"
+                                              [width]="100">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                  </dxi-column>
+                                  <dxi-column dataField="vatAppl"
+                                              caption="VAT Appl"
+                                              dataType="boolean"
+                                              [width]="50">
+                                    <dx-check-box [value]="false"></dx-check-box>
+                                  </dxi-column>
+                                  <dxi-column dataField="grnAppl"
+                                              caption="GRN Appl"
+                                              dataType="boolean"
+                                              [width]="50">
+                                    <dx-check-box [value]="false"></dx-check-box>
+                                  </dxi-column>
+                                  <dxi-column dataField="total"
+                                              caption="Total (Vat Excl.)"
+                                              dataType="number"
+                                              [format]="{
+                                    type: 'currency',
+                                    currency: currency,
+                                    precision: 2
+                                  }"
+                                              [editorOptions]="{
+                                    disabled: true,
+                                    format: {
+                                      type: 'currency',
+                                      currency: currency,
+                                      precision: 2
+                                    }
+                                  }"></dxi-column>
+                                </dx-data-grid>
+                                <!--Services-->
+                                <h5 class="io-view-heading-preview"
+                                    style="margin-top: 20px"
+                                    *ngIf="data.services.length > 0">
+                                  Services
+                                </h5>
+                                <dx-data-grid #ordersservices
+                                              id="ordersservices"
+                                              [dataSource]="data.services"
+                                              [columnAutoWidth]="true"
+                                              [hoverStateEnabled]="false"
+                                              [rowAlternationEnabled]="false"
+                                              [showBorders]="false"
+                                              [wordWrapEnabled]="true"
+                                              (onInitNewRow)="
+                                  onInitNewRowServiceItems($event)
+                                "
+                                              (onSaved)="onSaved($event)"
+                                              (onEditorPreparing)="
+                                  onEditorPreparingService($event)
+                                "
+                                              (onRowRemoved)="onRowRemoved($event)"
+                                              (onCellPrepared)="OnCellPrepared($event)"
+                                              *ngIf="data.services.length > 0">
+                                  <dxi-column dataField="id"
+                                              [visible]="false"
+                                              dataType="int"></dxi-column>
+                                  <dxi-column dataField="code"
+                                              caption="Code"></dxi-column>
+                                  <dxi-column dataField="description"
+                                              caption="Supplier Desc"></dxi-column>
+                                  <dxi-column dataField="glcodeId"
+                                              caption="GL Code">
+                                    <dxo-lookup [dataSource]="GLCodeForeignDataSource"
+                                                displayExpr="glfullname"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="departmentId"
+                                              caption="Department">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                    <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                                                displayExpr="name"
+                                                valueExpr="id">
+                                    </dxo-lookup>
+                                  </dxi-column>
+                                  <dxi-column dataField="quantity"
+                                              caption="Qty"
+                                              dataType="number">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                  </dxi-column>
+                                  <dxi-column dataField="value"
+                                              caption="Price"
+                                              [format]="{
+                                    type: 'currency',
+                                    currency: currency,
+                                    precision: 2
+                                  }"
+                                              [editorOptions]="{
+                                    format: {
+                                      type: 'currency',
+                                      currency: currency,
+                                      precision: 2
+                                    }
+                                  }"
+                                              dataType="number"
+                                              [setCellValue]="setServiceCellValuePrice"
+                                              [width]="100">
+                                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                                  </dxi-column>
+                                  <dxi-column dataField="vatAppl"
+                                              caption="VAT Appl"
+                                              dataType="boolean"
+                                              [width]="50">
+                                    <dx-check-box [value]="false"></dx-check-box>
+                                  </dxi-column>
+                                  <dxi-column dataField="grnAppl"
+                                              [editorOptions]="{ disabled: true }"
+                                              caption="GRN Appl"
+                                              dataType="boolean"
+                                              [width]="50">
+                                    <dx-check-box [value]="false"></dx-check-box>
+                                  </dxi-column>
+                                  <dxi-column dataField="value"
+                                              caption="Total (Vat Excl.)"
+                                              dataType="number"
+                                              [format]="{
+                                    type: 'currency',
+                                    currency: currency,
+                                    precision: 2
+                                  }"
+                                              [editorOptions]="{
+                                    disabled: true,
+                                    format: {
+                                      type: 'currency',
+                                      currency: currency,
+                                      precision: 2
+                                    }
+                                  }"></dxi-column>
+                                </dx-data-grid>
+                              </div>
+                            </dx-scroll-view>
+                          </dxi-item>
+                        </dx-form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </dx-tab-panel>
+          </div>
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupClearItems">
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesRemoveItemsOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noRemoveItemsOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center" my="center" of="window"> </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to change the supplier? All the current line
+              items will be removed.
+            </p>
+          </dx-popup>
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupClearLineItems">
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesRemoverLineItemsOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noRemoverLineItemsOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center" my="center" of="window"> </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to uncheck?
+              The current line items will be removed.
+            </p>
+          </dx-popup>
+          <dx-popup title="Plant Location"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHidden($event)"
+                    [(visible)]="popupVisibleP">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-plant-location></app-plant-location>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Add Project"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHidden($event)"
+                    [(visible)]="popupVisibleProj">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-project></app-project>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Add Company"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHidden($event)"
+                    [(visible)]="popupVisibleComp">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-company></app-company>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Department"
+                    [width]="750"
+                    [height]="650"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHidden($event)"
+                    [(visible)]="popupVisibleD">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-department></app-department>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Supplier"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHidden($event)"
+                    [(visible)]="popupVisibleS">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-supplier></app-supplier>
+            </dx-scroll-view>
+          </dx-popup>
+        </div>
+      </div>
+      <div class="table-align" [ngClass]="{'border-deny-left': statusDisplayLabel === 'Close','border-approve-left': statusDisplayLabel === 'Approved','border-draft-left': statusDisplayLabel === 'Draft','border-add-left': statusDisplayLabel === 'New','border-review-left': statusDisplayLabel === 'Review','border-pending-left': statusDisplayLabel === 'Pending','border-pending-price-left': statusDisplayLabel === 'Pending Price Approval'}">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Total</h5>
+            <dx-form id="form"
+                     *ngIf="data != null; else DataLoading"
+                     [(formData)]="data"
+                     validationGroup="internalOrderData">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="3">
+                <dxi-item itemType="empty"></dxi-item>
+                <dxi-item dataField="total"
+                          [editorOptions]="{
+                    readOnly: true,
+                    format: {
+                      type: 'currency',
+                      currency: currency,
+                      precision: 2
+                    },
+                    dataType: 'number'
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Total (Excl. VAT)'"></dxo-label>
+                </dxi-item>
+                <dxi-item itemType="empty"></dxi-item>
+                <dxi-item dataField="vat"
+                          [editorOptions]="{
+                    readOnly: true,
+                    format: {
+                      type: 'currency',
+                      currency: currency,
+                      precision: 2
+                    },
+                    dataType: 'number'
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'VAT'"></dxo-label>
+                </dxi-item>
+                <dxi-item itemType="empty"></dxi-item>
+                <dxi-item dataField="totalinclvat"
+                          [editorOptions]="{
+                    readOnly: true,
+                    format: {
+                      type: 'currency',
+                      currency: currency,
+                      precision: 2
+                    },
+                    dataType: 'number'
+                  }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Total (Incl. VAT)'"></dxo-label>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="6" [colSpan]="2">
+                <dxi-item itemType="group" [colCount]="1">
+                  <dxi-item itemType="button"
+                            horizontalAlignment="left"
+                            [buttonOptions]="AddUpdateOrderCancelBtn">
+                  </dxi-item>
+                  <dxi-item itemType="button"
+                            *ngIf="data.statusId == 6"
+                            horizontalAlignment="left"
+                            [buttonOptions]="AddUpdateDeleteDraftOrderBtn">
+                  </dxi-item>
+                </dxi-item>
+                  <dxi-item itemType="empty"></dxi-item>
+                  <dxi-item itemType="empty"></dxi-item>
+                  <dxi-item itemType="empty"></dxi-item>
+                  <dxi-item itemType="empty"></dxi-item>
+                  <dxi-item itemType="group" [colCount]="2">
+                    <dxi-item itemType="empty"
+                              *ngIf="!(newState || data.statusId == 6)"></dxi-item>
+                    <dxi-item 
+                              itemType="button"
+                              *ngIf="newState || data.statusId == 6"
+                              horizontalAlignment="right"
+                              [buttonOptions]="AddUpdateDraftOrderBtn">
+                    </dxi-item>
+                    <dxi-item 
+                              itemType="button"
+                              *ngIf="newState || data.statusId == 1 || data.statusId == 2 || data.statusId == 4 || data.statusId == 5 || data.statusId == 6"
+                              horizontalAlignment="right"
+                              [buttonOptions]="AddUpdateOrderBtn">
+                    </dxi-item>
+                  </dxi-item>
+                </dxi-item>
+              </dxi-item>
+
+            </dx-form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <dx-load-panel #loadPanel
+                 shadingColor="rgba(0,0,0,0.4)"
+                 [(visible)]="loadingVisible"
+                 [showIndicator]="true"
+                 [showPane]="true"
+                 [shading]="true"
+                 [closeOnOutsideClick]="false"></dx-load-panel>
+  <ng-template #DataLoading> Loading Data... </ng-template>
+  <!-- end page title -->
+</div>
+<!-- container-fluid -->

@@ -1,0 +1,92 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Capture Order</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Stores → Capture Order</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align" [ngClass]="{'border-complete-left': data.invoice.allItemsReceived === true, 'border-new-left' : data.invoice.allItemsReceived === false }">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Internal Order Details</h5>
+            <dx-form id="form" *ngIf="data != null; else DataLoading" [(formData)]="data.internalOrder">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item dataField="requestByFullName" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'Request By'"></dxo-label></dxi-item>
+                <dxi-item dataField="placedByFullName" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'Placed By'"></dxo-label></dxi-item>
+                <dxi-item dataField="supplierFullName" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'Supplier'"></dxo-label></dxi-item>
+                <dxi-item dataField="dateCreated" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'Date Created'"></dxo-label></dxi-item>
+                <dxi-item dataField="total" [editorOptions]="{format:currencyZAR}"><dxo-label [text]="'Order Total (VAT excl.)'"></dxo-label></dxi-item>
+                <dxi-item dataField="deliveryCost" [editorOptions]="{format:currencyZAR}"><dxo-label [text]="'Delivery Cost'"></dxo-label></dxi-item>
+                <dxi-item dataField="comment" editorType="dxTextArea" [editorOptions]="{ height: 70, stylingMode: 'filled', readOnly: true }">
+                  <dxo-label [text]="'Comment'"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="internalComment" editorType="dxTextArea" [editorOptions]="{ height: 70, stylingMode: 'filled', readOnly: true }">
+                  <dxo-label [text]="'Internal Comment'"></dxo-label>
+                </dxi-item>
+              </dxi-item>
+            </dx-form>
+          </div>
+        </div>
+      </div>
+      <div class="table-align" [ngClass]="{'border-complete-left': data.invoice.allItemsReceived === true, 'border-new-left' : data.invoice.allItemsReceived === false }">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Capture Items</h5>
+            <dx-form id="form" class="invoice-form" *ngIf="data != null; else DataLoading" [(formData)]="data.invoice" validationGroup="invoiceData">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item dataField="invoiceNumber"><dxo-label [text]="'Invoice Number'"></dxo-label><dxi-validation-rule type="required"></dxi-validation-rule></dxi-item>
+                <!--<dxi-item dataField="discrepencyId" editorType="dxSelectBox" [editorOptions]="{ dataSource: DiscrepencyForeignDataSource,displayExpr:'name',valueExpr:'id' }"><dxo-label [text]="'Discrepency'"></dxo-label></dxi-item>-->
+                <dxi-item dataField="total" [editorOptions]="{format:currencyZAR}"><dxo-label [text]="'Invoice Total (VAT excl.)'"></dxo-label><dxi-validation-rule type="compare" comparisonType=">" [comparisonTarget]="checkComparison" message="Invoice Total Required"></dxi-validation-rule></dxi-item>
+                <!--<dxi-item dataField="discrepencyDescription" [spellcheck]="true" editorType="dxTextArea" [editorOptions]="{ height: 70, stylingMode: 'filled'}"><dxo-label [text]="'Discrepency Description'"></dxo-label></dxi-item>-->
+                <dxi-item dataField="expectedTotal" [editorOptions]="{format:currencyZAR,readOnly: true,inputAttr: {'style': 'border: 1px solid #ffff0091;'}}"><dxo-label [text]="'Expected line item total'"></dxo-label></dxi-item>
+              </dxi-item>
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2" caption="Ordered Line Items">
+                <dx-data-grid #invoiceitems id="invoiceitems" [dataSource]="data.invoice.invoiceItems"
+                              [columnAutoWidth]="true"
+                              [hoverStateEnabled]="true"
+                              [rowAlternationEnabled]="true"
+                              [showBorders]="true">
+                  <dxo-scrolling mode="virtual" rowRenderingMode="virtual"></dxo-scrolling>
+                  <dxo-sorting mode="none"></dxo-sorting>
+                  <dxo-paging [enabled]="false"></dxo-paging>
+                  <dxo-search-panel [visible]="true"></dxo-search-panel>
+                  <dxo-editing mode="cell"
+                               [allowUpdating]="true"
+                               [allowDeleting]="false"
+                               [allowAdding]="false">
+                  </dxo-editing>
+                  <dxi-column caption="Manufacturer Code" dataField="manufacturerCode" [allowEditing]="false"></dxi-column>
+                  <dxi-column caption="Manufacturer Product Name" dataField="manufacturerProductName" [allowEditing]="false"></dxi-column>
+                  <dxi-column caption="Required" dataField="requiredQuantity" [allowEditing]="false"></dxi-column>
+                  <dxi-column caption="Remaining" [calculateDisplayValue]="getRemaining" dataField="remaining" [allowEditing]="false"></dxi-column>
+                  <dxi-column caption="Quantity" dataField="quantity" [allowEditing]="true" [setCellValue]="setCellValueQuantity"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                  <dxi-column caption="Item Value" [format]="currencyZAR" dataField="itemValue" [allowEditing]="true"></dxi-column>
+                </dx-data-grid>
+              </dxi-item>
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item itemType="button"
+                          horizontalAlignment="left"
+                          [buttonOptions]="AddUpdateInvoiceCancelBtn">
+                </dxi-item>
+                <dxi-item itemType="button"
+                          horizontalAlignment="right"
+                          [buttonOptions]="AddUpdateInvoiceBtn">
+                </dxi-item>
+              </dxi-item>
+
+            </dx-form>                       
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #DataLoading>
+    Loading Data...
+  </ng-template>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

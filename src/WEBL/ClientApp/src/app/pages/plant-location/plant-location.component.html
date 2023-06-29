@@ -1,0 +1,179 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <h4 class="mb-0 font-size-18">Plant Location & Stores</h4>
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">Settings → System Config → Plant Location & Stores</li>
+            </ol>
+          </div>
+        </div>
+        <div class="table-align">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <dx-data-grid #status id="roles" [dataSource]="dataSource"
+                          [remoteOperations]="true"
+                          showBorders="true"
+                          keyExpr="id"
+                          showRowLines="true"
+                          showColumnLines="true"
+                          [hoverStateEnabled]="true" class="dx-table"
+                          [wordWrapEnabled]="true"
+                          [columnAutoWidth]="true"
+                          [showColumnLines]="true"
+                          [showRowLines]="false"
+                          [showBorders]="false"
+                          [rowAlternationEnabled]="true"
+                          (onExporting)="onExporting($event)"
+                          (onExported)="onExported($event)"
+                          (onEditingStart)="EditStart($event)"
+                          (onInitNewRow)="newRow($event)"
+                          (onSaving)="onSaving($event)"
+                          (onSaved)="onSaved($event)"
+                          (onSelectionChanged)="selectionChanged($event)"
+                          (onRowExpanding)="rowChanged($event)">
+              <dxo-search-panel [visible]="true"></dxo-search-panel>
+              <dxo-selection mode="single"></dxo-selection>
+              <dxo-paging [pageSize]="15"></dxo-paging>
+              <dxo-pager [showPageSizeSelector]="true"
+                         [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                         [showInfo]="true"
+                         [showNavigationButtons]="true">
+              </dxo-pager>
+              <dxo-filter-row [visible]="true"></dxo-filter-row>
+              <dxo-group-panel [visible]="false"></dxo-group-panel>
+              <dxo-editing mode="popup"
+                           [allowAdding]="allowModify"
+                           [allowUpdating]="allowModify"
+                           [allowDeleting]="allowModify"
+                           [useIcons]="true">
+
+                <dxo-popup title="Plant Location"
+                           [showTitle]="true"
+                           [dragEnabled]="true"
+                           [width]="800"
+                           [height]="560">
+                </dxo-popup>
+
+                <dxo-form>
+                  <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+                    <dxi-item dataField="name" [editorOptions]="{hint:'Enter the name for the new plant location'}"></dxi-item>
+                    <dxi-item dataField="description"></dxi-item>
+                    <dxi-item dataField="defaultStoreId" [visible]="notEditMode" [editorOptions]="{searchEnabled:true,showClearButton:'true',hint:'check the box if the current location will be the default plant location'}"></dxi-item>
+                    <dxi-item itemType="group" caption="Address" [colSpan]="2">
+                      <dxi-item dataField="address">
+                        <dxo-label [visible]="false"></dxo-label>
+                      </dxi-item>
+                    </dxi-item>
+                  </dxi-item>
+                </dxo-form>
+              </dxo-editing>
+
+              <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+              <dxo-export [enabled]="true" fileName="Plant-Location-List"></dxo-export>
+
+              <dxi-column dataField="name" caption="Name">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+              </dxi-column>
+              <dxi-column dataField="description" caption="Description" [spellcheck]="true">
+                <dxo-form-item editorType="dxTextArea"
+                               [editorOptions]="{ height: 70, stylingMode: 'filled', hint:'Enter the description for the new plant location' }">
+                </dxo-form-item>
+              </dxi-column>
+              <dxi-column dataField="defaultStoreId" caption="Default Store">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="defaultStoreForeignDataSource"
+                            displayExpr="name"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="address" [visible]="false" editCellTemplate="editCellTemplateAddress"></dxi-column>
+              <div *dxTemplate="let cellInfo of 'editCellTemplateAddress'">
+                <dx-form #formAddress
+                         (onFieldDataChanged)="fieldDataChanged(cellInfo, tempAddress)"
+                         (onContentReady)="fieldDataChanged(cellInfo, tempAddress)"
+                         [colCount]="2"
+                         [(formData)]="tempAddress">
+                  <dxi-item dataField="streetAddress1" [editorOptions]="{hint:'Enter the street address 1 for the new plant location'}">
+                    <dxo-label text="Street Address 1"></dxo-label>
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="streetAddress2" [editorOptions]="{hint:'Enter the street address 2 for the new plant location'}">
+                    <dxo-label text="Street Address 2"></dxo-label>
+                  </dxi-item>
+                  <dxi-item dataField="suburb" [editorOptions]="{hint:'Enter the subrub for the new plant location'}">
+                    <dxo-label text="Suburb"></dxo-label>
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="city" [editorOptions]="{hint:'Enter the city for the new plant location'}">
+                    <dxo-label text="City"></dxo-label>
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="postCode" [editorOptions]="{hint:'Enter the postal code for the new plant location'}">
+                    <dxo-label text="Postal Code"></dxo-label>
+                    <dxi-validation-rule type="pattern" [pattern]="postalPattern" message="The Postal Code must be numbers."></dxi-validation-rule>
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="countryId" editorType="dxSelectBox" [editorOptions]="{ dataSource: CountryForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:'true',hint:'Select the country for the new plant location' }">
+                    <dxo-label [text]="'Country'"></dxo-label>
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-item>
+                </dx-form>
+              </div>
+
+              <dxo-master-detail [enabled]="true" template="stores"></dxo-master-detail>
+              <div *dxTemplate="let item of 'stores'">
+                <div class="master-detail-caption icon-inline">
+                  <h4 class="mb-0 font-size-18">Store Configuration</h4>
+                  <div id="info" (mouseenter)="toggleDefault()" (mouseleave)="toggleDefault()"><i class="bx bx-info-circle"></i></div>
+                </div>
+
+                <dx-tooltip target="#info"
+                            [(visible)]="defaultVisible"
+                            [closeOnOutsideClick]="false">
+                  <div *dxTemplate="let data = data of 'content'">
+                    Below is the list of stores added to the location.
+                  </div>
+                </dx-tooltip>
+
+                <app-stores [key]="item.key"></app-stores>
+
+              </div>
+            </dx-data-grid>
+            <dx-popup [width]="400"
+                      [height]="150"
+                      [showTitle]="false"
+                      [dragEnabled]="false"
+                      [closeOnOutsideClick]="false"
+                      [showCloseButton]="false"
+                      [(visible)]="popupDownloadConfirmVisible">
+
+              <dxi-toolbar-item widget="dxButton"
+                                itemType="group"
+                                toolbar="bottom"
+                                location="center"
+                                [options]="yesDownloadButtonOptions">
+              </dxi-toolbar-item>
+
+              <dxi-toolbar-item widget="dxButton"
+                                itemType="group"
+                                toolbar="bottom"
+                                location="center"
+                                [options]="noDownloadButtonOptions">
+              </dxi-toolbar-item>
+
+              <dxo-position at="center"
+                            my="center"
+                            of="window">
+              </dxo-position>
+              <p style="text-align: center">
+                Are you sure you want to download this file?
+              </p>
+            </dx-popup>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

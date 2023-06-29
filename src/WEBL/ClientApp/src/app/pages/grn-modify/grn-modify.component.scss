@@ -1,0 +1,48 @@
+.io-view-heading {
+  border: 1px solid #2a3042;
+  padding: 4px;
+  border-radius: 4px;
+  text-align: center;
+  background-color: #2a304226;
+  color: #2a3042;
+}
+
+.invoice-form {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  margin-bottom: 20px;
+}
+
+.sub-heading{
+    text-align:center !important;
+}
+
+.table-align {
+  margin-bottom: 25px !important;
+}
+
+.button-align-left{
+    float:left !important;
+}
+
+.border-complete-left {
+  border-left: 10px solid #34c38f !important;
+}
+
+.border-incomplete-left {
+  border-left: 10px solid #f1b44c !important;
+}
+
+.border-new-left {
+  border-left: 10px solid #337ab7 !important;
+}
+
+.highlight {
+  background-color: yellow !important;
+  padding: 3px !important;
+  border-radius: 4px !important;
+}
+::ng-deep .dx-data-row .cell-highlighted {
+  border: 1.5px solid rgba(92,184,92,.5) !important;
+}

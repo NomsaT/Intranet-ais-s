@@ -1,0 +1,38 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12 col-md-12 col-sm-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <h4 class="mb-0 font-size-18">Capture Overview</h4>
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">Stores → Capture Overview</li>
+            </ol>
+          </div>
+        </div>
+        <!--ADD START-->
+        <div class="table-align">
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-12 table-col">
+              <h5 class="io-view-heading">Capture Order</h5>
+              <p class="sub-heading">To capture items, specify the particulars, click Capture Order and complete the form that is displayed.</p>
+              <dx-form class="invoice-form" [showValidationSummary]="false" [(formData)]="data">
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                  <dxi-item dataField="internalOrderid" editorType="dxSelectBox" [editorOptions]="{ dataSource: InternalOrdersForeignDataSource,displayExpr:getInternalOrder,valueExpr:'id',searchEnabled: true }">
+                    <dxo-label [text]="'Internal Order'"></dxo-label>
+                    <dxi-validation-rule type="required" message="Internal Order Number is required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item itemType="button"
+                            alignment="left"
+                            [buttonOptions]="CaptureOrder">
+                  </dxi-item>
+                </dxi-item>
+              </dx-form>
+            </div>
+          </div>
+        </div>
+        <!--ADD END-->
+      </div>
+    </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

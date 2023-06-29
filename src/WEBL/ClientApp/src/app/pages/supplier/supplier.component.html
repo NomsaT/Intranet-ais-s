@@ -1,0 +1,339 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Suppliers</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Masterlists → Suppliers</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-12 table-col">
+          <dx-data-grid #status id="supplier" [dataSource]="dataSource"
+                        [remoteOperations]="true"
+                        showBorders="true"
+                        keyExpr="id"
+                        showRowLines="true"
+                        showColumnLines="true"
+                        [hoverStateEnabled]="true" class="dx-table"
+                        [wordWrapEnabled]="true"
+                        [columnAutoWidth]="true"
+                        [showColumnLines]="true"
+                        [showRowLines]="false"
+                        [showBorders]="false"
+                        (onExporting)="onExporting($event)"
+                        (onExported)="onExported($event)"
+                        (onEditingStart)="EditStart($event)"
+                        (onInitNewRow)="newRow($event)"
+                        [rowAlternationEnabled]="true"
+                        (onSaving)="onSaving($event)">
+            <dxo-search-panel [visible]="true"></dxo-search-panel>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager [showPageSizeSelector]="true"
+                       [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                       [showInfo]="true"
+                       [showNavigationButtons]="true">
+            </dxo-pager>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-group-panel [visible]="true"></dxo-group-panel>
+            <dxo-editing mode="popup"
+                         [allowAdding]="allowModify"
+                         [allowUpdating]="allowModify"
+                         [allowDeleting]="allowModify"
+                         [useIcons]="true">
+              <dxo-popup title="Supplier Information"
+                         [showTitle]="true"
+                         [dragEnabled]="true"
+                         [width]="950"
+                         [height]="'100%'">
+              </dxo-popup>
+
+              <dxo-form id="form"
+                        scrollingEnabled="true">
+                <!-- START -->
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                  <dxi-item dataField="companyName" [editorOptions]="{hint:'Enter supplier name for the new supplier'}"></dxi-item>
+                  <dxi-item dataField="creditLimit" [editorOptions]="{format:currencyZAR,hint:'Enter the credit limit for the new supplier'}"></dxi-item>
+                  <dxi-item dataField="creditTerms" [editorOptions]="{hint:'Enter the credit terms for the new supplier'}"></dxi-item>
+                  <dxi-item dataField="currencyId" [colSpan]="1" editorType="dxSelectBox" [editorOptions]="{ dataSource: CurrencyForeignDataSource,displayExpr:'iso',valueExpr:'id', searchEnabled:true, showClearButton:'true',hint:'Select a currency for the new supplier'}">
+                    <dxo-label text="Currency"></dxo-label>
+                    <dxi-validation-rule type="required" message="Payment method is required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="discount" [editorOptions]="{hint:'Enter the % dicount given by the new supplier'}">
+                    <dxo-label [text]="'Settlement Discount (%)'"></dxo-label>
+                  </dxi-item>
+                  <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                    <dxi-item dataField="paymentMethodId" [colSpan]="1" editorType="dxSelectBox" [editorOptions]="{ dataSource: paymentMethodForeignDatasource,displayExpr:'type',valueExpr:'id', searchEnabled:true, showClearButton:'true',width: '330%',hint:'Select a payment method for the new supplier'}">
+                      <dxo-label text="Payment Method"></dxo-label>
+                      <dxi-validation-rule type="required" message="Payment method is required"></dxi-validation-rule>
+                    </dxi-item>
+                    <dxi-item itemType="button"
+                              alignment="left"
+                              [buttonOptions]="buttonOptionPayment"
+                              [editorOptions]="{ width: '20%' }">
+                    </dxi-item>
+                  </dxi-item>
+                  <dxi-item dataField="comment"></dxi-item>
+                </dxi-item>
+                <dxi-item itemType="group" caption="Banking Details" [colCount]="2" [colSpan]="2">
+                  <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                    <dxi-item dataField="bankNameId" [editorOptions]="{searchEnabled:true,showClearButton:true,width: '290%',hint:'Select a bank for the new supplier'}">
+                    </dxi-item>
+                    <dxi-item itemType="button"
+                              alignment="left"
+                              [buttonOptions]="buttonOptions"
+                              [editorOptions]="{ width: '20%' }">
+                    </dxi-item>
+                  </dxi-item>
+                  <dxi-item dataField="accountNumber" [editorOptions]="{hint:'Enter the account number for the new supplier'}">
+                    <dxi-validation-rule type="pattern" [pattern]="accountPattern" message="The Account Number must be numbers."></dxi-validation-rule>
+                  </dxi-item>
+
+                  <dxi-item dataField="branchCode" [editorOptions]="{hint:'Enter the branch code for the new supplier'}">
+                    <dxi-validation-rule type="pattern" [pattern]="branchPattern" message="The Branch Code must be numbers."></dxi-validation-rule>
+                  </dxi-item>
+
+                </dxi-item>
+                <dxi-item itemType="group" caption="{{contactgroupheading}}" [colSpan]="2">
+                  <dxi-item dataField="contacts"><dxo-label [visible]="false"></dxo-label> </dxi-item>
+                  <dxi-item>
+                    <div *dxTemplate>
+                      <dx-button style="float:right; right: 20px;"
+                                 type="success"
+                                 hint="Add new contact details"
+                                 icon="fa fa-plus"
+                                 (onClick)="AddItem()">
+                      </dx-button>
+                    </div>
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item itemType="group" caption="Physical Address" [colSpan]="2">
+                  <dxi-item dataField="address"><dxo-label [visible]="false"></dxo-label> </dxi-item>
+                </dxi-item>
+              </dxo-form>
+            </dxo-editing>
+
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Supplier-List"></dxo-export>
+            <dxi-column dataField="companyName" caption="Supplier Name">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="creditLimit" [format]="currencyZAR" caption="Credit Limit (ZAR)">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="creditTerms" caption="Credit Terms">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="discount" caption="Settlement Discount (%)">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="comment" caption="Comment" [spellcheck]="true">
+              <dxo-form-item editorType="dxTextArea"
+                             [editorOptions]="{ height: 70, stylingMode: 'filled',hint:'Enter additional info/comments for the new supplier' }">
+              </dxo-form-item>
+            </dxi-column>
+            <dxi-column dataField="paymentMethodId" caption="Payment Method">
+              <dxo-lookup [dataSource]="paymentMethodForeignDatasource"
+                          valueExpr="id"
+                          displayExpr="type">
+              </dxo-lookup>
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="currencyId" caption="Currency">
+              <dxo-lookup [dataSource]="CurrencyForeignDataSource"
+                          valueExpr="id"
+                          displayExpr="iso">
+              </dxo-lookup>
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="bankNameId" caption="Bank Name" [visible]="false">
+              <dxo-lookup [dataSource]="BankNameForeignDataSource"
+                          displayExpr="bankName1"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="accountNumber" caption="Account Number" [visible]="false"></dxi-column>
+            <dxi-column dataField="branchCode" caption="Branch Code" [visible]="false"></dxi-column>
+            <dxi-column dataField="contacts" [visible]="false" editCellTemplate="editCellTemplateContacts"></dxi-column>
+            <div *dxTemplate="let cellInfo of 'editCellTemplateContacts'">
+              <div *ngFor="let contact of tempContacts; let i = index">
+
+                <dx-form #formContact
+                         (onFieldDataChanged)="fieldDataChanged(cellInfo, tempContacts)"
+                         (onContentReady)="fieldDataChanged(cellInfo, tempContacts)"
+                         [colCount]="2"
+                         [(formData)]="tempContacts[i]">
+                  <dxi-item itemType="group" caption="Contact {{i+1}}" [colCount]="2" [colSpan]="2">
+                    <dxi-item dataField="personName" [editorOptions]="{hint:'Enter the person name for the new contact'}">
+                      <dxo-label [text]="'Person Name'"></dxo-label>
+                      <dxi-validation-rule type="required" message="Person name is required"></dxi-validation-rule>
+                    </dxi-item>
+                    <dxi-item dataField="personPosition" [editorOptions]="{hint:'Enter the persons position for the new contact'}">
+                      <dxo-label [text]="'Person Position'"></dxo-label>
+                      <dxi-validation-rule type="required" message="Position is required"></dxi-validation-rule>
+                    </dxi-item>
+                    <dxi-item dataField="contactNumber" [editorOptions]="{hint:'Enter the contact number 1 for the new contact'}">
+                      <dxo-label [text]="'Contact 1'"></dxo-label>
+                      <dxi-validation-rule type="pattern" [pattern]="contactPattern" message="The Contact Number must be a 10 or 11 digit number."></dxi-validation-rule>
+                      <dxi-validation-rule type="required" message="Contact number is required"></dxi-validation-rule>
+                    </dxi-item>
+                    <dxi-item dataField="workLandlineNumber" [editorOptions]="{hint:'Enter contact number 2 for the new contact'}">
+                      <dxo-label [text]="'Contact 2'"></dxo-label>
+                      <dxi-validation-rule type="pattern" [pattern]="worklandlinePattern" message="The Contact Number must be a 10 or 11 digit number."></dxi-validation-rule>
+                    </dxi-item>
+                    <dxi-item dataField="contactEmail" [editorOptions]="{hint:'Enter the email address for the new contact'}">
+                      <dxo-label [text]="'Contact Email'"></dxo-label>
+                      <dxi-validation-rule type="email" message="Email is invalid"></dxi-validation-rule>
+                      <dxi-validation-rule type="required" message="Email address is required"></dxi-validation-rule>
+                    </dxi-item>
+                    <dxi-item editCellTemplate="editCellTemplatebtn">
+                      <div *dxTemplate="let btn of 'editCellTemplatebtn'">
+                        <dx-button style="float:right; right: 20px;"
+                                   type="danger"
+                                   hint="Delete the current contact details"
+                                   icon="fa fa-trash"
+                                   (onClick)="showDeletePopup(i)">
+                        </dx-button>
+                      </div>
+                    </dxi-item>
+                  </dxi-item>
+                </dx-form>
+              </div>
+            </div>
+
+            <dxi-column dataField="address" [visible]="false" editCellTemplate="editCellTemplateAddress"></dxi-column>
+            <div *dxTemplate="let cellInfo of 'editCellTemplateAddress'">
+
+
+              <dx-form #formAddress
+                       (onFieldDataChanged)="fieldDataChanged(cellInfo, tempAddress)"
+                       (onContentReady)="fieldDataChanged(cellInfo, tempAddress)"
+                       [colCount]="2"
+                       [(formData)]="tempAddress">
+                <dxi-item dataField="streetAddress1" [editorOptions]="{hint:'Enter street address 1 for the new supplier'}">
+                  <dxo-label text="Street Address 1"></dxo-label>
+                  <dxi-validation-rule type="required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item dataField="streetAddress2" [editorOptions]="{hint:'Optional: Enter street address 2 for the new supplier'}">
+                  <dxo-label text="Street Address 2"></dxo-label>
+                </dxi-item>
+                <dxi-item dataField="suburb" [editorOptions]="{hint:'Enter a suburb for the new supplier'}">
+                  <dxo-label text="Suburb"></dxo-label>
+                  <dxi-validation-rule type="required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item dataField="city" [editorOptions]="{hint:'Enter a city for the new supplier'}">
+                  <dxo-label text="City"></dxo-label>
+                  <dxi-validation-rule type="required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item dataField="postCode" [editorOptions]="{hint:'Enter a post code for the new supplier'}">
+                  <dxo-label text="Postal Code"></dxo-label>
+                  <dxi-validation-rule type="pattern" [pattern]="postalPattern" message="The Postal Code must be numbers."></dxi-validation-rule>
+                  <dxi-validation-rule type="required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item dataField="countryId" editorType="dxSelectBox" [editorOptions]="{ dataSource: CountryForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true, showClearButton:'true',hint:'Select a country for the new supplier'}">
+                  <dxo-label [text]="'Country'"></dxo-label>
+                  <dxi-validation-rule type="required"></dxi-validation-rule>
+                </dxi-item>
+              </dx-form>
+            </div>
+
+          </dx-data-grid>
+          <dx-popup title="Bank Name"
+                    [width]="750"
+                    [height]="550"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddenBankName($event)"
+                    [(visible)]="popupVisible">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-bank-name></app-bank-name>
+            </dx-scroll-view>
+          </dx-popup>
+
+          <dx-popup title="Payment Method"
+                    [width]="750"
+                    [height]="550"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddenPayment($event)"
+                    [(visible)]="popupVisiblePayment">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-payment-methods></app-payment-methods>
+            </dx-scroll-view>
+          </dx-popup>
+
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupDeleteContactVisible">
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesDeleteButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noDeleteButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center"
+                          my="center"
+                          of="window">
+            </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to delete this contact detail?
+            </p>
+          </dx-popup>
+
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupDownloadConfirmVisible">
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center"
+                          my="center"
+                          of="window">
+            </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

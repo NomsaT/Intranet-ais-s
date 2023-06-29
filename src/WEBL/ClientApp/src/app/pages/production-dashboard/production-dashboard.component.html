@@ -1,0 +1,126 @@
+<div class="container-fluid">
+    <!--HEADING START-->
+    <div class="row">
+      <div class="col-12 col-md-12 col-sm-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between " style="margin-top:-16px">
+          <h4 class="mb-0 font-size-18">Production Dashboard</h4>
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">ACS → Production Dashboard</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--HEADING END-->
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="card" style="height:83px;margin-top:-8px">
+            <div class="card-body">
+              <div class="align-left">
+                <h4 class="card-title mb-2" style="margin-top:-8px !important;">Production Stock Value</h4>
+                <p class="text-muted dash-data" style="margin-bottom:-3px !important;font-size: x-small"
+                  *ngIf="monthlyProductionValueObj">{{monthlyProductionValueObj}}</p>
+                <p *ngIf="!monthlyProductionValueObj" class="text-muted" style="margin-bottom:-3px !important;font-size: small;">
+                  No Stock Value Available.</p>
+                <br />
+              </div>
+              <div class="align-right" style="margin-top:-10px">
+                <i class=" bx bx-money icon"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="card" style="height:83px;margin-top:-8px">
+            <div class="card-body">
+              <div class="align-left">
+                <h4 class="card-title " style="margin-top:-8px !important;">Production Value Increase </h4>
+                <p class="text-muted   dash-data" style="margin-top:-7px !important;color:green !important;"
+                  *ngIf="monthlyProductionValue">{{monthlyProductionValue}}</p>
+                <p *ngIf="monthlyProductionValue" class="text-muted " style="margin-top:-15px !important; ">vs previous month</p>
+              </div>
+              <div class="align-right" style="margin-top:-10px">
+                <i class="bx bx-line-chart icon"></i>
+              </div>
+            </div>
+          </div>
+        </div> -->
+    </div>
+
+    <div class="row">
+    <div class="col-lg-6">
+        <div class="card" style="margin-top:-14px;height:400px">
+          <div class="card-body">
+            <h4 class="card-title mb-4 justify-content-between" style="font-size: 18px">
+              Production Stock 
+            </h4>
+            <div class="justify-content-between" *ngIf="productionStockListExist">
+              <apx-chart style="height: 270px;margin-bottom:24px;margin-right:50px" [series]="chartOptions.series"
+                [chart]="chartOptions.chart" [labels]="chartOptions.labels" [responsive]="chartOptions.responsive"
+                [dataLabels]="chartOptions.dataLabels"></apx-chart>
+            </div>
+            <div *ngIf="!productionStockListExist">No Production
+              Stock
+              Available.
+            </div>
+          </div>
+        </div>
+      </div> 
+
+     <div class="col-lg-6">
+        <div class="card" style="margin-top:-14px;height:400px" id="card">
+          <div class="card-body">
+            <div class="d-flex">
+              <div class="me-2">
+                <h4 class="card-title mb-4" style="font-size: 18px">Production Stock Items</h4>
+              </div>
+              <div class="ms-auto dropdown">
+                <a role="button" class="dropdown-toggle text-muted font-size-16" aria-expanded="false"
+                  (click)="navigateProductionStock()">
+                  <em class="mdi mdi-open-in-new ms-1 font-size"></em>
+                </a>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-middle table-nowrap mb-0" caption="Last 5 Production Stock Items Added"
+                *ngIf="productionStockItems.length != 0">
+                <thead>
+                  <tr>
+                    <th scope="col">Code</th>
+                    <th scope="col">ProductName</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let productionStockItem of productionStockItems">
+                    <td>
+                      <h3 class="font-size-13 text-truncate mb-1"><a class="text-dark">{{productionStockItem.code}}
+                       </a></h3>
+                      <!-- <p class="text-muted mb-0">{{productionStockItem.productName}}</p> -->
+                    </td>
+                    <td>
+                      <em class="align-middle me-1"></em> {{productionStockItem.productName}}
+                    </td>
+                    <td>
+                      <p class="text-muted mb-0">{{productionStockItem.quantity}}({{ productionStockItem.uomName}})</p>
+                    </td>
+                    <td><em class="bx  align-middle me-1"></em> R{{productionStockItem.price | number: '.2'}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div *ngIf="productionStockItems">
+                <div *ngIf="productionStockItems.length === 0">
+                  <div class="align-left">
+                    <p>No Production Stock Available.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
+    </div>
+</div>
+  

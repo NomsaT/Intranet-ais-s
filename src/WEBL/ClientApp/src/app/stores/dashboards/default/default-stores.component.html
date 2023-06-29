@@ -1,0 +1,835 @@
+<div class="container-fluid">
+  <!--HEADING START-->
+  <div class="row">
+    <div class="col-12 col-md-12 col-sm-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Stores Dashboard</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Stores → Dashboard</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--HEADING END-->
+  <!--DELIVERY HEADING-->
+  <div class="row">
+    <!--Deliveries Due Today HEADING-->
+    <div class="col-lg-4 col-md-4 col-sm-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-4">Deliveries Due Today</h5>
+            </div>
+          </div>
+          <div class="table-responsive" style="height: 175px">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+              <div class="text-reset notification-item">
+                <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+                  <div class="media" *ngFor="let todaysD of todaysDeliveriesObj">
+                    <div class="media-body" (click)="openTodaysDeliveries(todaysD)">
+                      <div class="font-size-12 text-muted" style="cursor:pointer">
+                        <div class="row io-header">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">Order #{{todaysD.id}}</p>
+                          </div>
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1 float-right" style="margin-bottom: 0px !important;float: right;"><span class="badge bg-warning">{{todaysD.deliveryDate | date: 'dd MMMM yy'}}</span></p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Supplier: </strong>{{todaysD.supplierFullName}}</p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Requested By: </strong>{{todaysD.requestByFullName}}</p>
+                          </div>
+                        </div>
+                        <div class="row io-header">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Placed By: </strong>{{todaysD.placedByFullName}}</p>
+                          </div>
+                          <div class="col">
+                            <a role="button" style="float: right;font-size:13px" class="dropdown-toggle text-success" aria-expanded="false" (click)="sendReminder($event,todaysD.id,'today')">
+                              <em class="mdi mdi-reply ms-1"></em> Reminder
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <hr class="hr-split" />
+                    </div>
+                  </div>
+                </dx-scroll-view>
+                <div class="media" *ngIf="todaysDeliveriesObj && todaysDeliveriesObj.length === 0">
+                  <div class="media-body">
+                    <div class="font-size-12 text-muted">
+                      <div>
+                        <p class="text-muted font-size-14 mb-1" style="margin-bottom: 0px !important">There are no items</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <dx-load-panel #loadPanel shadingColor="rgba(0,0,0,0.4)" [(visible)]="loadingVisible" [showIndicator]="true" [showPane]="true" [shading]="true" [closeOnOutsideClick]="false" message="Sending Reminder..."></dx-load-panel>
+
+                <dx-popup width="fit-content"
+                          height="800px"
+                          [showTitle]="true"
+                          [title]="IOTitle"
+                          [dragEnabled]="false"
+                          [closeOnOutsideClick]="false"
+                          [showCloseButton]="true"
+                          container=".dx-viewport"
+                          [(visible)]="popupVisibleToday">
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-scroll-view width="100%" height="100%">
+                      <div style="width: auto; height: auto">
+                        <h5 class="io-view-heading">Internal Order Details</h5>
+                        <div class="IO-Details">
+                          <table class="table table-centered table-nowrap internalOrder">
+                            <tbody>
+                              <tr>
+                                <td><strong>Supplier:</strong> {{selectedTodaysD.supplierFullName}}</td>
+                                <td><strong>Requested By:</strong> {{selectedTodaysD.requestByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Quotation Number:</strong> {{selectedTodaysD.quotationNumber}}</td>
+                                <td><strong>Placed By:</strong> {{selectedTodaysD.placedByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Plant Location:</strong> {{selectedTodaysD.plantLocationName}}</td>
+                                <td><strong>Approved By:</strong> {{selectedTodaysD.approveByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Follow Up Date:</strong> {{selectedTodaysD.followUpDate | date: 'dd MMMM yy'}}</td>
+                                <td><strong>Delivery Date:</strong> {{selectedTodaysD.deliveryDate | date: 'dd MMMM yy'}}</td>
+                              </tr>
+                              <tr>
+                                <td style="white-space: pre-wrap;"><strong>Supplier Comment:</strong> {{selectedTodaysD.supplierComment}}</td>
+                                <td style="white-space: pre-wrap;"><strong>Internal Comment:</strong> {{selectedTodaysD.comment}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--Listed Items-->
+                        <h5 class="io-view-heading" *ngIf="selectedTodaysD.internalOrderItems.length > 0">Listed Items</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedTodaysD.internalOrderItems.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Stock</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">UoM</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Pack Size</th>
+                              <th scope="col">Total (UoM)</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedTodaysD.internalOrderItems">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.stockName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.uomName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity * item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!--Once-Off Items-->
+                        <h5 class="io-view-heading" *ngIf="selectedTodaysD.onceOffItems.length > 0">Once-Off Items</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedTodaysD.onceOffItems.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Item Code</th>
+                              <th scope="col">Item Desc</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">UoM</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Pack Size</th>
+                              <th scope="col">Total (UoM)</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedTodaysD.onceOffItems">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.code}}</p>
+                              </td>
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.description}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.uomName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity * item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!--Services-->
+                        <h5 class="io-view-heading" *ngIf="selectedTodaysD.services.length > 0">Services</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedTodaysD.services.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Code</th>
+                              <th scope="col">Service Desc</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedTodaysD.services">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.code}}</p>
+                              </td>
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.description}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </dx-scroll-view>
+                  </div>
+                </dx-popup>
+              </div>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-------------------------------->
+    <!--Upcoming Deliveries HEADING-->
+    <div class="col-lg-4 col-md-4 col-sm-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-4">Upcoming Deliveries</h5>
+            </div>
+          </div>
+          <div class="table-responsive" style="height: 175px">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+              <div class="text-reset notification-item">
+                <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+                  <div class="media" *ngFor="let upcommingD of upcomingDeliveriesObj">
+                    <div class="media-body" (click)="openUpcomingDeliveries(upcommingD)">
+                      <div class="font-size-12 text-muted" style="cursor:pointer">
+                        <div class="row io-header">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">Order #{{upcommingD.id}}</p>
+                          </div>
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1 float-right" style="margin-bottom: 0px !important;float: right;"><span class="badge bg-warning">{{upcommingD.deliveryDate | date: 'dd MMMM yy'}}</span></p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Supplier: </strong>{{upcommingD.supplierFullName}}</p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Requested By: </strong>{{upcommingD.requestByFullName}}</p>
+                          </div>
+                        </div>
+                        <div class="row io-header">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Placed By: </strong>{{upcommingD.placedByFullName}}</p>
+                          </div>
+                          <div class="col">
+                            <a role="button" style="float: right;font-size:13px" class="dropdown-toggle text-success" aria-expanded="false" (click)="sendReminder($event,upcommingD.id,'upcomming')">
+                              <em class="mdi mdi-reply ms-1"></em> Reminder
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <hr class="hr-split"/>
+                    </div>                    
+                  </div>                  
+                </dx-scroll-view>
+                <div class="media" *ngIf="upcomingDeliveriesObj && upcomingDeliveriesObj.length === 0">
+                  <div class="media-body">
+                    <div class="font-size-12 text-muted">
+                      <div>
+                        <p class="text-muted font-size-14 mb-1" style="margin-bottom: 0px !important">There are no items</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <dx-popup width="fit-content"
+                          height="800px"
+                          [showTitle]="true"
+                          [title]="IOTitle"
+                          [dragEnabled]="false"
+                          [closeOnOutsideClick]="false"
+                          [showCloseButton]="true"
+                          container=".dx-viewport"
+                          [(visible)]="popupVisibleUpcomming">
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-scroll-view width="100%" height="100%">
+                      <div style="width: auto; height: auto">
+                        <h5 class="io-view-heading">Internal Order Details</h5>
+                        <div class="IO-Details">
+                          <table class="table table-centered table-nowrap internalOrder">
+                            <tbody>
+                              <tr>
+                                <td><strong>Supplier:</strong> {{selectedUpcomingD.supplierFullName}}</td>
+                                <td><strong>Requested By:</strong> {{selectedUpcomingD.requestByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Quotation Number:</strong> {{selectedUpcomingD.quotationNumber}}</td>
+                                <td><strong>Placed By:</strong> {{selectedUpcomingD.placedByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Plant Location:</strong> {{selectedUpcomingD.plantLocationName}}</td>
+                                <td><strong>Approved By:</strong> {{selectedUpcomingD.approveByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Follow Up Date:</strong> {{selectedUpcomingD.followUpDate | date: 'dd MMMM yy'}}</td>
+                                <td><strong>Delivery Date:</strong> {{selectedUpcomingD.deliveryDate | date: 'dd MMMM yy'}}</td>
+                              </tr>
+                              <tr>
+                                <td style="white-space: pre-wrap;"><strong>Supplier Comment:</strong> {{selectedUpcomingD.supplierComment}}</td>
+                                <td style="white-space: pre-wrap;"><strong>Internal Comment:</strong> {{selectedUpcomingD.comment}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--Listed Items-->
+                        <h5 class="io-view-heading" *ngIf="selectedUpcomingD.internalOrderItems.length > 0">Listed Items</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedUpcomingD.internalOrderItems.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Stock</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">UoM</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Pack Size</th>
+                              <th scope="col">Total (UoM)</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedUpcomingD.internalOrderItems">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.stockName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.uomName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity * item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!--Once-Off Items-->
+                        <h5 class="io-view-heading" *ngIf="selectedUpcomingD.onceOffItems.length > 0">Once-Off Items</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedUpcomingD.onceOffItems.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Item Code</th>
+                              <th scope="col">Item Desc</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">UoM</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Pack Size</th>
+                              <th scope="col">Total (UoM)</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedUpcomingD.onceOffItems">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.code}}</p>
+                              </td>
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.description}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.uomName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity * item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!--Services-->
+                        <h5 class="io-view-heading" *ngIf="selectedUpcomingD.services.length > 0">Services</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedUpcomingD.services.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Code</th>
+                              <th scope="col">Service Desc</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedUpcomingD.services">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.code}}</p>
+                              </td>
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.description}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </dx-scroll-view>
+                  </div>
+                </dx-popup>
+              </div>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-------------------------------->
+    <!--Late Deliveries HEADING-->
+    <div class="col-lg-4 col-md-4 col-sm-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-4">Late Deliveries</h5>
+            </div>
+          </div>
+          <div class="table-responsive" style="height: 175px">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+              <div class="text-reset notification-item">
+                <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+                  <div class="media" *ngFor="let lateD of lateDeliveriesObj">
+                    <div class="media-body" (click)="openLateDeliveries(lateD)">
+                      <div class="font-size-12 text-muted" style="cursor:pointer">
+                        <div class="row io-header">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">Order #{{lateD.id}}</p>
+                          </div>
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1 float-right" style="margin-bottom: 0px !important;float: right;"><span class="badge bg-warning">{{lateD.deliveryDate | date: 'dd MMMM yy'}}</span></p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Supplier: </strong>{{lateD.supplierFullName}}</p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Requested By: </strong>{{lateD.requestByFullName}}</p>
+                          </div>
+                        </div>
+                        <div class="row io-header">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Placed By: </strong>{{lateD.placedByFullName}}</p>
+                          </div>
+                          <div class="col">
+                            <a role="button" style="float: right;font-size:13px" class="dropdown-toggle text-success" aria-expanded="false" (click)="sendReminder($event,lateD.id,'late')">
+                              <em class="mdi mdi-reply ms-1"></em> Reminder
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <hr class="hr-split" />
+                    </div>
+                  </div>
+                </dx-scroll-view>
+                <div class="media" *ngIf="lateDeliveriesObj && lateDeliveriesObj.length === 0">
+                  <div class="media-body">
+                    <div class="font-size-12 text-muted">
+                      <div>
+                        <p class="text-muted font-size-14 mb-1" style="margin-bottom: 0px !important">There are no items</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <dx-popup width="fit-content"
+                          height="800px"
+                          [showTitle]="true"
+                          [title]="IOTitle"
+                          [dragEnabled]="false"
+                          [closeOnOutsideClick]="false"
+                          [showCloseButton]="true"
+                          container=".dx-viewport"
+                          [(visible)]="popupVisibleLate">
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-scroll-view width="100%" height="100%">
+                      <div style="width: auto; height: auto">
+                        <h5 class="io-view-heading">Internal Order Details</h5>
+                        <div class="IO-Details">
+                          <table class="table table-centered table-nowrap internalOrder">
+                            <tbody>
+                              <tr>
+                                <td><strong>Supplier:</strong> {{selectedLateD.supplierFullName}}</td>
+                                <td><strong>Requested By:</strong> {{selectedLateD.requestByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Quotation Number:</strong> {{selectedLateD.quotationNumber}}</td>
+                                <td><strong>Placed By:</strong> {{selectedLateD.placedByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Plant Location:</strong> {{selectedLateD.plantLocationName}}</td>
+                                <td><strong>Approved By:</strong> {{selectedLateD.approveByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Follow Up Date:</strong> {{selectedLateD.followUpDate | date: 'dd MMMM yy'}}</td>
+                                <td><strong>Delivery Date:</strong> {{selectedLateD.deliveryDate | date: 'dd MMMM yy'}}</td>
+                              </tr>
+                              <tr>
+                                <td style="white-space: pre-wrap;"><strong>Supplier Comment:</strong> {{selectedLateD.supplierComment}}</td>
+                                <td style="white-space: pre-wrap;"><strong>Internal Comment:</strong> {{selectedLateD.comment}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--Listed Items-->
+                        <h5 class="io-view-heading" *ngIf="selectedLateD.internalOrderItems.length > 0">Listed Items</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedLateD.internalOrderItems.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Stock</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">UoM</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Pack Size</th>
+                              <th scope="col">Total (UoM)</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedLateD.internalOrderItems">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.stockName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.uomName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity * item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!--Once-Off Items-->
+                        <h5 class="io-view-heading" *ngIf="selectedLateD.onceOffItems.length > 0">Once-Off Items</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedLateD.onceOffItems.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Item Code</th>
+                              <th scope="col">Item Desc</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">UoM</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Pack Size</th>
+                              <th scope="col">Total (UoM)</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedLateD.onceOffItems">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.code}}</p>
+                              </td>
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.description}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.uomName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity * item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!--Services-->
+                        <h5 class="io-view-heading" *ngIf="selectedLateD.services.length > 0">Services</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details" *ngIf="selectedLateD.services.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Code</th>
+                              <th scope="col">Service Desc</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedLateD.services">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.code}}</p>
+                              </td>
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.description}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </dx-scroll-view>
+                  </div>
+                </dx-popup>
+              </div>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-------------------------------->
+  </div>
+  <!--DELIVERY END-->
+  <!--REQUIRE BARCODE HEADING-->
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-5">Stock Items Require Barcodes to be printed.</h5>
+            </div>
+            <div class="ms-auto dropdown">
+              <a role="button" class="dropdown-toggle text-muted font-size-16" aria-expanded="false" (click)="navigatePrintBarcode()">
+                <em class="mdi mdi-open-in-new ms-1 font-size"></em>
+              </a>
+            </div>
+          </div>
+          <dx-data-grid #status id="roles" [dataSource]="dataSource"
+                        [remoteOperations]="true"
+                        showBorders="true"
+                        keyExpr="id"
+                        showRowLines="true"
+                        showColumnLines="true"
+                        [hoverStateEnabled]="true" class="dx-table"
+                        [wordWrapEnabled]="true"
+                        [columnAutoWidth]="true"
+                        [showColumnLines]="true"
+                        [showRowLines]="false"
+                        [showBorders]="false"
+                        (onCellClick)="barcodeOnClick($event)"
+                        [rowAlternationEnabled]="true">
+            <dxo-search-panel [visible]="false"></dxo-search-panel>
+            <dxo-filter-row [visible]="false"></dxo-filter-row>
+            <dxo-group-panel [visible]="false"></dxo-group-panel>
+            <dxo-paging [pageSize]="5"></dxo-paging>
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="false" fileName="Barcode-List"></dxo-export>
+            <dxi-column dataField="grnNumber" caption="PO/GRN Nr"></dxi-column>
+            <dxi-column dataField="dateCreated" caption="Date Created" dataType="date"></dxi-column>
+            <dxi-column dataField="stockFullName" caption="Stock Item"></dxi-column>
+            <dxi-column dataField="barcode" caption="Barcode" [calculateCellValue]="calculateCellValue"></dxi-column>
+            <dxi-column type="buttons" cellTemplate="BarcodecellTemplate" [formItem]="{ visible: false }" dataField="barcode" caption="Print Barcode"></dxi-column>
+            <div *dxTemplate="let data of 'BarcodecellTemplate'">
+              <i class="bx bx-barcode" style="font-size: x-large;"></i>
+            </div>
+          </dx-data-grid>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--REQUIRE BARCODE END-->
+</div>

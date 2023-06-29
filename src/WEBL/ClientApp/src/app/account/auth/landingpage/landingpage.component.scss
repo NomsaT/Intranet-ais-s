@@ -1,0 +1,42 @@
+.row{
+    height:969px;
+    overflow-y: hidden !important;
+}
+.store {
+  /*background-color: rgba(85, 110, 230, 0.25) !important;
+  color: #556ee6;*/
+  background-image: linear-gradient(rgb(33, 31, 31,.6),rgb(33, 31, 31,.6)), url(../../../../assets/images/landingPage/Store.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #f8f9fa;
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+  padding-top: 20%;
+}
+.acs {
+  /*background-color: rgba(85, 110, 230, 0.25) !important;
+  color: #556ee6;*/
+  background-image: linear-gradient(rgb(33, 31, 31,.6),rgb(33, 31, 31,.6)), url(../../../../assets/images/landingPage/ACS1.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #f8f9fa;
+  text-align: center;
+  font-size: 50px;
+  font-weight: bold;
+  padding-top: 20%;
+}
+.acs:hover, .store:hover {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  opacity: 0.8;
+  cursor: pointer;
+  transition: .5s ease;
+  background-color: black;
+}
+

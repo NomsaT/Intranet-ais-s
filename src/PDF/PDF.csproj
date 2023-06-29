@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="BarcodePDF\BarcodePDF.vsrepx" />
+    <None Remove="Quotation\Quotation.vsrepx" />
+    <None Remove="XtraReport11.vsrepx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="BarcodePDF\BarcodePDF.vsrepx" />
+    <EmbeddedResource Include="PurchaseOrder\PurchaseOrder.vsrepx" />
+    <EmbeddedResource Include="Quotation\Quotation.vsrepx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Reporting.Core" Version="21.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DAL\DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="BarcodePDF\BarcodePDF.cs">
+      <DependentUpon>BarcodePDF.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="BarcodePDF\BarcodePDF.Designer.cs">
+      <DependentUpon>BarcodePDF.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="PurchaseOrder\PurchaseOrder.cs">
+      <DependentUpon>PurchaseOrder.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="PurchaseOrder\PurchaseOrder.Designer.cs">
+      <DependentUpon>PurchaseOrder.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="Quotation\Quotation.cs">
+      <DependentUpon>Quotation.vsrepx</DependentUpon>
+    </Compile>
+    <Compile Update="Quotation\Quotation.Designer.cs">
+      <DependentUpon>Quotation.vsrepx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

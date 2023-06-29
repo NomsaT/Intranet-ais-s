@@ -1,0 +1,556 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Users</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">User Management → Users → {{breadcrumbs}}</li>
+          </ol>
+        </div>
+      </div>
+      <dx-tab-panel #tabPanel
+                    [dataSource]="tabs"
+                    [selectedIndex]="0"
+                    [loop]="false"
+                    [animationEnabled]="true"
+                    [swipeEnabled]="true"
+                    (onSelectionChanged)="onOptionChanged($event)">
+        <div *dxTemplate="let tab of 'title'">
+          <span>{{tab.text}}</span>
+        </div>
+        <div *dxTemplate="let tab of 'item'">
+          <div class="tabpanel-item">
+            <div *ngIf="tab.text == 'Active'">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col">
+                  <div class="table-align">
+                    <div class="col-md-12 col-sm-12 col-12 table-col">
+                      <dx-data-grid #activeUsers id="customer" [dataSource]="ActiveDataSource"
+                                    [remoteOperations]="true"
+                                    showBorders="true"
+                                    keyExpr="id"
+                                    showRowLines="true"
+                                    showColumnLines="true"
+                                    [hoverStateEnabled]="true" class="dx-table"
+                                    [wordWrapEnabled]="true"
+                                    [columnAutoWidth]="true"
+                                    [showColumnLines]="true"
+                                    [showRowLines]="false"
+                                    [showBorders]="false"
+                                    [rowAlternationEnabled]="false"
+                                    (onEditingStart)="EditStart($event)"
+                                    (onSaving)="onSaving($event)"
+                                    (onEditorPreparing)="onEditorPreparing($event)"
+                                    (onExporting)="onExporting($event)"
+                                    (onExported)="onExported($event)"
+                                    (onCellPrepared)="deactivateUserPrepared($event)"
+                                    (onInitNewRow)="newRow($event)"
+                                    (onCellClick)="onCellClickActive($event)">
+                        <dxo-search-panel [visible]="true"></dxo-search-panel>
+                        <dxo-paging [pageSize]="15"></dxo-paging>
+                        <dxo-pager [showPageSizeSelector]="true"
+                                   [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                                   [showInfo]="true"
+                                   [showNavigationButtons]="true">
+                        </dxo-pager>
+                        <dxo-filter-row [visible]="true"></dxo-filter-row>
+                        <dxo-group-panel [visible]="true"></dxo-group-panel>
+                        <dxo-editing mode="popup"
+                                     [allowAdding]="allowModify"
+                                     [allowUpdating]="allowModify"
+                                     [allowDeleting]="allowModify"
+                                     [useIcons]="true">
+                          <dxo-popup title="User Information"
+                                     [showTitle]="true"
+                                     dragEnabled="true"
+                                     [width]="950"
+                                     [height]="'100%'">
+                          </dxo-popup>
+                          <dxo-form scrollingEnabled="false">
+                            <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+
+                              <dxi-item dataField="name">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="surname">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="userName">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="lastActivity"></dxi-item>
+
+                              <dxi-item dataField="isDisabled">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="idnumber">
+                                <dxi-validation-rule type="pattern" [pattern]="idPattern" message="The ID number must be a 13 digit number."></dxi-validation-rule>
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="employeeNumber">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="contactNumber">
+                                <dxi-validation-rule type="pattern" [pattern]="contactPattern" message="The Contact Number must be a 10 or 11 digit number."></dxi-validation-rule>
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="birthday">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="incomeTaxNumber">
+                                <dxi-validation-rule type="pattern" [pattern]="taxPattern" message="The Tax Number must be a 10 or 11 digit number."></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="raceId" [editorOptions]="{ searchEnabled:true, showClearButton:'true' }">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="RaceForeignDataSource"
+                                            displayExpr="race1"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-item>
+
+                              <dxi-item dataField="genderId" [editorOptions]="{ searchEnabled:true, showClearButton:'true' }">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="GenderForeignDataSource"
+                                            displayExpr="gender1"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-item>
+
+                              <dxi-item dataField="maritalStatusId" [editorOptions]="{ searchEnabled:true, showClearButton:'true' }">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="MaritalStatusForeignDataSource"
+                                            displayExpr="status"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-item>
+                              <dxi-item dataField="nextOfKinName">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="nextOfKinContactNumber">
+                                <dxi-validation-rule type="pattern" [pattern]="contactPattern" message="The Contact Number must be a 10 or 11 digit number."></dxi-validation-rule>
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="hourlyRate" [editorOptions]="{format:currencyZAR}">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="baseSalaryPerMonth" [editorOptions]="{format:currencyZAR}">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="highestQualification">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="numberOfDependants">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="typeOfEmploymentId" [editorOptions]="{ searchEnabled:true, showClearButton:'true' }">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="TypeEmploymentForeignDataSource"
+                                            displayExpr="type"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-item>
+
+                              <dxi-item dataField="email">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxi-validation-rule type="email" message="Email is invalid"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="startDate">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="employeePositionId" [editorOptions]="{ searchEnabled:true, showClearButton:'true' }">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="PositionForeignDataSource"
+                                            displayExpr="position"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-item>
+
+                              <dxi-item dataField="paymentIntervalsId" [editorOptions]="{ searchEnabled:true, showClearButton:'true' }">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="PaymentIntervalsForeignDataSource"
+                                            displayExpr="intervals"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-item>
+
+                              <dxi-item dataField="lawsId" [editorOptions]="{ searchEnabled:true, showClearButton:'true' }">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                                <dxo-lookup [dataSource]="LawsForeignDataSource"
+                                            displayExpr="law1"
+                                            valueExpr="id">
+                                </dxo-lookup>
+                              </dxi-item>
+
+                            </dxi-item>
+
+                            <dxi-item itemType="group" caption="Physical Address" [colCount]="2" [colSpan]="2">
+                              <dxi-item dataField="streetAddress1">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="streetAddress2"></dxi-item>
+
+                              <dxi-item dataField="suburb">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="city">
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="postCode">
+                                <dxi-validation-rule type="pattern" [pattern]="postalPattern" message="The Postal Code must be numbers."></dxi-validation-rule>
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="countryId" editorType="dxSelectBox" [editorOptions]="{ dataSource: CountryForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true, showClearButton:'true'}">
+                                <dxo-label [text]="'Country'"></dxo-label>
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                            </dxi-item>
+
+                            <dxi-item itemType="group" caption="Banking Details" [colCount]="2" [colSpan]="2">
+                              <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                                <dxi-item dataField="bankNameId" [editorOptions]="{searchEnabled:true,showClearButton:true,width: '240%',hint:'Select a bank for the new supplier'}"></dxi-item>
+                                <dxi-item itemType="button"
+                                          alignment="left"
+                                          [buttonOptions]="buttonOptions"
+                                          [editorOptions]="{ width: '20%' }">
+                                </dxi-item>
+                              </dxi-item>
+
+                              <dxi-item dataField="accountNumber">
+                                <dxi-validation-rule type="pattern" [pattern]="accountPattern" message="The Account Number must be numbers."></dxi-validation-rule>
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                              <dxi-item dataField="branchCode">
+                                <dxi-validation-rule type="pattern" [pattern]="branchPattern" message="The Branch Code must be numbers."></dxi-validation-rule>
+                                <dxi-validation-rule type="required"></dxi-validation-rule>
+                              </dxi-item>
+
+                            </dxi-item>
+
+                          </dxo-form>
+                        </dxo-editing>
+
+                        <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+                        <dxo-export [enabled]="true" fileName="Active-Users-List"></dxo-export>
+
+                        <dxi-column dataField="name" caption="Name"></dxi-column>
+                        <dxi-column dataField="surname" caption="Surname"></dxi-column>
+                        <dxi-column dataField="userName" caption="User Name"></dxi-column>
+                        <dxi-column dataField="lastActivity" caption="Last Activity" dataType="date" [formItem]="{ visible: false }"></dxi-column>
+                        <dxi-column dataField="isDisabled" caption="Is Disabled" [visible]="false" [formItem]="{ visible: false }"></dxi-column>
+                        <dxi-column dataField="idnumber" caption="ID Number" [visible]="false"></dxi-column>
+                        <dxi-column dataField="employeeNumber" caption="Employee Number" [visible]="false"></dxi-column>
+                        <dxi-column dataField="contactNumber" caption="Contact Number" [visible]="false"></dxi-column>
+                        <dxi-column dataField="birthday" caption="Birthday" dataType="date" [visible]="false"></dxi-column>
+                        <dxi-column dataField="incomeTaxNumber" caption="Income Tax Number" [visible]="false"></dxi-column>
+                        <dxi-column dataField="raceId" caption="Race" [visible]="false">
+                          <dxo-lookup [dataSource]="RaceForeignDataSource"
+                                      displayExpr="race1"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+                        <dxi-column dataField="genderId" caption="Gender" [visible]="false">
+                          <dxo-lookup [dataSource]="GenderForeignDataSource"
+                                      displayExpr="gender1"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+                        <dxi-column dataField="streetAddress1" caption="Street Address 1" [visible]="false"></dxi-column>
+                        <dxi-column dataField="streetAddress2" caption="Street Address 2" [visible]="false"></dxi-column>
+                        <dxi-column dataField="suburb" caption="Suburb" [visible]="false"></dxi-column>
+                        <dxi-column dataField="city" caption="City" [visible]="false"></dxi-column>
+                        <dxi-column dataField="postCode" caption="Postal Code" [visible]="false"></dxi-column>
+                        <dxi-column dataField="countryId" caption="Country" [visible]="false"></dxi-column>
+                        <dxi-column dataField="nextOfKinName" caption="Next Of Kin Name" [visible]="false"></dxi-column>
+                        <dxi-column dataField="nextOfKinContactNumber" caption="Next Of Kin Contact Number" [visible]="false"></dxi-column>
+                        <dxi-column dataField="bankNameId" caption="Bank Name" [visible]="false">
+                          <dxi-validation-rule type="required"></dxi-validation-rule>
+                          <dxo-lookup [dataSource]="BankNameForeignDataSource"
+                                      displayExpr="bankName1"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+                        <dxi-column dataField="accountNumber" caption="Account Number" [visible]="false"></dxi-column>
+                        <dxi-column dataField="branchCode" caption="Branch Code" [visible]="false"></dxi-column>
+                        <dxi-column dataField="baseSalaryPerMonth" caption="Base Salary Per Month" [format]="currencyZAR" [visible]="false"></dxi-column>
+                        <dxi-column dataField="hourlyRate" caption="Hourly Rate" [format]="currencyZAR" [visible]="false"></dxi-column>
+                        <dxi-column dataField="highestQualification" caption="Highest Qualification" [visible]="false"></dxi-column>
+
+                        <dxi-column dataField="maritalStatusId" caption="Marital Status" [visible]="false">
+                          <dxo-lookup [dataSource]="MaritalStatusForeignDataSource"
+                                      displayExpr="status"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+                        <dxi-column dataField="numberOfDependants" caption="Number Of Dependants" [visible]="false"></dxi-column>
+                        <dxi-column dataField="typeOfEmploymentId" caption="Type Of Employment" [visible]="false">
+                          <dxo-lookup [dataSource]="TypeEmploymentForeignDataSource"
+                                      displayExpr="type"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+                        <dxi-column dataField="email" caption="Email" [visible]="false"></dxi-column>
+                        <dxi-column dataField="startDate" caption="Start Date" dataType="date" [visible]="false"></dxi-column>
+                        <dxi-column dataField="employeePositionId" caption="Employee Position" [visible]="false">
+                          <dxo-lookup [dataSource]="PositionForeignDataSource"
+                                      displayExpr="position"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+                        <dxi-column dataField="paymentIntervalsId" caption="Payment Intervals" [visible]="false">
+                          <dxo-lookup [dataSource]="PaymentIntervalsForeignDataSource"
+                                      displayExpr="intervals"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+                        <dxi-column dataField="lawsId" caption="Law" [visible]="false">
+                          <dxo-lookup [dataSource]="LawsForeignDataSource"
+                                      displayExpr="law1"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+
+                        <dxi-column type="buttons" caption="Deactivate User" cellTemplate="disablecellTemplate" [formItem]="{ visible: false }" [visible]="allowDeactivate">
+                        </dxi-column>
+                        <div *dxTemplate="let data of 'disablecellTemplate'">
+                          <i class="bx bx-user-x" style="font-size: x-large;"></i>
+                        </div>
+                        <dxi-column type="buttons" caption="Password" cellTemplate="passwordcellTemplate" [formItem]="{ visible: false }" [visible]="allowDeactivate">
+                        </dxi-column>
+                        <div *dxTemplate="let data of 'passwordcellTemplate'">
+                          <em class="bx bx-lock" style="font-size: x-large;"></em>
+                        </div>
+                        <dxi-column type="buttons" [visible]="allowModify">
+                          <dxi-button name="edit"></dxi-button>
+                        </dxi-column>
+                      </dx-data-grid>
+                      <dx-popup title="Bank Name"
+                                [width]="750"
+                                [height]="550"
+                                [showTitle]="true"
+                                dragEnabled="true"
+                                [closeOnOutsideClick]="false"
+                                [showCloseButton]="true"
+                                (onHidden)="onHidden($event)"
+                                [(visible)]="popupVisibleBanking">
+                        <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+                          <app-bank-name></app-bank-name>
+                        </dx-scroll-view>
+                      </dx-popup>
+                      <dx-popup width="430px"
+                                height="230px"
+                                [showTitle]="true"
+                                title="Disable User"
+                                dragEnabled="true"
+                                [closeOnOutsideClick]="false"
+                                [showCloseButton]="true"
+                                container=".dx-viewport"
+                                [(visible)]="popupVisible">
+                        <dxi-toolbar-item widget="dxButton"
+                                          toolbar="bottom"
+                                          location="before"
+                                          [options]="buttonCancel">
+                        </dxi-toolbar-item>
+                        <dxi-toolbar-item widget="dxButton"
+                                          toolbar="bottom"
+                                          location="after"
+                                          [options]="buttonDisable">
+                        </dxi-toolbar-item>
+
+                        <div *dxTemplate="let data of 'content'">
+                          <div style="width: auto; height: auto">
+                            <label>Type 'DISABLE' below if you would like to disable the user.</label>
+                            <dx-form id="form"
+                                     [colCount]="4"
+                                     [(formData)]="disableUser">
+                              <dxi-item dataField="confirmation" [colSpan]="4">
+                              </dxi-item>
+                            </dx-form>
+                            <label *ngIf="error" class="error">Incorrect Spelling</label>
+                          </div>
+                        </div>
+                      </dx-popup>
+                      <dx-popup width="430px"
+                                height="275px"
+                                [showTitle]="true"
+                                title="Manage Password"
+                                dragEnabled="true"
+                                [closeOnOutsideClick]="false"
+                                [showCloseButton]="true"
+                                container=".dx-viewport"
+                                [(visible)]="passwordPopupVisible">
+                        <dxi-toolbar-item widget="dxButton"
+                                          toolbar="bottom"
+                                          location="before"
+                                          [options]="passwordButtonCancel">
+                        </dxi-toolbar-item>
+                        <dxi-toolbar-item widget="dxButton"
+                                          toolbar="bottom"
+                                          location="after"
+                                          [options]="passwordButtonOK">
+                        </dxi-toolbar-item>
+
+                        <div *dxTemplate="let data of 'content'">
+                          <div style="width: auto; height: auto">
+                            <dx-form id="form"
+                                     [colCount]="4"
+                                     [(formData)]="passwordManageData">
+                              <dxi-item dataField="PasswordResetMethod" editorType="dxRadioGroup" [colSpan]="4" [editorOptions]="{ items: passwordResetMethods, value: passwordResetMethods[0] }">
+                                <dxo-label location="top"
+                                           alignment="center">
+                                </dxo-label>
+                              </dxi-item>
+                              <dxi-item dataField="NewPassword" [editorOptions]="{mode:'password'}" [colSpan]="4">
+                              </dxi-item>
+                            </dx-form>
+                            <label *ngIf="passwordError" class="error">Enter New Password</label>
+                          </div>
+                        </div>
+                      </dx-popup>
+                      <dx-popup [width]="400"
+                                [height]="150"
+                                [showTitle]="false"
+                                [dragEnabled]="false"
+                                [closeOnOutsideClick]="false"
+                                [showCloseButton]="false"
+                                [(visible)]="popupDownloadConfirmVisible">
+
+                        <dxi-toolbar-item widget="dxButton"
+                                          itemType="group"
+                                          toolbar="bottom"
+                                          location="center"
+                                          [options]="yesDownloadButtonOptions">
+                        </dxi-toolbar-item>
+
+                        <dxi-toolbar-item widget="dxButton"
+                                          itemType="group"
+                                          toolbar="bottom"
+                                          location="center"
+                                          [options]="noDownloadButtonOptions">
+                        </dxi-toolbar-item>
+
+                        <dxo-position at="center"
+                                      my="center"
+                                      of="window">
+                        </dxo-position>
+                        <p style="text-align: center">
+                          Are you sure you want to download this file?
+                        </p>
+                      </dx-popup>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="tab.text == 'Deactivated'">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col">
+                  <div class="table-align">
+                    <div class="col-md-12 col-sm-12 col-12 table-col">
+                      <dx-data-grid #deactivatedUsers id="customer" [dataSource]="DeactivatedDataSource"
+                                    [remoteOperations]="true"
+                                    showBorders="true"
+                                    keyExpr="id"
+                                    showRowLines="true"
+                                    showColumnLines="true"
+                                    [hoverStateEnabled]="true" class="dx-table"
+                                    [wordWrapEnabled]="true"
+                                    [columnAutoWidth]="true"
+                                    [showColumnLines]="true"
+                                    [showRowLines]="false"
+                                    [showBorders]="false"
+                                    [rowAlternationEnabled]="true"
+                                    (onExporting)="onExportingDisable($event)"
+                                    (onExported)="onExportedDisable($event)"
+                                    (onCellPrepared)="onCellPrepared($event)"
+                                    (onCellClick)="activateUser($event)">
+                        <dxo-search-panel [visible]="true"></dxo-search-panel>
+                        <dxo-paging [pageSize]="15"></dxo-paging>
+                        <dxo-pager [showPageSizeSelector]="true"
+                                   [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                                   [showInfo]="true"
+                                   [showNavigationButtons]="true">
+                        </dxo-pager>
+                        <dxo-filter-row [visible]="true"></dxo-filter-row>
+                        <dxo-group-panel [visible]="true"></dxo-group-panel>
+                        <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+                        <dxo-export [enabled]="true" fileName="Deactivated-Users-List"></dxo-export>
+
+                        <dxi-column dataField="name" caption="Name"></dxi-column>
+                        <dxi-column dataField="surname" caption="Surname"></dxi-column>
+                        <dxi-column dataField="userName" caption="User Name"></dxi-column>
+                        <dxi-column dataField="lastActivity" caption="Last Activity" dataType="date"></dxi-column>
+                        <dxi-column dataField="isDisabled" caption="Is Disabled" [visible]="false"></dxi-column>
+                        <dxi-column dataField="idnumber" caption="ID Number" [visible]="false"></dxi-column>
+                        <dxi-column type="buttons" caption="Activate User" cellTemplate="cellTemplate" [formItem]="{ visible: false }" [visible]="allowActivate">
+                        </dxi-column>
+                        <div *dxTemplate="let data of 'cellTemplate'">
+                          <i class="bx bx-user-plus" style="font-size: x-large;"></i>
+                        </div>
+                      </dx-data-grid>
+                      <dx-popup [width]="400"
+                                [height]="150"
+                                [showTitle]="false"
+                                [dragEnabled]="false"
+                                [closeOnOutsideClick]="false"
+                                [showCloseButton]="false"
+                                [(visible)]="popupDownloadConfirmDisabledVisible">
+
+                        <dxi-toolbar-item widget="dxButton"
+                                          itemType="group"
+                                          toolbar="bottom"
+                                          location="center"
+                                          [options]="yesDownloadDisabledButtonOptions">
+                        </dxi-toolbar-item>
+
+                        <dxi-toolbar-item widget="dxButton"
+                                          itemType="group"
+                                          toolbar="bottom"
+                                          location="center"
+                                          [options]="noDownloadDisabledButtonOptions">
+                        </dxi-toolbar-item>
+
+                        <dxo-position at="center"
+                                      my="center"
+                                      of="window">
+                        </dxo-position>
+                        <p style="text-align: center">
+                          Are you sure you want to download this file?
+                        </p>
+                      </dx-popup>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </dx-tab-panel>
+    </div>
+  </div>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

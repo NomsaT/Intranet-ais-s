@@ -1,0 +1,838 @@
+<div class="container-fluid">
+  <!--HEADING START-->
+  <div class="row">
+    <div class="col-12 col-md-12 col-sm-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Dashboard</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">ACS → Dashboard</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--HEADING END-->
+  <!--TILES START-->
+  <div class="row">
+    <div class="col-lg-3 col-md-12 col-sm-12">
+      <div class="card" id="items">
+        <div class="card-body">
+          <div class="align-left">
+            <h4 class="card-title mb-5 dash-heading">Total Stock Items</h4>
+            <p class="text-muted font-size-14 mb-4 dash-data" style="margin-bottom:0px !important"
+              *ngIf="totalStockItemsObj">{{totalStockItemsObj}}</p>
+            <p *ngIf="!totalStockItemsObj" class="text-muted font-size-14 mb-4" style="margin-bottom:0px !important">No
+              Items Available.</p>
+            <br />
+          </div>
+          <div class="align-right">
+            <i class=" bx bx-box icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-12 col-sm-12">
+      <div class="card" id="items">
+        <div class="card-body">
+          <div class="align-left">
+            <h4 class="card-title mb-5 dash-heading">Monthly Stock Value</h4>
+            <p class="text-muted font-size-14 mb-4 dash-data" style="margin-bottom:0px !important"
+              *ngIf="monthlyStockValueObj">{{monthlyStockValueObj}}</p>
+            <p *ngIf="!monthlyStockValueObj" class="text-muted font-size-14 mb-4" style="margin-bottom:0px !important">
+              No Stock Value Available.</p>
+            <br />
+          </div>
+          <div class="align-right">
+            <i class=" bx bx-money icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-12 col-sm-12">
+      <div class="card" id="items">
+        <div class="card-body">
+          <div class="align-left">
+            <h4 class="card-title mb-5 dash-heading">Total Departments</h4>
+            <p class="text-muted font-size-14 mb-4 dash-data" style="margin-bottom:0px !important"
+              *ngIf="totalDepartmentObj">{{totalDepartmentObj}}</p>
+            <p *ngIf="!totalDepartmentObj" class="text-muted font-size-14 mb-4" style="margin-bottom:0px !important">No
+              Departments Available.</p>
+            <br />
+          </div>
+          <div class="align-right">
+            <i class=" bx bx-store icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-12 col-sm-12">
+      <div class="card" id="items">
+        <div class="card-body">
+          <div class="align-left">
+            <h4 class="card-title mb-5 dash-heading">Total Locations</h4>
+            <p class="text-muted font-size-14 mb-4 dash-data" style="margin-bottom:0px !important"
+              *ngIf="totalLocationsObj">{{totalLocationsObj}}</p>
+            <p *ngIf="!totalLocationsObj" class="text-muted font-size-14 mb-4" style="margin-bottom:0px !important">No
+              Locations Available.</p>
+            <br />
+          </div>
+          <div class="align-right" style="height:74px">
+            <i class="dripicons-location icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--TILES END-->
+  <!-- FIRST ROW -->
+  <div class="row">
+    <!-- COLUMN 1-->
+    <!--PENDING INTERNAL ORDERS-->
+    <div class="col-lg-6 col-md-12 col-sm-12">
+      <div class="card" id="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-4">Pending Approval Items</h5>
+            </div>
+            <div class="ms-auto dropdown">
+              <dx-check-box class="dropdown-toggle text-muted font-size-16" text="Filter for me"
+                (onValueChanged)="FilterForMe($event)" [(value)]="filterForMe"></dx-check-box>
+            </div>
+          </div>
+          <div class="table-responsive" style="height:350px">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+              <div class="text-reset notification-item">
+                <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+                  <div class="media" *ngFor="let order of ordersObj">
+                    <div class="media-body" (click)="openInternalOrder(order)">
+                      <div class="font-size-12 text-muted" style="cursor:pointer">
+                        <div class="row io-header">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">Internal Order
+                              #{{order.id}}</p>
+                          </div>
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1 float-right"
+                              style="margin-bottom: 0px !important;float: right;"><span
+                                class="badge bg-warning">{{order.statusDisplay}}</span></p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">
+                              <strong>Supplier: </strong>{{order.supplierFullName}}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">
+                              <strong>Requested By: </strong>{{order.requestByFullName}}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Date
+                                Created: </strong>{{order.dateCreated | date: 'dd MMMM yy'}}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </dx-scroll-view>
+                <div class="media" *ngIf="ordersObj && ordersObj.length === 0">
+                  <div class="media-body">
+                    <div class="font-size-12 text-muted">
+                      <div>
+                        <p class="text-muted font-size-14 mb-1" style="margin-bottom: 0px !important">There are no items
+                          pending</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <dx-load-panel #loadPanel shadingColor="rgba(0,0,0,0.4)" [(visible)]="loadingVisible"
+                  [showIndicator]="true" [showPane]="true" [shading]="true" [closeOnOutsideClick]="false">
+                </dx-load-panel>
+
+                <dx-popup width="fit-content" height="800px" [showTitle]="true" [title]="IOTitle" [dragEnabled]="false"
+                  [closeOnOutsideClick]="false" [showCloseButton]="true" container=".dx-viewport"
+                  [(visible)]="popupVisibleIO">
+                  <dxi-toolbar-item [visible]="ApproverLoggedIn" widget="dxButton" toolbar="bottom" location="before"
+                    [options]="buttonDeny">
+                  </dxi-toolbar-item>
+                  <dxi-toolbar-item [visible]="ApproverLoggedIn" widget="dxButton" toolbar="bottom" location="before"
+                    [options]="buttonReview">
+                  </dxi-toolbar-item>
+                  <dxi-toolbar-item [visible]="ApproverLoggedIn" widget="dxButton" toolbar="bottom" location="after"
+                    [options]="buttonApprove">
+                  </dxi-toolbar-item>
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-scroll-view width="100%" height="100%">
+                      <div style="width: auto; height: auto">
+                        <h5 class="io-view-heading">Internal Order Details</h5>
+                        <div class="IO-Details">
+                          <table class="table table-centered table-nowrap internalOrder">
+                            <tbody>
+                              <tr>
+                                <td><strong>Supplier:</strong> {{selectedOrder.supplierFullName}}</td>
+                                <td><strong>Requested By:</strong> {{selectedOrder.requestByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Quotation Number:</strong> {{selectedOrder.quotationNumber}}</td>
+                                <td><strong>Placed By:</strong> {{selectedOrder.placedByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Plant Location:</strong> {{selectedOrder.plantLocationName}}</td>
+                                <td><strong>Approved By:</strong> {{selectedOrder.approveByFullName}}</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <strong>Follow Up Date:</strong> {{selectedOrder.followUpDate | date: 'dd MMMM yy'}}
+                                </td>
+                                <td>
+                                  <strong>Delivery Date:</strong> {{selectedOrder.deliveryDate | date: 'dd MMMM yy'}}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td><strong>Project:</strong> {{selectedOrder.projectName}}</td>
+                                <td><strong>Company:</strong> {{selectedOrder.companyName}}</td>
+                              </tr>
+                              <tr>
+                                <td style="white-space: pre-wrap;">
+                                  <strong>Internal Comment:</strong>
+                                  {{selectedOrder.comment}}
+                                </td>
+                                <td style="white-space: pre-wrap;">
+                                  <strong>Supplier Comment:</strong>
+                                  {{selectedOrder.supplierComment}}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--Listed Items-->
+                        <h5 class="io-view-heading" *ngIf="selectedOrder.internalOrderItems.length > 0">Listed Items
+                        </h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details"
+                          *ngIf="selectedOrder.internalOrderItems.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Stock</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">UoM</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Pack Size</th>
+                              <th scope="col">UoM Price</th>
+                              <th scope="col">Total (UoM)</th>
+                              <th scope="col">List Price</th>
+                              <th scope="col">New Price</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                              <th scope="col">Total (VAT Excl.)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedOrder.internalOrderItems">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.stockName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.uomName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0"> {{selectedOrder.supplierCurrency}} {{item.uomPrice}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity * item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{selectedOrder.supplierCurrency}} {{item.originalValue}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.value > item.originalValue" class="mb-0 totaldifferent">
+                                  {{selectedOrder.supplierCurrency}} {{item.value}}
+                                </p>
+                                <p *ngIf="item.value < item.originalValue" class="mb-0 totalsame">
+                                  {{selectedOrder.supplierCurrency}} {{item.value}}
+                                </p>
+                                <p *ngIf="item.value == item.originalValue" class="mb-0">
+                                  {{selectedOrder.supplierCurrency}} {{item.value}}
+                                </p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{selectedOrder.supplierCurrency}} {{item.total}} </p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!--Once-Off Items-->
+                        <h5 class="io-view-heading" *ngIf="selectedOrder.onceOffItems.length > 0">Once-Off Items</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details"
+                          *ngIf="selectedOrder.onceOffItems.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Item Code</th>
+                              <th scope="col">Supplier Desc</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">Price</th>
+                              <th scope="col">UoM</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Pack Size</th>
+                              <th scope="col">Total (UoM)</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                              <th scope="col">Total (VAT Excl.)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedOrder.onceOffItems">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.code}}</p>
+                              </td>
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.description}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{selectedOrder.supplierCurrency}} {{item.value}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.uomName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity * item.packSize}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{selectedOrder.supplierCurrency}} {{item.total}}</p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!--Services-->
+                        <h5 class="io-view-heading" *ngIf="selectedOrder.services.length > 0">Services</h5>
+                        <table class="table table-centered table-nowrap" Caption="Item Details"
+                          *ngIf="selectedOrder.services.length > 0">
+                          <thead>
+                            <tr>
+                              <th scope="col">Code</th>
+                              <th scope="col">Supplier Desc</th>
+                              <th scope="col">GL Code</th>
+                              <th scope="col">Department</th>
+                              <th scope="col">Quantity</th>
+                              <th scope="col">Price</th>
+                              <th scope="col">VAT Appl.</th>
+                              <th scope="col">GRN Appl.</th>
+                              <th scope="col">Total (VAT Excl.)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let item of selectedOrder.services">
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.code}}</p>
+                              </td>
+                              <td style="width: 200px;white-space: pre-wrap;">
+                                <p class="mb-0">{{item.description}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.glFullName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.departmentName}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{item.quantity}}</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{selectedOrder.supplierCurrency}} {{item.value}}</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.vatAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.vatAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p *ngIf="item.grnAppl" class="mb-0">Yes</p>
+                                <p *ngIf="!item.grnAppl" class="mb-0">No</p>
+                              </td>
+                              <td>
+                                <p class="mb-0">{{selectedOrder.supplierCurrency}} {{item.value}} </p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <h5 class="io-view-heading">Total</h5>
+                        <div class="IO-Details">
+                          <table class="table table-centered table-nowrap internalOrder">
+                            <tbody>
+                              <tr>
+                                <td class="total-value"><strong>Total (Excl.
+                                    VAT):</strong>{{selectedOrder.supplierCurrency}} {{selectedOrder.total}}</td>
+                              </tr>
+                              <tr>
+                                <td class="total-value"><strong>VAT:</strong>{{selectedOrder.supplierCurrency}}
+                                  {{selectedOrder.vat}} </td>
+                              </tr>
+                              <tr>
+                                <td class="total total-value"><strong>Total (Incl.
+                                    VAT):</strong>{{selectedOrder.supplierCurrency}} {{ selectedOrder.TotalDisplay |
+                                  number : '1.2-2'}}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </dx-scroll-view>
+                  </div>
+                </dx-popup>
+
+                <dx-popup width="500px" height="230px" [showTitle]="false" [dragEnabled]="false"
+                  [closeOnOutsideClick]="false" [showCloseButton]="false" container=".dx-viewport"
+                  [(visible)]="popupVisibleCommentIO">
+                  <dxi-toolbar-item widget="dxButton" toolbar="bottom" location="before" [options]="buttonCancel">
+                  </dxi-toolbar-item>
+                  <dxi-toolbar-item widget="dxButton" toolbar="bottom" location="after" [options]="buttonOK">
+                  </dxi-toolbar-item>
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-scroll-view width="100%" height="100%">
+                      <div style="width: auto; height: auto">
+                        <label>{{CommentTitle}}</label>
+                        <dx-form id="addIOComment" [(formData)]="internalOrderAction" [colCount]="4">
+                          <dxi-item dataField="internalComment" [colSpan]="4" editorType="dxTextArea"
+                            [editorOptions]="{ height: 80, stylingMode: 'filled',placeholder:'Type comment here..' }">
+                            <dxo-label [visible]="false"></dxo-label>
+                          </dxi-item>
+                        </dx-form>
+                      </div>
+                    </dx-scroll-view>
+                  </div>
+                </dx-popup>
+
+                <dx-popup width="500px" height="120px" [dragEnabled]="false" [closeOnOutsideClick]="true"
+                  [showCloseButton]="false" [showTitle]="false" [(visible)]="popupForAlreadyApprovedOrder">
+                  <dxi-toolbar-item widget="dxButton" toolbar="bottom" [options]="buttonClose">
+                  </dxi-toolbar-item>
+                  <div *dxTemplate="let data of 'content'">
+                    <p>Internal Order #<strong>{{nonApprovedItemid}}</strong> {{PopUpTitle}}
+                      <strong>{{approvedByName}}</strong>
+                    </p>
+                  </div>
+                </dx-popup>
+              </div>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 col-md-12 col-sm-12">
+      <div class="card" id="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-4">Internal Orders Pending Review</h5>
+            </div>
+            <div class="ms-auto dropdown">
+              <dx-check-box class="dropdown-toggle text-muted font-size-16" text="Filter for me"
+                (onValueChanged)="FilterForMeReview($event)" [(value)]="filterForMeReview"></dx-check-box>
+            </div>
+          </div>
+          <div class="table-responsive" style="height:175px">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+              <div class="text-reset notification-item">
+                <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+                  <div class="media" *ngFor="let order of ordersObjReview">
+                    <div class="media-body" (click)="openInternalOrderReview(order)">
+                      <div class="font-size-12 text-muted">
+                        <div class="row io-header">
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">Internal Order
+                              #{{order.id}}</p>
+                          </div>
+                          <div class="col">
+                            <p class="text-muted font-size-14 mb-1 float-right"
+                              style="margin-bottom: 0px !important;float: right;"><span
+                                class="badge bg-warning">{{order.statusDisplay}}</span></p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <div class="row">
+                              <div class="col">
+                                <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">
+                                  <strong>Supplier: </strong>{{order.supplierFullName}}
+                                </p>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col">
+                                <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">
+                                  <strong>Requested By: </strong>{{order.requestByFullName}}
+                                </p>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col">
+                                <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">
+                                  <strong>Date Created: </strong>{{order.dateCreated | date: 'dd MMMM yy'}}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col">
+                            <div class="row">
+                              <div class="col">
+                                <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">
+                                  <strong>{{order.approveByFullName}}: </strong> <em>{{order.internalComment}}</em>
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </dx-scroll-view>
+                <div class="media" *ngIf="ordersObjReview && ordersObjReview.length === 0">
+                  <div class="media-body">
+                    <div class="font-size-12 text-muted">
+                      <div>
+                        <p class="text-muted font-size-14 mb-1" style="margin-bottom: 0px !important">There are no items
+                          to review</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <dx-load-panel #loadPanel shadingColor="rgba(0,0,0,0.4)" [(visible)]="loadingVisible"
+                  [showIndicator]="true" [showPane]="true" [shading]="true" [closeOnOutsideClick]="false">
+                </dx-load-panel>
+
+                <dx-popup width="500px" height="230px" [showTitle]="false" [dragEnabled]="false"
+                  [closeOnOutsideClick]="false" [showCloseButton]="false" container=".dx-viewport"
+                  [(visible)]="popupVisibleCommentIO">
+                  <dxi-toolbar-item widget="dxButton" toolbar="bottom" location="before" [options]="buttonCancel">
+                  </dxi-toolbar-item>
+                  <dxi-toolbar-item widget="dxButton" toolbar="bottom" location="after" [options]="buttonOK">
+                  </dxi-toolbar-item>
+                  <div *dxTemplate="let data of 'content'">
+                    <dx-scroll-view width="100%" height="100%">
+                      <div style="width: auto; height: auto">
+                        <label>{{CommentTitle}}</label>
+                        <dx-form id="addIOComment" [(formData)]="internalOrderAction" [colCount]="4">
+                          <dxi-item dataField="internalComment" [colSpan]="4" editorType="dxTextArea"
+                            [editorOptions]="{ height: 80, stylingMode: 'filled',placeholder:'Type comment here..' }">
+                            <dxo-label [visible]="false"></dxo-label>
+                          </dxi-item>
+                        </dx-form>
+                      </div>
+                    </dx-scroll-view>
+                  </div>
+                </dx-popup>
+              </div>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </div>
+      <!--PRICE INCREASE-->
+      <div class="card" id="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-4">Pending Price Approval</h5>
+            </div>
+            <div class="ms-auto dropdown">
+              <a role="button" class="dropdown-toggle text-muted font-size-16" aria-expanded="false"
+                (click)="navigate()" *ngIf="allowViewPrice==true">
+                <em class="mdi mdi-open-in-new ms-1 font-size"></em>
+              </a>
+            </div>
+          </div>
+          <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+            <ul class="verti-timeline list-unstyled" style="height:100px">
+              <li class="event-list active" *ngFor="let FlaggedItems of flaggedItemsObj; let first = first">
+                <div class="event-timeline-dot">
+                  <em class="bx bxs-right-arrow-circle font-size-18" [ngClass]="{'bx-fade-right': first}"></em>
+                </div>
+                <div class="media">
+                  <div class="mr-3">
+                    <h5 class="font-size-14">
+                      {{FlaggedItems.date | date: 'dd MMMM'}}
+                      <em class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></em>
+                    </h5>
+                  </div>
+                  <div class="media-body">
+                    <div>{{FlaggedItems.productCode}} - {{FlaggedItems.internalProductName}}
+                      <strong>({{FlaggedItems.increaseOrigin}})</strong>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="event-list active" *ngIf="flaggedItemsObj">
+                <div class="media" *ngIf="flaggedItemsObj.length === 0">
+                  <div class="media-body">
+                    <div>No Pending Price Approvals.</div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </dx-scroll-view>
+        </div>
+      </div>
+    </div>
+    <!--COLUMN 2-->
+    <!--<div class="col-lg-5 col-md-12 col-sm-12">-->
+    <!--PRICE INCREASE-->
+    <!--<div class="card">
+    <div class="card-body">
+      <div class="d-flex">
+        <div class="me-2">
+          <h4 class="card-title mb-5">Price Increase Reminders</h4>
+        </div>
+        <div class="ms-auto dropdown">
+          <a role="button" class="dropdown-toggle text-muted font-size-16" aria-expanded="false" (click)="navigate()">
+            <em class="mdi mdi-open-in-new ms-1 font-size"></em>
+          </a>
+        </div>
+      </div>
+      <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+        <ul class="verti-timeline list-unstyled" style="height:50px">
+          <li class="event-list active" *ngFor="let FlaggedItems of flaggedItemsObj; let first = first">
+            <div class="event-timeline-dot">
+              <em class="bx bxs-right-arrow-circle font-size-18" [ngClass]="{'bx-fade-right': first}"></em>
+            </div>
+            <div class="media">
+              <div class="mr-3">
+                <h5 class="font-size-14">
+                  {{FlaggedItems.date | date: 'dd MMMM'}}
+                  <em class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></em>
+                </h5>
+              </div>
+              <div class="media-body">
+                <div>{{FlaggedItems.productCode}} - {{FlaggedItems.internalProductName}}</div>
+              </div>
+            </div>
+          </li>
+          <li class="event-list active" *ngIf="flaggedItemsObj">
+            <div class="media" *ngIf="flaggedItemsObj.length === 0">
+              <div class="media-body">
+                <div>No New Reminders.</div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </dx-scroll-view>
+    </div>
+  </div>-->
+    <!--LOW STOCK-->
+    <!-- <div class="card">
+    <div class="card-body">
+      <div class="d-flex">
+        <div class="me-2">
+          <h4 class="card-title">Low Stock Notifications</h4>
+        </div>
+        <div class="ms-auto dropdown">
+          <a role="button" class="dropdown-toggle text-muted font-size-16" aria-expanded="false" (click)="navigateStock()">
+            <em class="mdi mdi-open-in-new ms-1 font-size"></em>
+          </a>
+        </div>
+      </div>
+      <div class="table-responsive" [ngClass]="{'iflowstockNot': minStockThresholdObj.length != 0}">
+        <dx-scroll-view width="100%" height="100%" showScrollbar="never" [useNative]="false" mode="infinite">
+          <table class="table table-centered table-nowrap" Caption="Low Stock Notifications" *ngIf="minStockThresholdObj.length != 0">
+            <thead>
+              <tr>
+                <th scope="col">Items</th>
+                <th scope="col">Low Threshold</th>
+                <th scope="col">Item Quantity</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let MinStockThreshold of minStockThresholdObj">
+                <td>
+                  <p class="mb-0">{{MinStockThreshold.code}} {{MinStockThreshold.internalProductName}}</p>
+                </td>
+                <td>
+                  <h5 class="mb-0">{{MinStockThreshold.minThreshold}}</h5>
+                </td>
+                <td>
+                  <h5 class="mb-0">{{MinStockThreshold.quantity}}</h5>
+                </td>
+                <td>
+                  <a id="addStockItem" class="navigation" (click)="getLowStockObj(MinStockThreshold)">Add Items <em class="bx bx-package align-middle me-1"></em></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </dx-scroll-view>
+        <div *ngIf="minStockThresholdObj">
+          <div *ngIf="minStockThresholdObj.length === 0">
+            <p>No Low Stock Notifications.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>-->
+    <!--</div>-->
+  </div>
+  <!-- SECOND ROW-->
+  <div class="row">
+    <div class="col-lg-6 col-md-12 col-sm-12">
+      <!--RECOUNT STOCK-->
+      <div class="card" id="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-4">Stocktake - Items Pending Recount</h5> 
+            </div>
+            <div class="ms-auto dropdown">
+              <a role="button" class="dropdown-toggle text-muted font-size-16" aria-expanded="false"
+                (click)="nativagateStocktake()" *ngIf="allowViewStockTake==true">
+                <em class="mdi mdi-open-in-new ms-1 font-size"></em>
+              </a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle table-nowrap mb-0" caption="Stocktake - Items Pending Recount"
+              *ngIf="stocktakeObj.length != 0">
+              <thead>
+                <tr>
+                  <th scope="col">Stock</th>
+                  <th scope="col">Store</th>
+                  <th scope="col">Plant Location</th>
+                  <th scope="col">Current Qty</th>
+                  <th scope="col">Assigned To</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let Stocktake of stocktakeObj">
+                  <td>
+                    <h3 class="font-size-13 mb-0"><a class="text-dark">{{Stocktake.stock}}</a></h3>
+                    <!--<p class="text-muted mb-0">{{Stocktake.date | date: 'dd MMMM yy'}}</p>-->
+                  </td>
+                  <td>
+                    <p class="text-muted mb-0"> {{Stocktake.store}}</p>
+                  </td>
+                  <td>
+                    <p class="text-muted mb-0">{{Stocktake.location}}</p>
+                  </td>
+                  <td>
+                    <p class="text-muted mb-0"> {{Stocktake.currentQty}}</p>
+                  </td>
+                  <td>
+                    <p class="text-muted mb-0"> {{Stocktake.userFullName}}</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="stocktakeObj">
+              <div *ngIf="stocktakeObj.length === 0">
+                <div class="align-left">
+                  <p>No Stocktake recount pending.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--RECOUNT STOCK ENDS-->
+
+    </div>
+    <!-- LAST 5 STOCK ITEMS ADDED-->
+    <div class="col-lg-6">
+      <div class="card" id="card">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="me-2">
+              <h5 class="card-title mb-4">Last 5 Stock Items Added</h5>
+            </div>
+            <div class="ms-auto dropdown">
+              <a role="button" class="dropdown-toggle text-muted font-size-16" aria-expanded="false"
+                (click)="navigateStock()" *ngIf="allowViewAdded==true">
+                <em class="mdi mdi-open-in-new ms-1 font-size"></em>
+              </a>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle table-nowrap mb-0" caption="Last 5 Stock Items Added"
+              *ngIf="stockItemsObj.length != 0">
+              <thead>
+                <tr>
+                  <th scope="col">Item</th>
+                  <th scope="col">Stock Category</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">UoM</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let StockItems of stockItemsObj">
+                  <td>
+                    <h3 class="font-size-13 text-truncate mb-1"><a class="text-dark">{{StockItems.code}}
+                        {{StockItems.internalProductName}}</a></h3>
+                    <p class="text-muted mb-0">{{StockItems.date | date: 'dd MMMM yy'}}</p>
+                  </td>
+                  <td>
+                    <em class="bx bx-package align-middle me-1"></em> {{StockItems.stockCategory}}
+                  </td>
+                  <td>
+                    <p class="text-muted mb-0">{{StockItems.quantity}}</p>
+                  </td>
+                  <td><em class="bx bx-ruler align-middle me-1"></em> {{StockItems.uomType}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="stockItemsObj">
+              <div *ngIf="stockItemsObj.length === 0">
+                <div class="align-left">
+                  <p>No Stock Items Added.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

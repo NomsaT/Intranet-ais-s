@@ -1,0 +1,32 @@
+<dx-data-grid [dataSource]="dataSource" [showBorders]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true"
+              (onEditingStart)="EditStart($event)"
+              (onSaving)="SavingStart($event)"
+              (onRowInserting)="insertRow($event)">
+  <dxo-editing mode="popup"
+               [allowAdding]="allowModify"
+               [allowUpdating]="allowModify"
+               [allowDeleting]="allowModify"
+               [useIcons]="true">
+
+    <dxo-popup title="Add Department Manager"
+               [showTitle]="true"
+               [dragEnabled]="true"
+               [width]="600"
+               [height]="250">
+    </dxo-popup>
+    <dxo-form>
+      <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+        <dxi-item dataField="userId" [editorOptions]="{showClearButton:true,hint:'Select an user you wish to add to the list of department managers for the current department'}"></dxi-item>
+      </dxi-item>
+    </dxo-form>
+  </dxo-editing>
+
+  <dxi-column dataField="userId" caption="Employee">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-lookup [dataSource]="CostManagersForeignDataSource"
+                displayExpr="fullNamePosition"
+                valueExpr="id">
+    </dxo-lookup>
+  </dxi-column>
+
+</dx-data-grid>

@@ -1,0 +1,36 @@
+# This file is a template, and might need editing before it works on your project.
+# The following script will work for any project that can be built from command line by msbuild
+# It uses powershell shell executor, so you need to add the following line to your config.toml file
+# (located in gitlab-runner.exe directory):
+# shell = "powershell"
+#
+# The build stage restores NuGet packages and uses msbuild to build the exe and msi
+# One major issue you'll find is that you can't build msi projects from command line
+# if you use vdproj. There are workarounds building msi via devenv, but they rarely work
+# The best solution is migrating your vdproj projects to WiX, as it can be build directly
+# by msbuild.
+# place project specific paths in variables to make the rest of the script more generic
+variables:
+  SLN_FOLDER_PATH: 'C:\Users\S4\Documents\projects\PC101_Amfi_Composites_AIS\src'
+  GIT_BASH_PATH: 'C:\Users\S4\Documents\projects\PC101_Amfi_Composites_AIS'
+  SONARQUBE_MSBUILD_PATH: 'C:\Sonar\sonar-scanner-msbuild-5.3.1.36242-net5.0\SonarScanner.MSBuild.dll'
+  SONARQUBE_PROJECT_KEY: 'PC101_Amfi_Composites_AIS'
+  SONARQUBE_HOST_URL: 'http://192.168.1.72:9000/sonarqube'
+  BRANCH: 'develop'
+
+stages:
+  - build
+
+build_job:
+  stage: build
+  only:
+    - develop
+  before_script:
+    - '& git -C "$env:GIT_BASH_PATH" checkout "$env:BRANCH"'
+    - '& git -C "$env:GIT_BASH_PATH" pull'
+  script:
+    - '& cd "$env:SLN_FOLDER_PATH"'
+    - 'dotnet "$env:SONARQUBE_MSBUILD_PATH" begin /k:"$env:SONARQUBE_PROJECT_KEY" /d:sonar.host.url="$env:SONARQUBE_HOST_URL"'
+    - 'dotnet restore'
+    - 'dotnet build'
+    - 'dotnet "$env:SONARQUBE_MSBUILD_PATH" end'

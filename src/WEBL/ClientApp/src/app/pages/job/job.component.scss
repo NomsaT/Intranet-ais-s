@@ -1,0 +1,35 @@
+tbody tr:hover {
+  background-color: lightgrey;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+form {
+  float: right;
+  background-color: #f2f2f5;
+}
+
+.app-search .form-control {
+  border: none;
+  height: 38px;
+  padding-left: 40px;
+  padding-right: 20px;
+  background-color: #ffffff;
+  box-shadow: none;
+  border-radius: 30px;
+}
+
+tr:nth-child(even) {
+  background-color: #e9e7e7;
+}
+
+tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+thead tr {
+  background-color: #0063CC;
+  color: #FFF;
+}

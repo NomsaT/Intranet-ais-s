@@ -1,0 +1,225 @@
+<header id="page-topbar">
+  <div class="navbar-header">
+    <div class="d-flex">
+      <div class="navbar-brand-box">
+        <a routerLink="/" class="logo logo-dark" style="font-size:xx-large;color:#fff;text-align:left">
+          <span class="logo-sm">
+            <img src="assets/images/logo-dark.png" alt="" height="22">
+          </span>
+          <span class="logo-lg" style="padding-right:20px">
+            <img src="assets/images/logo-dark.png" alt="" height="17" style="height:31%;width:31%">
+          </span>
+          <span class="logo-lg">
+            ACS
+          </span>
+        </a>
+
+        <a routerLink="/" class="logo logo-light" style="font-size:xx-large;color:#fff;text-align:left">
+          <span class="logo-sm">
+            <img src="assets/images/logo-light.png" alt="" height="22">
+          </span>
+          <span class="logo-lg" style="padding-right:20px">
+            <img src="assets/images/logo-light.png" alt="" height="19" style="height:31%;width:31%">
+          </span>
+          <span class="logo-lg">
+            ACS
+          </span>
+        </a>
+      </div>
+
+      <button type="button" class="btn btn-sm px-3 font-size-16 header-item" id="vertical-menu-btn"
+        (click)="toggleMobileMenu($event)">
+        <em class="fa fa-fw fa-bars"></em>
+      </button>
+
+      <!--<form class="app-search d-none d-xl-block">
+        <div class="position-relative">
+          <input type="text" class="form-control" placeholder="{{'HEADER.SEARCH' | translate}}" value="{{this.searchValue}}" (keyup)="onKey($event)">
+          <span class="bx bx-search-alt"></span>
+        </div>
+      </form>-->
+
+    </div>
+
+    <div class="d-flex">
+      <!-- #region Search -->
+      <div class="dropdown d-inline-block d-lg-none ms-2" ngbDropdown>
+        <button type="button" class="btn header-item noti-icon" id="page-header-search-dropdown" data-toggle="dropdown"
+          aria-haspopup="true" ngbDropdownToggle aria-expanded="false">
+          <em class="mdi mdi-magnify"></em>
+        </button>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" ngbDropdownMenu
+          aria-labelledby="page-header-search-dropdown">
+
+          <form class="p-3">
+            <div class="m-0">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                <div class="input-group-append">
+                  <button class="btn btn-primary" type="submit"><em class="mdi mdi-magnify"></em></button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- #endregion Search -->
+      <!-- #region currency-->
+      <div *ngIf="usd != 0" class="dropdown d-none d-lg-inline-block me-1 currency-div">
+        <!--<app-currency></app-currency>-->
+        <a class="currency-a">USD <span id="currencyUSDSpan" [class]="getUSDSpan()">R{{usdZar| number:'1.2-2'}} <em
+              id="bx-usdCurrency" [class]="getUSDClass()"></em></span></a>
+        <a class="currency-a">Euro <span id="currencyEURSpan" [class]="getEURSpan()">R{{eurZar | number:'1.2-2'}} <em
+              id="bx-eurCurrency" [class]="getEURClass()"></em></span></a>
+      </div>
+      <!-- #endregioncurrency-->
+      <!-- #region Fullscreen -->
+      <div class="dropdown d-none d-lg-inline-block ms-1">
+        <button type="button" class="btn header-item noti-icon" data-toggle="fullscreen" (click)="fullscreen()">
+          <em class="bx bx-fullscreen"></em>
+        </button>
+      </div>
+      <!-- #endregion Fullscreen -->
+      <!-- #region Birthday -->
+      <div class="dropdown d-inline-block" ngbDropdown>
+        <button type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown"
+          ngbDropdownToggle>
+          <em class="mdi mdi-cake-variant"></em>
+        </button>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+          aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>
+          <div class="p-3">
+            <div class="row align-items-center">
+              <div class="col">
+                <h6 class="m-0">Birthday Reminder</h6>
+              </div>
+            </div>
+          </div>
+          <ngx-simplebar style="position: relative; height: 230px;">
+            <div class="text-reset notification-item">
+              <div class="media" *ngFor="let Birthdays of birthdayObj">
+                <div class="media-body">
+                  <div class="font-size-12 text-muted">
+                    <div>
+                      <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">
+                        <strong>{{Birthdays.birthday | date: 'dd MMMM'}} -</strong> {{Birthdays.fullName}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!---------------------->
+              <div class="media" *ngIf="birthdayObj && birthdayObj.length === 0">
+                <div class="media-body">
+                  <div class="font-size-12 text-muted">
+                    <div>
+                      <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">Oeps! No birthdays.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ngx-simplebar>
+        </div>
+      </div>
+      <!-- #endregion Birthday -->
+      <!-- #region Notifications -->
+      <!--<div class="dropdown d-inline-block" ngbDropdown>
+    <button type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown"
+            ngbDropdownToggle>
+      <em class="bx bx-bell"></em>
+    </button>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+         aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>
+      <div class="p-3">
+        <div class="row align-items-center">
+          <div class="col">
+            <h6 class="m-0">{{ 'HEADER.NOTIFICATIONS.TITLE' | translate}} </h6>
+          </div>
+        </div>
+      </div>
+      <ngx-simplebar style="position: relative; height: 230px; width: 320px">
+        <div class="text-reset notification-item">
+          <div class="media" *ngFor="let order of ordersObj">
+            <div class="media-body">
+              <div class="font-size-12 text-muted">
+                <div class="row io-header">
+                  <div class="col">
+                    <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important">Internal Order #{{order.id}}</p>
+                  </div>
+                  <div class="col">
+                    <p class="text-muted font-size-14 mb-1 float-right" style="margin-bottom:0px !important"><span class="badge bg-warning">{{order.statusDisplay}}</span></p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Supplier: </strong>{{order.supplier}}</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Requested By: </strong>{{order.requestByFullName}}</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <p class="text-muted font-size-14 mb-1" style="margin-bottom:0px !important"><strong>Date Created: </strong>{{order.dateCreated | date: 'dd MMMM yy'}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>-->
+      <!---------------------->
+      <!--<div class="media" *ngIf="ordersObj && ordersObj.length === 0">
+            <div class="media-body">
+              <div class="font-size-12 text-muted">
+                <div>
+                  <p class="text-muted font-size-14 mb-1" style="margin-bottom: 0px !important">No New Notifications</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ngx-simplebar>
+      <div class="p-2 border-top d-grid">
+        <a class="btn btn-sm btn-link font-size-14 text-center" (click)="navigateOrders()">
+          <em class="mdi mdi-arrow-right-circle me-1"></em>
+          <span key="t-view-more">
+            {{'HEADER.NOTIFICATIONS.LOAD_MORE' | translate}}
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>-->
+      <!-- #endregion Notifications -->
+      <!-- #region Profile -->
+      <div class="dropdown d-inline-block" ngbDropdown>
+        <button type="button" class="btn header-item" ngbDropdownToggle id="page-header-user-dropdown">
+          <img class="rounded-circle header-profile-user" src="assets/images/users/default-user-image.jpg"
+            alt="Header Avatar">
+          <span class="d-none d-xl-inline-block ms-1">{{username}}</span>
+          <em class="mdi mdi-chevron-down d-none d-xl-inline-block"></em>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+          <a class="dropdown-item" href="javascript: void(0);" (click)="changePassword()">
+            <em class="bx bx-lock font-size-16 align-middle me-1"></em>
+            {{ 'HEADER.LOGIN.CHANGEPASSWORD' | translate}}
+          </a>
+          <a class="dropdown-item text-danger" href="javascript: void(0);" (click)="logout()">
+            <em class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></em>
+            {{ 'HEADER.LOGIN.LOGOUT' | translate}}
+          </a>
+        </div>
+      </div>
+      <!-- #endregion Profile -->
+      <!-- #region Settings -->
+      <!--<div class="dropdown d-inline-block">
+        <button type="button" class="btn header-item noti-icon right-bar-toggle" (click)="toggleRightSidebar()">
+          <em class="bx bx-cog"></em>
+        </button>
+      </div>-->
+      <!-- #endregion Settings -->
+    </div>
+  </div>
+</header>

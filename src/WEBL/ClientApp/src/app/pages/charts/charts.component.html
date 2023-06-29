@@ -1,0 +1,67 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Charts</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Reports → Charts</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title mb-4 justify-content-between">
+            Total Spent by Quarter
+          </h4>
+          <apx-chart *ngIf="
+              basicColumnChart == null ||
+              (basicColumnChart != undefined && chartData == true)
+            " class="apex-charts" [series]="basicColumnChart.series" [chart]="basicColumnChart.chart"
+            [plotOptions]="basicColumnChart.plotOptions" [yaxis]="basicColumnChart.yaxis"
+            [dataLabels]="basicColumnChart.dataLabels" [tooltip]="basicColumnChart.tooltip"
+            [stroke]="basicColumnChart.stroke" [xaxis]="basicColumnChart.xaxis">
+          </apx-chart>
+        </div>
+      </div>
+      <!--end card-->
+    </div>
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title mb-4 justify-content-between">
+            Total Spent by Profit Center
+          </h4>
+          <apx-chart *ngIf="
+              stackedBarChart == null ||
+              (stackedBarChart != undefined && chartData == true)
+            " class="apex-charts" [series]="stackedBarChart.series" [chart]="stackedBarChart.chart"
+            [plotOptions]="stackedBarChart.plotOptions" [yaxis]="stackedBarChart.yaxis"
+            [tooltip]="stackedBarChart.tooltip" [stroke]="stackedBarChart.stroke"
+            [dataLabels]="stackedBarChart.dataLabels" [xaxis]="stackedBarChart.xaxis">
+          </apx-chart>
+        </div>
+      </div>
+      <!--end card-->
+    </div>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title mb-4 justify-content-between">
+            Total Company Spend Line Chart
+          </h4>
+          <apx-chart class="apex-charts" [series]="lineChart.series" [chart]="lineChart.chart"
+            [plotOptions]="lineChart.plotOptions" [yaxis]="lineChart.yaxis" [tooltip]="lineChart.tooltip"
+            [stroke]="lineChart.stroke" [dataLabels]="lineChart.dataLabels" [xaxis]="lineChart.xaxis">
+          </apx-chart>
+        </div>
+      </div>
+      <!--end card-->
+    </div>
+    <!-- end page title -->
+    <!-- container-fluid -->
+  </div>
+</div>

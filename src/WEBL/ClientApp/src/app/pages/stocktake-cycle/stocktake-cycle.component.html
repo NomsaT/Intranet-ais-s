@@ -1,0 +1,30 @@
+<div *ngIf="allowView==true">
+  <dx-data-grid #stockcycle  id="stockcycle" [dataSource]="dataSource"
+                [showBorders]="true"
+                keyExpr="id"
+                [columnAutoWidth]="true"
+                [rowAlternationEnabled]="true"
+                (onEditingStart)="editStart($event)"
+                (onSaving)="SavingStart($event)"
+                (onSaved)="onSaved($event)"
+                (onRowInserting)="insertRow($event)"
+                (onEditCanceled)="onEditCanceled($event)"
+                (onEditorPreparing)="editorPreparing($event)">
+    <dxo-paging  [pageSize]="6"></dxo-paging>
+    <dxo-editing mode="form"
+                 [allowAdding]="allowModify"
+                 [allowUpdating]="allowModify"
+                 [allowDeleting]="false"
+                 [useIcons]="true">
+      <dxo-form>
+        <dxi-column dataField="startDate" caption="Start Date" dataType="date"></dxi-column>
+        <dxi-column dataField="endDate" dataType="date" caption="End Date"></dxi-column>
+      </dxo-form>
+    </dxo-editing>
+
+    <dxi-column dataField="stocktakeName" caption="Stocktake Name" [editorOptions]="{ disabled: disableStocktakeName }" [formItem]="{ visible: visible }"></dxi-column>
+    <dxi-column dataField="startDate" caption="Start Date" [editorOptions]="{ disabled: disabled }" dataType="date">
+    </dxi-column>
+    <dxi-column dataField="endDate" dataType="date" caption="End Date"></dxi-column>
+  </dx-data-grid>
+</div>

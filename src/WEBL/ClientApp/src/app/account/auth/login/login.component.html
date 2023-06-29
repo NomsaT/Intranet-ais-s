@@ -1,0 +1,94 @@
+<div class="account-pages my-5 pt-sm-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card overflow-hidden">
+          <div class="bg-soft bg-primary">
+            <div class="row">
+              <div class="col-7">
+                <div class="text-primary p-4">
+                  <h5 class="text-primary">Welcome Back !</h5>
+                  <p>Sign in to continue to ACS.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body pt-0">
+            <div>
+              <a routerLink="/">
+                <div class="avatar-md profile-user-wid mb-4">
+                  <span class="avatar-title rounded-circle bg-light">
+                    <img src="assets/images/logo-dark.png" alt="" class="rounded-circle" height="34">
+                  </span>
+                </div>
+              </a>
+            </div>
+            <div class="p-2">
+              <form class="form-horizontal" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+                <ngb-alert type="danger" *ngIf="error" [dismissible]="false">{{error}}</ngb-alert>
+
+                <div class="mb-3">
+                  <label for="email">Username / Email</label>
+                  <input type="email" formControlName="email" class="form-control" id="email" placeholder="Username / Email"
+                         [ngClass]="{ 'is-invalid': submitted && f.email.errors }" />
+                  <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                    <div *ngIf="f.email.errors.required">Username / Email is required</div>
+                    <div *ngIf="f.email.errors.email">Email must be a valid email address</div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="password">Password</label>
+                  <div class="input-group auth-pass-inputgroup">
+
+                    <input [type]="password" class="form-control" formControlName="password" placeholder="Enter password" id="password"
+                           [ngClass]="{ 'is-invalid': submitted && f.password.errors }" aria-label="Password"
+                           aria-describedby="password-addon">
+
+                    <button (click)="onClick()" class="btn btn-light ms-0" type="button" id="password-addon">
+                      <em class="mdi mdi-eye-outline"></em>
+                    </button>
+
+                    <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                      <span *ngIf="f.password.errors.required">Password is required</span>
+                    </div>
+                  </div>
+                  <div *ngIf="attemptsRemaining<3">
+                    <ngb-alert type="danger" *ngIf="error" [dismissible]="false">
+                      {{attemptsRemaining}} Attempt(s) remaining
+                    </ngb-alert>
+                  </div>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="remember-check" formControlName="rememberMe">
+                  <label class="form-check-label" for="remember-check">
+                    Remember me
+                  </label>
+                </div>
+
+                <div class="mt-3 d-grid">
+                  <button class="btn btn-primary" type="submit">Log In</button>
+                </div>
+                <div class="mt-4 text-center">
+                  <a routerLink="/account/forgot-password" class="text-muted">
+                    <em class="mdi mdi-lock mr-1"></em> Forgot
+                    your
+                    password?
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="yearfooter">
+          <p>{{year}} © Amfi Composites.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- end container -->
+</div>
+<!-- end page -->

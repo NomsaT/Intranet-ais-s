@@ -1,0 +1,122 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Goods Received Note</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Purchasing → GRN</li>
+          </ol>
+        </div>
+      </div>
+      <!--ADD START-->
+      <div class="table-align">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">GRN</h5>
+            <dx-form class="invoice-form" [showValidationSummary]="false" [(formData)]="dataAdd">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item dataField="internalOrderid" editorType="dxSelectBox"
+                  [editorOptions]="{ dataSource: InternalOrdersForeignDataSource,displayExpr:'approvedIOSupplierName',valueExpr:'id',searchEnabled:true, showClearButton:'true' }">
+                  <dxo-label [text]="'Select PO'"></dxo-label>
+                  <dxi-validation-rule type="required" message="PO is required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item itemType="button" alignment="left" [buttonOptions]="CaptureGRN">
+                </dxi-item>
+              </dxi-item>
+            </dx-form>
+          </div>
+        </div>
+      </div>
+      <!--ADD END-->
+      <!--EDIT START-->
+      <div class="table-align">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Edit GRN</h5>
+            <dx-form class="invoice-form" [showValidationSummary]="false" [(formData)]="dataEdit">
+              <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+                <dxi-item dataField="internalOrderid" editorType="dxSelectBox"
+                  [editorOptions]="{ dataSource: InternalOrdersForeignDataSourceEdit,displayExpr:'approvedIOSupplierName',valueExpr:'id',searchEnabled:true, showClearButton:'true',onValueChanged:setGrn }">
+                  <dxo-label [text]="'Select PO'"></dxo-label>
+                  <dxi-validation-rule type="required" message="PO is required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item dataField="grnEditid" editorType="dxSelectBox"
+                  [editorOptions]="{ dataSource: GrnForeignDataSource,displayExpr:'grnNumber',valueExpr:'id',searchEnabled:true, showClearButton:'true',  disabled:!enableSelectGRNedit, value: updatedValueEdit  }">
+                  <dxo-label [text]="'Select GRN'"></dxo-label>
+                  <dxi-validation-rule type="required" message="GRN required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item itemType="button" alignment="left" [buttonOptions]="EditGRN">
+                </dxi-item>
+              </dxi-item>
+            </dx-form>
+          </div>
+        </div>
+      </div>
+      <!--EDIT END-->
+      <!--DELETE START-->
+      <div class="table-align">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Delete GRN</h5>
+            <dx-form class="invoice-form" [showValidationSummary]="false" [(formData)]="dataDelete">
+              <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+                <dxi-item dataField="internalOrderid" editorType="dxSelectBox"
+                  [editorOptions]="{ dataSource: InternalOrdersForeignDataSourceDlt,displayExpr:'approvedIOSupplierName',valueExpr:'id',searchEnabled:true, showClearButton:'true',onValueChanged:setGrnDlt }">
+                  <dxo-label [text]="'Select PO'"></dxo-label>
+                  <dxi-validation-rule type="required" message="PO is required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item dataField="grnDeleteid" editorType="dxSelectBox"
+                  [editorOptions]="{ dataSource: GrnForeignDataSource,displayExpr:'grnNumber',valueExpr:'id',searchEnabled:true, showClearButton:'true' ,disabled:!enableSelectGRNdlt,  value: updatedValueDlt  }">
+                  <dxo-label [text]="'Select GRN'"></dxo-label>
+                  <dxi-validation-rule type="required" message="GRN is required"></dxi-validation-rule>
+                </dxi-item>
+                <dxi-item itemType="button" alignment="left" [buttonOptions]="DeleteGRN">
+                </dxi-item>
+              </dxi-item>
+            </dx-form>
+          </div>
+        </div>
+      </div>
+      <!--DELETE END-->
+      <!--POPUP Delete Grn-->
+      <dx-popup width="auto" height="150px" [showTitle]="false" dragEnabled="true" [closeOnOutsideClick]="false"
+        container=".dx-viewport" [(visible)]="popupVisible">
+        <dxi-toolbar-item widget="dxButton" toolbar="bottom" location="after" [options]="GrnRemove">
+        </dxi-toolbar-item>
+        <dxi-toolbar-item widget="dxButton" toolbar="bottom" location="before" [options]="CancelRemove">
+        </dxi-toolbar-item>
+        <div *dxTemplate="let data of 'content'">
+          <div style="width: auto; height: auto">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <table class="table table-centered table-nowrap">
+                <tr>
+                  <td class="tr-top-padding">Are you sure you want to delete the following GRN Number:
+                    {{popupDeleteData.grn.grnNumber}}</td>
+                </tr>
+              </table>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </dx-popup>
+      <!--POPUP Barcode Void Grn-->
+      <dx-popup width="300px" height="auto" [showTitle]="true" [title]="title" dragEnabled="true"
+        [closeOnOutsideClick]="false" container=".dx-viewport" [showCloseButton]="true"
+        [(visible)]="popupVisibleBarcodeVoid">
+        <div *dxTemplate="let data of 'content'">
+          <div style="width: auto; height: auto">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <table class="table table-centered table-nowrap">
+                <tr *ngFor="let barcode of voidedBarcodes">
+                  <td>{{barcode}}</td>
+                </tr>
+              </table>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </dx-popup>
+    </div>
+  </div>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

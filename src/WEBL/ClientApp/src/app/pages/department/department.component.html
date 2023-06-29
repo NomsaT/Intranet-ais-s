@@ -1,0 +1,158 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <h4 class="mb-0 font-size-18">Profit Centers / Departments</h4>
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">Masterlists → Profit Centers / Departments</li>
+            </ol>
+          </div>
+        </div>
+        <div class="table-align">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <dx-data-grid #status id="roles" [dataSource]="dataSource"
+                          [remoteOperations]="true"
+                          showBorders="true"
+                          keyExpr="id"
+                          showRowLines="true"
+                          showColumnLines="true"
+                          [hoverStateEnabled]="true" class="dx-table"
+                          [wordWrapEnabled]="true"
+                          [columnAutoWidth]="true"
+                          [showColumnLines]="true"
+                          [showRowLines]="false"
+                          [showBorders]="false"
+                          (onExporting)="onExporting($event)"
+                          (onExported)="onExported($event)"
+                          (onEditingStart)="EditStart($event)"
+                          (onCellPrepared)="onCellPrepared($event)"
+                          (onInitNewRow)="newRow($event)"
+                          [rowAlternationEnabled]="true"
+                          (onSaving)="onSaving($event)">
+              <dxo-search-panel [visible]="true"></dxo-search-panel>
+              <dxo-scrolling mode="infinite"></dxo-scrolling>
+              <dxo-filter-row [visible]="true"></dxo-filter-row>
+              <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+              <dxo-editing mode="popup"
+                           [allowAdding]="allowModify"
+                           [allowUpdating]="allowModify"
+                           [allowDeleting]="allowModify"
+                           [useIcons]="true">
+                <dxo-popup title="Profit Centers / Departments"
+                           [showTitle]="true"
+                           dragEnabled="true"
+                           [width]="550"
+                           [height]="500">
+                </dxo-popup>
+
+                <dxo-form>
+                  <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+                    <dxi-item dataField="abbreviation" [editorOptions]="{hint:'Enter abbreviation for the new department'}"></dxi-item>
+                    <dxi-item dataField="name" [editorOptions]="{hint:'Enter department name'}"></dxi-item>
+                    <dxi-item dataField="color"></dxi-item>
+                    <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                      <dxi-item dataField="costTypeId" [editorOptions]="{searchEnabled:true,showClearButton:true,width: '320%',hint:'Select a cost type for the new department'}"></dxi-item>
+                      <dxi-item itemType="button"
+                                alignment="left"
+                                [buttonOptions]="buttonOptions"
+                                [editorOptions]="{ width: '20%' }">
+                      </dxi-item>
+                    </dxi-item>
+                    <dxi-item dataField="description" [spellcheck]="true" [colSpan]="2">
+                      <dxo-form-item editorType="dxTextArea"
+                                     [editorOptions]="{ height: 70, stylingMode: 'filled'}">
+                      </dxo-form-item>
+                    </dxi-item>
+                    <dxi-item dataField="generalPurchasing" [editorOptions]="{hint:'Check the box if you wish to make this department the default purchasing department.'}">
+                      <dxo-label [text]="'General Purchasing'"></dxo-label>
+                    </dxi-item>
+                  </dxi-item>
+                </dxo-form>
+              </dxo-editing>
+              <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+              <dxo-export [enabled]="true" fileName="Department-List"></dxo-export>
+
+              <dxi-column dataField="abbreviation" caption="Abbreviated"></dxi-column>
+              <dxi-column dataField="name" caption="Name">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+              </dxi-column>
+              <dxi-column dataField="costTypeId" caption="Cost Type">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="CostTypeForeignDataSource"
+                            displayExpr="abbName"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="generalPurchasing" caption="Default Department" dataType="boolean">
+                <dx-check-box [value]="false"></dx-check-box>
+              </dxi-column>
+              <dxi-column dataField="description" caption="Description" [spellcheck]="true">
+                <dxo-form-item editorType="dxTextArea"
+                               [editorOptions]="{ height: 70, stylingMode: 'filled',hint:'Enter a description for the new department' }">
+                </dxo-form-item>
+              </dxi-column>
+              <dxi-column dataField="color" caption="Department Color" cellTemplate="cellColorTemplate" editCellTemplate="cellColorTemplate" [visible]="false">
+              </dxi-column>
+
+              <div *dxTemplate="let cell of 'cellColorTemplate'">
+                <div class="dx-field-value">
+                  <dx-color-box [(value)]="currentColor" hint="Enter department color"  applyButtonText="Apply" cancelButtonText="Decline" (onValueChanged)="handleValueChange($event,cell)" style="padding:10px 0" ></dx-color-box>
+                </div>
+              </div>
+              <dxi-column caption="Department Color" cellTemplate="cellTemplate" [formItem]="{ visible: false }">
+              </dxi-column>
+              <div *dxTemplate="let data of 'cellTemplate'">
+              </div>
+            </dx-data-grid>
+            <dx-popup title="Cost Type"
+                      [width]="750"
+                      [height]="550"
+                      [showTitle]="true"
+                      dragEnabled="true"
+                      [closeOnOutsideClick]="false"
+                      [showCloseButton]="true"
+                      (onHidden)="onHidden($event)"
+                      [(visible)]="popupVisible">
+              <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+                <app-cost-types></app-cost-types>
+              </dx-scroll-view>
+            </dx-popup>
+            <dx-popup [width]="400"
+                      [height]="150"
+                      [showTitle]="false"
+                      [dragEnabled]="false"
+                      [closeOnOutsideClick]="false"
+                      [showCloseButton]="false"
+                      [(visible)]="popupDownloadConfirmVisible">
+
+              <dxi-toolbar-item widget="dxButton"
+                                itemType="group"
+                                toolbar="bottom"
+                                location="center"
+                                [options]="yesDownloadButtonOptions">
+              </dxi-toolbar-item>
+
+              <dxi-toolbar-item widget="dxButton"
+                                itemType="group"
+                                toolbar="bottom"
+                                location="center"
+                                [options]="noDownloadButtonOptions">
+              </dxi-toolbar-item>
+
+              <dxo-position at="center"
+                            my="center"
+                            of="window">
+              </dxo-position>
+              <p style="text-align: center">
+                Are you sure you want to download this file?
+              </p>
+            </dx-popup>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

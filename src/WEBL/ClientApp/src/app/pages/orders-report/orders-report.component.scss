@@ -1,0 +1,82 @@
+tbody:hover {
+  background-color: #96989dbf;
+}
+
+tbody {
+  border-radius: 5px !important;
+}
+
+.inner-tbody {
+  width: 100% !important;
+  display: table;
+}
+
+.blanks {
+  background-color: #f2f2f5;
+}
+
+.table-align {
+  background-color: #f2f2f5 !important;
+}
+
+.table-col {
+  background-color: #f1f1f4 !important;
+}
+
+.border-left {
+  border-left: 10px solid #2a3042;
+}
+
+.border-approve-left {
+  border-left: 10px solid #34c38f !important;
+}
+
+.border-pending-left {
+  border-left: 10px solid #f1b44c !important;
+}
+
+.border-deny-left {
+  border-left: 10px solid #f46a6a !important;
+}
+
+.dx-datagrid {
+  background-color: #f1f1f4 !important;
+}
+
+.io-header {
+  background-color: #72737838;
+  color: #2a3042;
+}
+
+.badge {
+  padding: 6px 6px !important;
+  font-size: 80% !important;
+}
+
+.float-right {
+  text-align: right !important;
+}
+
+.icon-inline {
+  display: inline-flex;
+}
+
+#info {
+  font-size: 19px !important;
+  font-weight: 600;
+  margin-left: 8px;
+  color: #2a3042;
+}
+
+.bg-default {
+  background-color: #337ab7 !important;
+}
+
+.bg-pink {
+  background-color: #ff2d53 !important;
+}
+
+.edit-badge {
+  background-color: #337ab7 !important;
+  margin-left: 4px;
+}

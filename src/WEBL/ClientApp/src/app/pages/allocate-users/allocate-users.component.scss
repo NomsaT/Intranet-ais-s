@@ -1,0 +1,15 @@
+::ng-deep .dx-datagrid-rowsview .dx-master-detail-row:not(.dx-datagrid-edit-form) > .dx-datagrid-group-space,
+::ng-deep .dx-datagrid-rowsview .dx-master-detail-row:not(.dx-datagrid-edit-form) .dx-master-detail-cell {
+  background-color: white !important;
+}
+
+.icon-inline {
+  display: inline-flex;
+}
+
+#info {
+  font-size: 19px !important;
+  font-weight: 600;
+  margin-left: 8px;
+  color: #2a3042;
+}

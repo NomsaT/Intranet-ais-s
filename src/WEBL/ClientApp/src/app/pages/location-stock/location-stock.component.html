@@ -1,0 +1,252 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div
+        class="page-title-box d-flex align-items-center justify-content-between"
+      >
+        <h4 class="mb-0 font-size-18">Location Stock</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">
+              Stock Management → Location Stock
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-12 table-col">
+          <dx-data-grid
+            #status
+            id="roles"
+            [dataSource]="dataSource"
+            [remoteOperations]="true"
+            showBorders="true"
+            keyExpr="id"
+            showRowLines="true"
+            showColumnLines="true"
+            [hoverStateEnabled]="true"
+            class="dx-table"
+            [wordWrapEnabled]="true"
+            [columnAutoWidth]="true"
+            [showColumnLines]="true"
+            [showRowLines]="false"
+            [showBorders]="false"
+            (onExporting)="onExporting($event)"
+            (onExported)="onExported($event)"
+            [rowAlternationEnabled]="true"
+          >
+            <dxo-search-panel [visible]="true"></dxo-search-panel>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager
+              [showPageSizeSelector]="true"
+              [allowedPageSizes]="[10, 15, 20, 25, 50]"
+              [showInfo]="true"
+              [showNavigationButtons]="true"
+            >
+            </dxo-pager>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+            <dxo-editing
+              mode="form"
+              [allowAdding]="false"
+              [allowUpdating]="false"
+              [allowDeleting]="false"
+              [useIcons]="true"
+            >
+            </dxo-editing>
+
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Location-List"></dxo-export>
+
+            <dxi-column
+              dataField="code"
+              caption="Item Code"
+              [formItem]="{ disabled: true }"
+              [groupIndex]="1"
+            ></dxi-column>
+            <dxi-column
+              dataField="productName"
+              caption="Item Name"
+              [formItem]="{ disabled: true }"
+            ></dxi-column>
+            <dxi-column
+              dataField="internalProductName"
+              caption="Internal Item Name"
+              [formItem]="{ disabled: true }"
+              [groupIndex]="2"
+            ></dxi-column>
+            <dxi-column
+              dataField="stockCategoryId"
+              caption="Stock Category"
+              [formItem]="{ disabled: true }"
+            >
+              <dxo-lookup
+                [dataSource]="StockCategoryForeignDataSource"
+                displayExpr="name"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+
+            <dxi-column
+              dataField="stockGroupId"
+              caption="Stock Group"
+              [formItem]="{ disabled: true }"
+            >
+              <dxo-lookup
+                [dataSource]="StockGroupForeignDataSource"
+                displayExpr="name"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+
+            <dxi-column
+              dataField="departmentId"
+              caption="Department"
+              [formItem]="{ disabled: true }"
+            >
+              <dxo-lookup
+                [dataSource]="DepartmentForeignDataSource"
+                displayExpr="name"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column
+              dataField="locationId"
+              caption="Plant Location"
+              [groupIndex]="0"
+            >
+              <dxo-lookup
+                [dataSource]="LocationForeignDataSource"
+                displayExpr="name"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storeId" caption="Store">
+              <dxo-lookup
+                [dataSource]="StoreForeignDataSource"
+                displayExpr="name"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storeTypeId" caption="Store Type">
+              <dxo-lookup
+                [dataSource]="StoreTypeForeignDataSource"
+                displayExpr="name"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column
+              dataField="supplierCurrencyId"
+              caption="ISO"
+              [visible]="false"
+              [formItem]="{ visible: false }"
+            >
+              <dxo-lookup
+                [dataSource]="CurrencyForeignDataSource"
+                displayExpr="iso"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storageTypeId" caption="Storage Type">
+              <dxo-lookup
+                [dataSource]="StorageTypeForeignDataSource"
+                displayExpr="name"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column
+              dataField="price"
+              caption="Price"
+              alignment="right"
+              [formItem]="{ disabled: true }"
+              [calculateCellValue]="priceISO"
+            ></dxi-column>
+            <dxi-column
+              dataField="verificationScan"
+              caption="VerificationScan"
+              alignment="right"
+              [formItem]="{ disabled: true }"
+            ></dxi-column>
+            <dxi-column
+              dataField="quantity"
+              caption="Quantity"
+              [formItem]="{ disabled: true }"
+              [calculateCellValue]="initialUomQuantity"
+            ></dxi-column>
+            <dxi-column
+              dataField="uomid"
+              caption="UoM"
+              [formItem]="{ disabled: true }"
+              [visible]="false"
+            >
+              <dxo-lookup
+                [dataSource]="UnitofMeasureForeignDataSource"
+                displayExpr="name"
+                valueExpr="id"
+              >
+              </dxo-lookup>
+            </dxi-column>
+
+            <dxo-summary>
+              <dxi-group-item
+                column="code"
+                summaryType="count"
+                displayFormat="{0} items"
+              >
+              </dxi-group-item>
+              <!--<dxi-group-item column="price"
+                    summaryType="sum"
+                    [customizeText]="randFormatConversion"
+                    displayFormat="Total: R {0}">
+    </dxi-group-item>-->
+            </dxo-summary>
+          </dx-data-grid>
+          <dx-popup
+            [width]="400"
+            [height]="150"
+            [showTitle]="false"
+            [dragEnabled]="false"
+            [closeOnOutsideClick]="false"
+            [showCloseButton]="false"
+            [(visible)]="popupDownloadConfirmVisible"
+          >
+            <dxi-toolbar-item
+              widget="dxButton"
+              itemType="group"
+              toolbar="bottom"
+              location="center"
+              [options]="yesDownloadButtonOptions"
+            >
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item
+              widget="dxButton"
+              itemType="group"
+              toolbar="bottom"
+              location="center"
+              [options]="noDownloadButtonOptions"
+            >
+            </dxi-toolbar-item>
+
+            <dxo-position at="center" my="center" of="window"> </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+</div>
+<!-- container-fluid -->

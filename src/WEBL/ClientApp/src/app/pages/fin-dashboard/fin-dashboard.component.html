@@ -1,0 +1,128 @@
+<div class="container-fluid">
+  <!--HEADING START-->
+  <div class="row">
+    <div class="col-12 col-md-12 col-sm-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between " style="margin-top:-16px">
+        <h4 class="mb-0 font-size-18">FIN Dashboard</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">ACS → Fin Dashboard</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--HEADING END-->
+
+  <div class="row">
+
+
+    <div class="col-lg-6 col-md-12 col-sm-12">
+      <div class="card" style="height:83px;margin-top:-8px">
+        <div class="card-body">
+          <div class="align-left">
+            <h4 class="card-title mb-2  " style="margin-top:-8px !important;">Monthly Stock Value</h4>
+            <p class="text-muted dash-data" style="margin-bottom:-3px !important;font-size: x-small"
+              *ngIf="monthlyStockValueObj">{{monthlyStockValueObj}}</p>
+            <p *ngIf="!monthlyStockValueObj" class="text-muted" style="margin-bottom:-3px !important;font-size: small;">
+              No Stock Value Available.</p>
+            <br />
+          </div>
+          <div class="align-right" style="margin-top:-10px">
+            <i class=" bx bx-money icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="col-lg-6 col-md-12 col-sm-12">
+      <div class="card" style="height:83px;margin-top:-8px">
+        <div class="card-body">
+          <div class="align-left">
+            <h4 class="card-title " style="margin-top:-8px !important;">Stock Value </h4>
+            <p class="text-muted   dash-data" style="margin-top:-7px !important;color:green !important;"
+               *ngIf="monthlyStockPercentage>=0"><span class="currency-span-up bx bx-up-arrow-alt"> </span>{{monthlyStockValue }}</p>
+
+            <p class="text-muted   dash-data" style="margin-top: -7px !important; color: #d9534f !important;"
+               *ngIf="monthlyStockPercentage<0"><span class="currency-span-down bx bx-down-arrow-alt"> </span>{{monthlyStockValue }}</p>
+
+            <p *ngIf="monthlyStockValue" class="text-muted " style="margin-top:-15px !important; ">vs previous month</p>
+
+          </div>
+          <div class="align-right" style="margin-top:-10px">
+            <i class="bx bx-line-chart icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+  <!--end card-->
+  <div class="col-lg-12">
+    <div class="card" style="margin-top:-14px;height:425px">
+      <div class="card-body">
+        <h4 class="card-title mb-4 justify-content-between" style="font-size: 18px">
+          Stock Value Summary
+        </h4>
+
+        <apx-chart [series]="lineColumnChart.series" [chart]="lineColumnChart.chart" [yaxis]="lineColumnChart.yaxis"
+          [xaxis]="lineColumnChart.xaxis" [labels]="lineColumnChart.labels" [stroke]="lineColumnChart.stroke"
+          [title]="lineColumnChart.title" [fill]="lineColumnChart.fill" [tooltip]="lineColumnChart.tooltip"></apx-chart>
+
+      </div>
+    </div>
+
+  </div>
+  <!--end card-->
+</div>
+<!--ROW 1 START-->
+<div class="row">
+  <!-- DEPARTMENT STOCK -->
+  <div class="col-lg-6 col-md-12 col-sm-12">
+    <div class="card" style="height: 270px;margin-top:-14px;margin-left: 12px;">
+      <div class="card-body">
+        <h4 class="card-title justify-content-between" style="margin-bottom:-14px ;font-size: 18px">
+          Total Orders Placed
+        </h4>
+
+        <div *ngIf="orderListExist">
+          <apx-chart style="height: 270px;margin-bottom:24px" [series]="chartOption.series" [chart]="chartOption.chart"
+            [labels]="chartOption.labels" [responsive]="chartOption.responsive" [dataLabels]="chartOption.dataLabels" [colors]="chartOption.colors" >
+          </apx-chart>
+        </div>
+        <div style="height: 270px;margin-bottom:24px; margin-top:84px;" *ngIf="!orderListExist">No Internal Orders
+          Placed This Month.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card" style="margin-top:-14px;height:270px;margin-right: 12px;">
+      <div class="card-body">
+        <h4 class="card-title justify-content-between" style="margin-bottom:-14px !important;font-size: 18px">
+          Department Stock
+        </h4>
+        <div *ngIf="departmentStockListExist">
+          <apx-chart style="height: 270px;margin-bottom:24px;margin-right:50px" [series]="chartOptions.series"
+            [chart]="chartOptions.chart" [labels]="chartOptions.labels" [responsive]="chartOptions.responsive"
+            [dataLabels]="chartOptions.dataLabels"></apx-chart>
+        </div>
+        <div style="height: 270px;margin-bottom:24px; margin-top:84px;" *ngIf="!departmentStockListExist">No Department
+          Stock
+          Available.
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </div>
+  <!--end card-->
+</div>
+
+<!--ROW 1 END-->

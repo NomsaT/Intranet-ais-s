@@ -1,0 +1,12 @@
+<dx-data-grid [dataSource]="dataSource" [showBorders]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true">
+  <dxi-column dataField="stockComponentId" caption="Item Description">
+    <dxo-lookup [dataSource]="StockForeignDataSource"
+                [displayExpr]="getStock"
+                valueExpr="id">
+    </dxo-lookup>
+  </dxi-column>
+
+  <dxi-column dataField="quantity" dataType="int" caption="Quantity"></dxi-column>
+  <dxi-column dataField="uomName" caption="UOM"></dxi-column>
+
+</dx-data-grid>

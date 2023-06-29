@@ -1,0 +1,397 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <div class="icon-inline">
+            <h4 class="mb-0 font-size-18">Orders</h4>
+            <div id="info" (mouseenter)="toggleDefault()" (mouseleave)="toggleDefault()"><i class="bx bx-info-circle"></i></div>
+            <dx-tooltip target="#info"
+                        [(visible)]="defaultVisible"
+                        [closeOnOutsideClick]="false">
+              <div *dxTemplate="let data = data of 'content'">
+                This page will show all internal orders.
+              </div>
+            </dx-tooltip>
+          </div>            
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">Purchasing → Orders</li>
+            </ol>
+          </div>
+        </div>
+        <div class="table-align">
+          <dx-load-panel #loadPanel
+                         shadingColor="rgba(0,0,0,0.4)"
+                         [(visible)]="loadingVisible"
+                         [showIndicator]="true"
+                         [showPane]="true"
+                         [shading]="true"
+                         [closeOnOutsideClick]="false">
+          </dx-load-panel>
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <dx-data-grid #orders id="orders"
+                          [dataSource]="dataSource"
+                          keyExpr="id"
+                          [columnAutoWidth]="true"
+                          [showColumnLines]="true"
+                          [showRowLines]="false"
+                          [showBorders]="false"
+                          (onSelectionChanged)="selectedChanged($event)"
+                          (onCellPrepared)="onCellPrepared($event)"
+                          (onInitNewRow)="onInitNewRow($event)"
+                          (onEditorPreparing)="onEditorPreparingParent($event)"
+                          (onEditingStart)="onEditingStartParent($event)"
+                          (onToolbarPreparing)="onToolbarPreparingParent($event)"
+                          (onSaving)="onSaving($event)"
+                          (onSaved)="onSavedParent($event)"
+                          (onEditCanceled)="onEditCanceledParent($event)"
+                          rowTemplate="dataRowTemplateName"
+                          [showColumnHeaders]="false"
+                          [wordWrapEnabled]="true">
+              <dxo-selection mode="single"></dxo-selection>
+              <dxo-load-panel [enabled]="false"></dxo-load-panel>
+              <dxo-search-panel [visible]="true" [width]="250"></dxo-search-panel>
+              <dxo-editing mode="popup">
+                <dxo-texts saveRowChanges="Submit">
+                </dxo-texts>
+                <dxo-popup [title]="heading"
+                           [showTitle]="true"
+                           dragEnabled="true"
+                           [width]="'70%'"
+                           [height]="'90%'">
+                </dxo-popup>
+                <dxo-form id="form" scrollingEnabled="true">
+                  <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                    <dxi-item dataField="requestedById"></dxi-item>
+                    <dxi-item dataField="placedById" [editorOptions]="{ readOnly: true }"></dxi-item>
+                    <dxi-item dataField="quotationNumber"></dxi-item>
+                    <dxi-item dataField="supplierId"></dxi-item>
+                    <dxi-item dataField="plantLocationId"></dxi-item>
+                    <dxi-item dataField="departmentId"></dxi-item>
+                    <dxi-item dataField="glcodeId"></dxi-item>
+                    <dxi-item dataField="approveById"></dxi-item>
+                    <dxi-item dataField="followUpDate"></dxi-item>
+                    <dxi-item dataField="deliveryDate"></dxi-item>
+                    <dxi-item dataField="deliveryCost" [editorOptions]="{format:currencyZAR}"></dxi-item>
+                    <dxi-item dataField="discount"></dxi-item>
+                    <dxi-item dataField="total" [editorOptions]="{ readOnly: true,format:currencyZAR}"></dxi-item>
+                    <dxi-item dataField="comment">
+                      <dxo-label [text]="'Internal Comment'"></dxo-label>
+                    </dxi-item>
+                    <dxi-item dataField="internalComment" [visible]="hasComment" [editorOptions]="{ disabled: true}">
+                      <dxo-label [text]="'Additional Comment'"></dxo-label>
+                    </dxi-item>
+                  </dxi-item>
+                  <!-- #region Internal Order Items-->
+                  <dxi-item itemType="group" caption="Internal Order Items" [colSpan]="2">
+                    <dxi-item dataField="internalOrderItems"><dxo-label [visible]="false"></dxo-label> </dxi-item>
+                  </dxi-item>
+                </dxo-form>
+              </dxo-editing>
+              <!-- #endregion -->
+              <!--#region Internal Order-->
+              <dxi-column dataField="id" [visible]="false" dataType="int"></dxi-column>
+              <dxi-column dataField="requestedById" caption="Requested By">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="UsersForeignDataSource"
+                            displayExpr="fullName"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="placedById" caption="Placed By">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="UsersForeignDataSource"
+                            displayExpr="fullName"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="quotationNumber"></dxi-column>
+              <dxi-column dataField="supplierId" caption="Supplier">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="SupplierForeignDataSource"
+                            [displayExpr]="getFullName"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="plantLocationId" caption="Plant Location">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="PlantLocationForeignDataSource"
+                            displayExpr="name"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="departmentId" caption="Department">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                            displayExpr="name"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="approveById" caption="Approve By">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="DepartmentManagersForeignDataSource"
+                            displayExpr="fullName"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="followUpDate" dataType="date">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+              </dxi-column>
+              <dxi-column dataField="deliveryDate" dataType="date">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+              </dxi-column>
+              <dxi-column dataField="deliveryCost" caption="Delivery Cost (ZAR)" [format]="currencyZAR" dataType="number" [setCellValue]="setCellValueDeliveryCost"></dxi-column>
+              <dxi-column dataField="discount" caption="Discount (%)" dataType="number" [setCellValue]="setCellValueDiscount">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+              </dxi-column>
+              <dxi-column dataField="total" caption="Total (ZAR)" dataType="number" [format]="currencyZAR">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+              </dxi-column>
+              <dxi-column dataField="comment" [spellcheck]="true">
+                <dxo-form-item editorType="dxTextArea"
+                               [editorOptions]="{ height: 70, stylingMode: 'filled' }">
+                </dxo-form-item>
+              </dxi-column>
+              <dxi-column dataField="internalComment">
+                <dxo-form-item editorType="dxTextArea"
+                               [editorOptions]="{ height: 70,disabled: true, stylingMode: 'filled' }">
+                </dxo-form-item>
+              </dxi-column>
+              <dxi-column dataField="internalOrderItems" [visible]="false" editCellTemplate="editCellTemplateInternalOrderItems" [setCellValue]="setCellValueInternalOrderItem">
+              </dxi-column>
+              <div *dxTemplate="let cellInfo of 'editCellTemplateInternalOrderItems'">
+                <dx-data-grid #OrderItem id="OrderItem"
+                              [dataSource]="cellInfo.value"
+                              (onKeyDown)="onKeyDown($event)"
+                              (onFocusedCellChanged)="onFocusedCellChanged($event)"
+                              (onToolbarPreparing)="onToolbarPreparing($event)"
+                              (onEditorPreparing)="onEditorPreparingChild($event)"
+                              (onSaved)="onSavedChild(cellInfo)"
+                              (onInitNewRow)="onInitNewRowChild($event)"
+                              [showRowLines]="false"
+                              [showBorders]="false"
+                              [wordWrapEnabled]="true"
+                              [height]="300"
+                              [columnAutoWidth]="true">
+                  <dxo-editing mode="row"
+                               [allowAdding]="true"
+                               [allowUpdating]="true"
+                               [allowDeleting]="true"
+                               [useIcons]="true">
+                  </dxo-editing>
+                  <dxo-scrolling mode="infinite"></dxo-scrolling>
+                  <dxi-column dataField="id" [visible]="false" dataType="int"></dxi-column>
+                  <dxi-column dataField="stockId" caption="Stock" [setCellValue]="setCellValueItemPrice">
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                    <dxo-lookup #stockId [dataSource]="StockForeignDataSource"
+                                [displayExpr]="getStock"
+                                valueExpr="id">
+                    </dxo-lookup>
+                  </dxi-column>
+                  <dxi-column dataField="originalValue" caption="Old Price (ZAR)" [format]="currencyZAR" [editorOptions]="{readOnly: true,format:currencyZAR}" dataType="number"></dxi-column>
+                  <dxi-column dataField="value" caption="New Price (ZAR)" [format]="currencyZAR" [editorOptions]="{format:currencyZAR}" dataType="number" [setCellValue]="setCellValuePrice">
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-column>
+                  <dxi-column dataField="quantity" caption="Quantity" dataType="number" [setCellValue]="setCellValueQuantity">
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-column>
+                  <dxi-column dataField="total" caption="Total (ZAR)" dataType="number" [format]="currencyZAR" [editorOptions]="{ disabled: true,format:currencyZAR }"></dxi-column>
+                  <dxo-summary>
+                    <dxi-total-item column="stockId" displayFormat="Total Items: {0}" summaryType="count"> </dxi-total-item>
+                  </dxo-summary>
+                </dx-data-grid>
+              </div>
+              <!--#endregion-->
+              <!--#region Internal Order Tile View-->
+              <tbody class="dx-row" *dxTemplate="let orders of 'dataRowTemplateName'">
+                <tr class="blanks" style="border-left: 10px solid #f2f2f5 !important;">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <!------------------PENDING------------------>
+                <tr class="border-pending-left io-header" *ngIf="orders.data.statusDisplay == 'Pending'">
+                  <td colspan="12"><strong>Internal Order #{{orders.data.id}}</strong></td>
+                  <td colspan="3" class="float-right"><span class="badge bg-warning">{{orders.data.statusDisplay}}</span><span class="badge bg-warning edit-badge"><i class="bx bx-edit"></i> Edit Order</span></td>
+                </tr>
+                <tr class="main-row border-pending-left" *ngIf="orders.data.statusDisplay == 'Pending'">
+                  <td colspan="12"><strong>Supplier: </strong>{{ orders.data.supplierFullName }}</td>
+                  <td colspan="3" class="float-right"><strong>Requested By: </strong>{{ orders.data.requestByFullName }}</td>
+                </tr>
+                <tr class="notes-row border-pending-left" *ngIf="orders.data.statusDisplay == 'Pending'">
+                  <td colspan="13">
+                    <div>
+                      {{ orders.data.comment }}
+                    </div>
+                  </td>
+                  <td colspan="2" class="float-right"><strong>Date Created: </strong>{{ orders.data.dateCreated | date: 'dd MMMM yy' }}</td>
+                </tr>
+                <!------------------Pending Price Approval------------------>
+                <tr class="border-pink-left io-header" *ngIf="orders.data.statusDisplay == 'Pending Price Approval'">
+                  <td colspan="12"><strong>Internal Order #{{orders.data.id}}</strong></td>
+                  <td colspan="3" class="float-right"><span class="badge bg-pink">{{orders.data.statusDisplay}}</span><span class="badge bg-warning edit-badge"><i class="bx bx-edit"></i> Edit Order</span></td>
+                </tr>
+                <tr class="main-row border-pink-left" *ngIf="orders.data.statusDisplay == 'Pending Price Approval'">
+                  <td colspan="12"><strong>Supplier: </strong>{{ orders.data.supplierFullName }}</td>
+                  <td colspan="3" class="float-right"><strong>Requested By: </strong>{{ orders.data.requestByFullName }}</td>
+                </tr>
+                <tr class="notes-row border-pink-left" *ngIf="orders.data.statusDisplay == 'Pending Price Approval'">
+                  <td colspan="12"><strong>Delivery Date: </strong>{{ orders.data.deliveryDate | date: 'dd MMMM yy' }}</td>
+                  <td colspan="3" class="float-right"><strong>Date Created: </strong>{{ orders.data.dateCreated | date: 'dd MMMM yy' }}</td>
+                </tr>
+                <!------------------APPROVE------------------>
+                <tr class="border-approve-left io-header" *ngIf="orders.data.statusDisplay == 'Approved'">
+                  <td colspan="12"><strong>Internal Order #{{orders.data.id}}</strong></td>
+                  <td colspan="3" class="float-right"><span class="badge bg-success">{{orders.data.statusDisplay}}</span><span class="badge bg-success open-badge">Open</span></td>
+                </tr>
+                <tr class="main-row border-approve-left" *ngIf="orders.data.statusDisplay == 'Approved'">
+                  <td colspan="12"><strong>Supplier: </strong>{{ orders.data.supplierFullName }}</td>
+                  <td colspan="3" class="float-right"><strong>Requested By: </strong>{{ orders.data.requestByFullName }}</td>
+                </tr>
+                <tr class="notes-row border-approve-left" *ngIf="orders.data.statusDisplay == 'Approved'">
+                  <td colspan="12"><strong>Delivery Date: </strong>{{ orders.data.deliveryDate | date: 'dd MMMM yy' }}</td>
+                  <td colspan="3" class="float-right"><strong>Date Created: </strong>{{ orders.data.dateCreated | date: 'dd MMMM yy' }}</td>
+                </tr>
+                <!------------------REVIEW------------------>
+                <tr class="border-review-left io-header" *ngIf="orders.data.statusDisplay == 'Review'">
+                  <td colspan="12"><strong>Internal Order #{{orders.data.id}}</strong></td>
+                  <td colspan="3" class="float-right"><span class="badge bg-default">{{orders.data.statusDisplay}}</span><span class="badge bg-warning edit-badge"><i class="bx bx-edit"></i> Review Order</span></td>
+                </tr>
+                <tr class="main-row border-review-left" *ngIf="orders.data.statusDisplay == 'Review'">
+                  <td colspan="12"><strong>Supplier: </strong>{{ orders.data.supplierFullName }}</td>
+                  <td colspan="3" class="float-right"><strong>Requested By: </strong>{{ orders.data.requestByFullName }}</td>
+                </tr>
+                <tr class="notes-row border-review-left" *ngIf="orders.data.statusDisplay == 'Review'">
+                  <td colspan="12"><strong>Delivery Date: </strong>{{ orders.data.deliveryDate | date: 'dd MMMM yy' }}</td>
+                  <td colspan="3" class="float-right"><strong>Date Created: </strong>{{ orders.data.dateCreated | date: 'dd MMMM yy' }}</td>
+                </tr>
+                <!-----------------CLOSE------------------->
+                <tr class="border-deny-left io-header" *ngIf="orders.data.statusDisplay == 'Close'">
+                  <td colspan="12"><strong>Internal Order #{{orders.data.id}}</strong></td>
+                  <td colspan="3" class="float-right"><span class="badge bg-danger">{{orders.data.statusDisplay}}</span></td>
+                </tr>
+                <tr class="main-row border-deny-left" *ngIf="orders.data.statusDisplay == 'Close'">
+                  <td colspan="12"><strong>Supplier: </strong>{{ orders.data.supplierFullName }}</td>
+                  <td colspan="3" class="float-right"><strong>Requested By: </strong>{{ orders.data.requestByFullName }}</td>
+                </tr>
+                <tr class="notes-row border-deny-left" *ngIf="orders.data.statusDisplay == 'Close'">
+                  <td colspan="12"><strong>Delivery Date: </strong>{{ orders.data.deliveryDate | date: 'dd MMMM yy' }}</td>
+                  <td colspan="3" class="float-right"><strong>Date Created: </strong>{{ orders.data.dateCreated | date: 'dd MMMM yy' }}</td>
+                </tr>
+                <!------------------DRAFT------------------>
+                <tr class="border-draft-left io-header" *ngIf="orders.data.statusDisplay == 'Draft'">
+                  <td colspan="12"><strong>Internal Order #{{orders.data.id}}</strong></td>
+                  <td colspan="3" class="float-right"><span class="badge bg-draft">{{orders.data.statusDisplay}}</span><span class="badge bg-warning edit-badge"><i class="bx bx-edit"></i> Edit Draft</span></td>
+                </tr>
+                <tr class="main-row border-draft-left" *ngIf="orders.data.statusDisplay == 'Draft'">
+                  <td colspan="12"><strong>Supplier: </strong>{{ orders.data.supplierFullName }}</td>
+                  <td colspan="3" class="float-right"><strong>Requested By: </strong>{{ orders.data.requestByFullName }}</td>
+                </tr>
+                <tr class="notes-row border-draft-left" *ngIf="orders.data.statusDisplay == 'Draft'">
+                  <td colspan="12"><strong>Delivery Date: </strong>{{ orders.data.deliveryDate | date: 'dd MMMM yy' }}</td>
+                  <td colspan="3" class="float-right"><strong>Date Created: </strong>{{ orders.data.dateCreated | date: 'dd MMMM yy' }}</td>
+                </tr>
+              </tbody>
+              <!--#endregion-->
+            </dx-data-grid>
+            <dx-popup title="Pending Price Increase"
+                      [width]="950"
+                      [height]="'100%'"
+                      [showTitle]="true"
+                      dragEnabled="true"
+                      [closeOnOutsideClick]="false"
+                      [showCloseButton]="true"
+                      (onHidden)="onHidden($event)"
+                      [(visible)]="popupVisiblePriceIncrease">
+              <div *dxTemplate="let data of 'content'">
+                <dx-scroll-view width="100%" height="100%">
+                  <div style="width: auto; height: auto">
+                    <div class="IO-Details">
+                      <table class="table table-centered table-nowrap">
+                        <thead>
+                          <tr>
+                            <th scope="col">Increase Type</th>
+                            <th scope="col">Increase Value</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Comment</th>
+                            <th scope="col"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let item of priceIncreases">
+                            <td>
+                              <p class="mb-0">{{item.increaseTypeName}}</p>
+                            </td>
+                            <td>
+                              <p class="mb-0">{{item.increase}}</p>
+                            </td>
+                            <td>
+                              <p class="mb-0">{{item.date | date: 'dd MMMM yy'}}</p>
+                            </td>
+                            <td style="width: 200px;white-space: pre-wrap;">
+                              <p class="mb-0">{{item.comment}}</p>
+                            </td>
+                            <td style="text-align:center">
+                              <dx-button icon="save"
+                                         type="success"
+                                         text="Add"
+                                         (onClick)="onVoidUpdateIncrease(item.priceLookUpId)">
+                              </dx-button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </dx-scroll-view>
+              </div>
+            </dx-popup>
+            <dx-popup [width]="400"
+                      [height]="150"
+                      [showTitle]="false"
+                      [dragEnabled]="false"
+                      [closeOnOutsideClick]="true"
+                      [showCloseButton]="true"
+                      [(visible)]="popupquestion">
+
+              <dxi-toolbar-item widget="dxButton"
+                                itemType="group"
+                                toolbar="bottom"
+                                location="center"
+                                [options]="editOption">
+              </dxi-toolbar-item>
+
+              <dxi-toolbar-item widget="dxButton"
+                                itemType="group"
+                                toolbar="bottom"
+                                location="center"
+                                [options]="approveOption">
+              </dxi-toolbar-item>
+
+              <dxo-position at="center"
+                            my="center"
+                            of="window">
+              </dxo-position>
+              <p style="text-align: center">
+                Do you want to edit the internal order or approve the price increase?
+              </p>
+            </dx-popup>
+          </div>
+        </div>
+        </div>
+    </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

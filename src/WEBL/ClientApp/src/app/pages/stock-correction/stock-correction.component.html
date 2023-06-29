@@ -1,0 +1,152 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Stock Correction</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Stock Management → Stock Correction</li>
+          </ol>
+        </div>
+      </div>
+      <div class="page-title-box d-flex align-items-center justify-content-between warning">
+        <h4 class="warning-text">Below is a list of stock items including their quantities and prices. Only edit these records when you are certain about it.
+        Actions cannot be reverted.</h4>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-12 table-col">
+          <dx-data-grid #status id="roles" [dataSource]="dataSource"
+                        [remoteOperations]="true"
+                        showBorders="true"
+                        keyExpr="id"
+                        showRowLines="true"
+                        showColumnLines="true"
+                        [hoverStateEnabled]="true" class="dx-table"
+                        [wordWrapEnabled]="true"
+                        [columnAutoWidth]="true"
+                        [showColumnLines]="true"
+                        [showRowLines]="false"
+                        [showBorders]="false"
+                        (onExporting)="onExporting($event)"
+                        (onEditingStart)="EditStart($event)"
+                        (onExported)="onExported($event)"
+                        [rowAlternationEnabled]="true">
+            <dxo-search-panel [visible]="true"></dxo-search-panel>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager [showPageSizeSelector]="true"
+                       [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                       [showInfo]="true"
+                       [showNavigationButtons]="true">
+            </dxo-pager>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+            <dxo-editing mode="popup"
+                         [allowAdding]="false"
+                         [allowUpdating]="allowModify"
+                         [allowDeleting]="false"
+                         [useIcons]="true">
+
+              <dxo-popup title="Stock Correction"
+                         [showTitle]="true"
+                         [width]="500"
+                         [height]="500">
+              </dxo-popup>
+              <dxo-form>
+                <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+                  <dxi-item dataField="stockId" [editorOptions]="{ disabled: true }"></dxi-item>
+                  <dxi-item dataField="dateCreated" [editorOptions]="{ disabled: true }"></dxi-item>
+                  <dxi-item dataField="itemQuantity" [editorOptions]="{hint:'Enter the quantity (L, KG) of the item in the pack'}"></dxi-item>
+                  <dxi-item dataField="price" [editorOptions]="{hint:'Enter the correct price for the current stock item'}"></dxi-item>
+                  <dxi-item dataField="departmentId" [editorOptions]="{showClearButton:true,hint:'Select a location for the current stock item'}"></dxi-item>
+                  <dxi-item dataField="locationId" [editorOptions]="{onValueChanged:setStoreValue,showClearButton:true,hint:'Select a location for the current stock item'}"></dxi-item>
+                  <dxi-item dataField="storeId" [editorOptions]="{showClearButton:true,hint:'Select a store for the current stock item'}"></dxi-item>
+                </dxi-item>
+              </dxo-form>
+            </dxo-editing>
+
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Stock-Correction-List"></dxo-export>
+
+            <dxi-column dataField="stockId" caption="Item Description">
+              <dxo-lookup [dataSource]="StockForeignDataSource"
+                          [displayExpr]="getStock"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="dateCreated" caption="Date Created" dataType="date">
+            </dxi-column>
+            <dxi-column dataField="itemQuantity" caption="Item Quantity" [calculateCellValue]="initialUomQuantity">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="supplierCurrencyId" caption="ISO" [visible]="false" [formItem]="{ visible: false }">
+              <dxo-lookup [dataSource]="CurrencyForeignDataSource"
+                          displayExpr="iso"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="price" caption="Price" [calculateCellValue]="priceISO">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="departmentId" caption="Department">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+              <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="locationId" caption="Location">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+              <dxo-lookup [dataSource]="LocationForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storeId" caption="Store">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+              <dxo-lookup [dataSource]="StoreForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="dateModified" caption="Date Modified" dataType="date">
+            </dxi-column>
+
+          </dx-data-grid>
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupDownloadConfirmVisible">
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center"
+                          my="center"
+                          of="window">
+            </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

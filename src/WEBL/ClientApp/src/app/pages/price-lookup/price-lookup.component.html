@@ -1,0 +1,404 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <div class="icon-inline">
+            <h4 class="mb-0 font-size-18">Price-lookup</h4>
+            <div id="info" (mouseenter)="toggleDefault()" (mouseleave)="toggleDefault()" *ngIf="showInfoIcon"><i class="bx bx-info-circle"></i></div>
+            <dx-tooltip target="#info"
+                        [(visible)]="defaultVisible"
+                        [closeOnOutsideClick]="false">
+              <div *dxTemplate="let data = data of 'content'">
+                Price History will only be stored for 5 years. It will automatically be deleted after 5 years.
+              </div>
+            </dx-tooltip>
+          </div>
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">Price-Lookup → {{breadcrumbs}}</li>
+            </ol>
+          </div>
+        </div>
+        <dx-tab-panel #tabPanel
+                      [dataSource]="tabs"
+                      [selectedIndex]="0"
+                      [loop]="false"
+                      [animationEnabled]="true"
+                      [swipeEnabled]="true"
+                      (onSelectionChanged)="onOptionChanged($event)">
+          <div *dxTemplate="let tab of 'title'">
+            <span>{{tab.text}}</span>
+          </div>
+          <div *dxTemplate="let tab of 'item'">
+            <div class="tabpanel-item">
+              <div *ngIf="tab.text == 'Current Prices' && allowView == true">
+                <div class="table-align">
+                  <div class="col-md-12 col-sm-12 col-12 table-col">
+                    <dx-data-grid id="currentPrice" [dataSource]="CurrentDataSource"
+                                  [remoteOperations]="true"
+                                  showBorders="true"
+                                  keyExpr="id"
+                                  (onCellPrepared)="onCellPrepared($event)"
+                                  (onCellClick)="priceincrease($event)"
+                                  (onContentReady)="onContentReady($event)"
+                                  (onEditingStart)="EditStart($event)"
+                                  (onEditCanceling)="onEditCanceling($event)"
+                                  (onEditorPreparing)="onEditorPreparing($event)"
+                                  (onInitNewRow)="newRow($event)"
+                                  (onSaved)="onSaved($event)"
+                                  (onSaving)="onSaved($event)"
+                                  (onExporting)="onExporting($event)"
+                                  (onExported)="onExported($event)"
+                                  [hoverStateEnabled]="true" class="dx-table"
+                                  [columnAutoWidth]="true"
+                                  [showColumnLines]="true"
+                                  [showRowLines]="false"
+                                  [showBorders]="false"
+                                  [wordWrapEnabled]="true"
+                                  [rowAlternationEnabled]="true">
+                      <dxo-search-panel [visible]="true"></dxo-search-panel>
+                      <dxo-paging [pageSize]="15"></dxo-paging>
+                      <dxo-pager [showPageSizeSelector]="true"
+                                 [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                                 [showInfo]="true"
+                                 [showNavigationButtons]="true">
+                      </dxo-pager>
+                      <dxo-filter-row [visible]="true"></dxo-filter-row>
+                      <dxo-header-filter [visible]="true"></dxo-header-filter>
+                      <dxo-group-panel [visible]="true"></dxo-group-panel>
+                      <dxo-editing mode="popup"
+                                   [allowAdding]="allowModify"
+                                   [allowUpdating]="allowModify"
+                                   [allowDeleting]="allowModify"
+                                   [useIcons]="true">
+                        <dxo-popup title="Current Prices"
+                                   [showTitle]="true"
+                                   dragEnabled="true"
+                                   [width]="950"
+                                   [height]="370">
+                        </dxo-popup>
+                        <dxo-form>
+                          <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                            <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                              <dxi-item dataField="supplierId" [editorOptions]="{showClearButton:true,onValueChanged:setStockValue,width: '240%',hint:'Select a supplier for the new price lookup record'}"></dxi-item>
+                              <dxi-item itemType="button"
+                                        [buttonOptions]="buttonOptions"
+                                        [editorOptions]="{ width: '20%' }">
+                              </dxi-item>
+                            </dxi-item>
+
+                            <dxi-item dataField="stockId" [editorOptions]="{ dataSource: StockUnassignedDataSource,displayExpr:'internalProductNameFull',valueExpr:'id',showClearButton:true,hint:'Select a item description for the new price lookup record' }">
+                              <dxo-label [text]="'Item Desc'"></dxo-label>
+                            </dxi-item>
+                            <dxi-item dataField="currency" [editorOptions]="{readOnly:true,hint:'Current currency linked to the selected supplier' }" [visible]="false">
+                              <dxo-label [text]="'Currency'"></dxo-label>
+                            </dxi-item>
+                            <dxi-item dataField="price" [editorOptions]="{format:{ type: 'currency',currency: currency, precision: 2 }, dataType:'number',hint:'Add a price for the select stock item'}"></dxi-item>
+                            <dxi-item dataField="date" [editorOptions]="{hint:'Select a date the new price should be effective from'}">
+                              <dxo-label [text]="'Effective Date'"></dxo-label>
+                            </dxi-item>
+                            <dxi-item dataField="comment"></dxi-item>
+                          </dxi-item>
+                        </dxo-form>
+                      </dxo-editing>
+                      <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+                      <dxo-export [enabled]="true" fileName="Price-Lookup-List"></dxo-export>
+
+                      <dxi-column dataField="supplierId" caption="Supplier">
+                        <dxi-validation-rule type="required"></dxi-validation-rule>
+                        <dxo-lookup [dataSource]="SupplierForeignDataSource"
+                                    displayExpr="companyName"
+                                    valueExpr="id">
+                        </dxo-lookup>
+                      </dxi-column>
+
+                      <dxi-column dataField="stockId" caption="Item Desc">
+                        <dxi-validation-rule type="required"></dxi-validation-rule>
+                        <dxo-lookup [dataSource]="StockForeignDataSource"
+                                    [displayExpr]="getStock"
+                                    valueExpr="id">
+                        </dxo-lookup>
+                      </dxi-column>
+                      <dxi-column dataField="supplierCurrencyId" caption="ISO" [visible]="false" [formItem]="{ disable: true }">
+                        <dxo-lookup [dataSource]="CurrencyForeignDataSource"
+                                    displayExpr="iso"
+                                    valueExpr="id">
+                        </dxo-lookup>
+                      </dxi-column>
+                      <dxi-column dataField="currency" caption="Currency" [visible]="false"></dxi-column>
+                      <dxi-column dataField="price" caption="Price" [visible]="false">
+                        <dxi-validation-rule type="required"></dxi-validation-rule>
+                      </dxi-column>
+                      <dxi-column dataField="price" caption="Price" [calculateCellValue]="priceISO" [formItem]="{ visible: false }">
+                        <dxi-validation-rule type="required"></dxi-validation-rule>
+                      </dxi-column>
+                      <dxi-column dataField="discount" caption="Discount (%)">
+                      </dxi-column>
+                      <dxi-column dataField="date" caption="Date" dataType="date">
+                        <dxi-validation-rule type="required"></dxi-validation-rule>
+                      </dxi-column>
+
+                      <dxi-column dataField="comment" caption="Comment" [spellcheck]="true">
+                        <dxo-form-item editorType="dxTextArea"
+                                       [editorOptions]="{ height: 70, stylingMode: 'filled',hint:'Enter a comment for the current record' }">
+                        </dxo-form-item>
+                      </dxi-column>
+
+                      <dxi-column type="buttons" caption="Price Increase Reminder" cellTemplate="cellTemplate" [formItem]="{ visible: false }" [visible]="allowReminderSet">
+                      </dxi-column>
+                      <div *dxTemplate="let data of 'cellTemplate'" class="button">
+                        <i class="bx bx-trending-up" style="font-size: large;"></i>                      
+                      </div>
+                    <dxi-column dataField="priceIncreaseCount" sortOrder="desc" caption="PriceIncreaseCount"
+                      [visible]="false">
+                    </dxi-column>
+
+                      <dxi-column type="buttons" caption="Add Increase" cellTemplate="cellUpdateTemplate" [formItem]="{ visible: false }" [visible]="allowReminderAdd">
+                      </dxi-column>
+                      <div *dxTemplate="let data of 'cellUpdateTemplate'" class="button">
+                        <i class="bx bx-save" style="font-size: large;"></i>
+                      </div>
+
+                      <dxi-column type="buttons" [visible]="allowModify">
+                        <dxi-button name="edit"></dxi-button>
+                        <dxi-button name="delete"></dxi-button>
+                      </dxi-column>
+                    </dx-data-grid>
+                    <!--START Label popup-->
+                    <dx-popup width="auto"
+                              height="400px"
+                              [showTitle]="true"
+                              title="Price Increase Reminder"
+                              dragEnabled="true"
+                              [closeOnOutsideClick]="false"
+                              [showCloseButton]="true"
+                              container=".dx-viewport"
+                              [(visible)]="popupVisible">
+                      <dxi-toolbar-item widget="dxButton"
+                                        toolbar="bottom"
+                                        location="after"
+                                        [options]="buttonRemove">
+                      </dxi-toolbar-item>
+                      <dxi-toolbar-item widget="dxButton"
+                                        toolbar="bottom"
+                                        location="after"
+                                        [options]="buttonAdd"
+                                        *ngIf="showAddbtn">
+                      </dxi-toolbar-item>
+                      <dxi-toolbar-item widget="dxButton"
+                                        toolbar="bottom"
+                                        location="after"
+                                        [options]="buttonEdit"
+                                        *ngIf="showEditbtn">
+                      </dxi-toolbar-item>
+                      <div *dxTemplate="let data of 'content'">
+                        <div style="width: auto; height: auto">
+
+                          <dx-form id="priceIncreaseReminderForm"
+                                   [colCount]="2"
+                                   [(formData)]="priceIncrease"
+                                   [showValidationSummary]="false"
+                                   (onInitialized)="savePriceIncreaseReminderFormInstance($event)">
+
+                            <dxi-item dataField="increaseTypeId"
+                                      editorType="dxSelectBox"
+                                      [editorOptions]="{ dataSource: IncreaseTypeForeignDataSource,displayExpr:'type',valueExpr:'id',showClearButton:true,hint:'Select an increase type (%, Currency or new price)' }">
+                              <dxo-label [text]="'Increase Type'"></dxo-label>
+                              <dxi-validation-rule type="required" message="Value is required"></dxi-validation-rule>
+                            </dxi-item>
+
+                            <dxi-item dataField="increase" [editorOptions]="{hint:'Enter the increase value depending on the increase type you selected'}">
+                              <dxi-validation-rule type="required" message="Increase is required"></dxi-validation-rule>
+                              <dxi-validation-rule type="numeric" message="Numbers Only"></dxi-validation-rule>
+                            </dxi-item>
+
+                            <dxi-item dataField="date" editorType="dxDateBox" [colSpan]="2" [editorOptions]="{ dateSerializationFormat: 'yyyy-MM-dd',invalidDateMessage: 'The date must have the following format: yyyy/MM/dd',hint:'Select the date you wish for the price to be approved by' }">
+                              <dxi-validation-rule type="required" message="Date is required"></dxi-validation-rule>
+                            </dxi-item>
+
+                            <dxi-item dataField="comment" [editorOptions]="{ height: 90, hint:'Enter a comment for the new price increase reminder' }" [colSpan]="2">
+                            </dxi-item>
+                          </dx-form>
+                        </div>
+                      </div>
+                    </dx-popup>
+                    <!--END Label popup-->
+                    <dx-popup title="Add Supplier"
+                              [width]="1000"
+                              [height]="750"
+                              [showTitle]="true"
+                              [dragEnabled]="true"
+                              [closeOnOutsideClick]="false"
+                              [showCloseButton]="true"
+                              (onHidden)="onHidden($event)"
+                              [(visible)]="popupVisibleSupplier">
+                      <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+                        <app-supplier></app-supplier>
+                      </dx-scroll-view>
+                    </dx-popup>
+
+                    <dx-popup [width]="400"
+                              [height]="150"
+                              [showTitle]="false"
+                              [dragEnabled]="false"
+                              [closeOnOutsideClick]="false"
+                              [showCloseButton]="false"
+                              [(visible)]="popupVisibleUpdate">
+
+                      <dxi-toolbar-item widget="dxButton"
+                                        itemType="group"
+                                        toolbar="bottom"
+                                        location="center"
+                                        [options]="yesUpdateButton">
+                      </dxi-toolbar-item>
+
+                      <dxi-toolbar-item widget="dxButton"
+                                        itemType="group"
+                                        toolbar="bottom"
+                                        location="center"
+                                        [options]="noUpdateButton">
+                      </dxi-toolbar-item>
+
+                      <dxo-position at="center"
+                                    my="center"
+                                    of="window">
+                      </dxo-position>
+                      <p style="text-align: center">
+                        Are you sure you want to update the item price?
+                      </p>
+                    </dx-popup>
+                    <dx-popup [width]="400"
+                              [height]="150"
+                              [showTitle]="false"
+                              [dragEnabled]="false"
+                              [closeOnOutsideClick]="false"
+                              [showCloseButton]="false"
+                              [(visible)]="popupDownloadConfirmVisible">
+
+                      <dxi-toolbar-item widget="dxButton"
+                                        itemType="group"
+                                        toolbar="bottom"
+                                        location="center"
+                                        [options]="yesDownloadButtonOptions">
+                      </dxi-toolbar-item>
+
+                      <dxi-toolbar-item widget="dxButton"
+                                        itemType="group"
+                                        toolbar="bottom"
+                                        location="center"
+                                        [options]="noDownloadButtonOptions">
+                      </dxi-toolbar-item>
+
+                      <dxo-position at="center"
+                                    my="center"
+                                    of="window">
+                      </dxo-position>
+                      <p style="text-align: center">
+                        Are you sure you want to download this file?
+                      </p>
+                    </dx-popup>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="tab.text == 'Current Prices' && allowView == false">
+                <div class="table-align">
+                  <div class="col-md-12 col-sm-12 col-12 table-col center">
+                    <p>You do not have permission to view the content.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="tab.text == 'Price History' && allowHistory == true">
+                <div class="table-align">
+                  <div class="col-md-12 col-sm-12 col-12 table-col">
+                    <dx-data-grid [dataSource]="HistoryDataSource"
+                                  [remoteOperations]="true"
+                                  showBorders="true"
+                                  keyExpr="id"
+                                  class="dx-table"
+                                  (onExporting)="onExportingHistory($event)"
+                                  (onExported)="onExportedHistory($event)"
+                                  [columnAutoWidth]="true"
+                                  [hoverStateEnabled]="true"
+                                  [showColumnLines]="true"
+                                  [showRowLines]="false"
+                                  [showBorders]="false"
+                                  [wordWrapEnabled]="true"
+                                  [rowAlternationEnabled]="true">
+                      <dxo-search-panel [visible]="true"></dxo-search-panel>
+                      <dxo-paging [pageSize]="15"></dxo-paging>
+                      <dxo-pager [showPageSizeSelector]="true"
+                                 [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                                 [showInfo]="true"
+                                 [showNavigationButtons]="true">
+                      </dxo-pager>
+                      <dxo-filter-row [visible]="true"></dxo-filter-row>
+                      <dxo-header-filter [visible]="true"></dxo-header-filter>
+                      <dxo-group-panel [visible]="true"></dxo-group-panel>
+                      <dxo-editing mode="row"
+                                   [allowAdding]="false"
+                                   [allowUpdating]="false"
+                                   [allowDeleting]="false"
+                                   [useIcons]="true">
+                      </dxo-editing>
+                      <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+                      <dxo-export [enabled]="true" fileName="Price-History"></dxo-export>
+                      <dxi-column dataField="supplier" caption="Supplier"></dxi-column>
+                      <dxi-column dataField="stock" caption="Item Desc"></dxi-column>
+                      <dxi-column dataField="internalProductName" caption="Internal Desc"></dxi-column>
+                      <dxi-column dataField="currency" caption="ISO" [visible]="false"></dxi-column>
+                      <dxi-column dataField="oldPrice" caption="Old Price" [calculateCellValue]="oldPriceISO"></dxi-column>
+                      <dxi-column dataField="newPrice" caption="New Price" [calculateCellValue]="newPriceISO"></dxi-column>
+                      <dxi-column dataField="uom" caption="UoM"></dxi-column>
+                      <dxi-column dataField="date" caption="Date" dataType="date"></dxi-column>
+                      <dxi-column dataField="comment" caption="Comment"></dxi-column>
+                      <dxi-column dataField="username" caption="Username"></dxi-column>
+                    </dx-data-grid>
+                    <dx-popup [width]="400"
+                              [height]="150"
+                              [showTitle]="false"
+                              [dragEnabled]="false"
+                              [closeOnOutsideClick]="false"
+                              [showCloseButton]="false"
+                              [(visible)]="popupDownloadConfirmHistoryVisible">
+
+                      <dxi-toolbar-item widget="dxButton"
+                                        itemType="group"
+                                        toolbar="bottom"
+                                        location="center"
+                                        [options]="yesDownloadHistoryButtonOptions">
+                      </dxi-toolbar-item>
+
+                      <dxi-toolbar-item widget="dxButton"
+                                        itemType="group"
+                                        toolbar="bottom"
+                                        location="center"
+                                        [options]="noDownloadHistoryButtonOptions">
+                      </dxi-toolbar-item>
+
+                      <dxo-position at="center"
+                                    my="center"
+                                    of="window">
+                      </dxo-position>
+                      <p style="text-align: center">
+                        Are you sure you want to download this file?
+                      </p>
+                    </dx-popup>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="tab.text == 'Price History' && allowHistory == false">
+                <div class="table-align">
+                  <div class="col-md-12 col-sm-12 col-12 table-col center">
+                    <p>You do not have permission to view the content.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </dx-tab-panel>
+      </div>
+    </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

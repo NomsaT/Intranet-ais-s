@@ -1,0 +1,107 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <h4 class="mb-0 font-size-18">Department Managers</h4>
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">Masterlists → Department-Managers</li>
+            </ol>
+          </div>
+        </div>
+        <div class="table-align">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <dx-data-grid #status id="roles" [dataSource]="dataSource"
+                          [remoteOperations]="true"
+                          showBorders="true"
+                          keyExpr="id"
+                          showRowLines="true"
+                          showColumnLines="true"
+                          [hoverStateEnabled]="true" class="dx-table"
+                          [wordWrapEnabled]="true"
+                          [columnAutoWidth]="true"
+                          [showColumnLines]="true"
+                          [showRowLines]="false"
+                          [showBorders]="false"
+                          (onExporting)="onExporting($event)"
+                          (onExported)="onExported($event)"
+                          [rowAlternationEnabled]="true">
+              <dxo-search-panel [visible]="true"></dxo-search-panel>
+              <dxo-paging [pageSize]="15"></dxo-paging>
+              <dxo-pager [showPageSizeSelector]="true"
+                         [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                         [showInfo]="true"
+                         [showNavigationButtons]="true">
+              </dxo-pager>
+              <dxo-filter-row [visible]="true"></dxo-filter-row>
+              <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+              <dxo-editing mode="popup"
+                           [allowAdding]="false"
+                           [allowUpdating]="false"
+                           [allowDeleting]="false"
+                           [useIcons]="true">
+              </dxo-editing>
+
+              <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+              <dxo-export [enabled]="true" fileName="Department-Manager-List"></dxo-export>
+
+              <dxi-column dataField="abbAndName" caption="Name"></dxi-column>
+              <dxi-column dataField="description" caption="Description"></dxi-column>
+
+              <dxo-master-detail [enabled]="true" template="departmentmanagerusers"></dxo-master-detail>
+              <div *dxTemplate="let item of 'departmentmanagerusers'">
+                <div class="master-detail-caption icon-inline">
+                  <h4 class="mb-0 font-size-18">Add Department Managers</h4>
+                  <div id="info" (mouseenter)="toggleDefault()" (mouseleave)="toggleDefault()"><em class="bx bx-info-circle"></em></div>
+                </div>
+
+                <dx-tooltip target="#info"
+                            [(visible)]="defaultVisible"
+                            [closeOnOutsideClick]="false">
+                  <div *dxTemplate="let data = data of 'content'">
+                    Below is the list of department managers that will have the ability to approve orders for the current department.
+                  </div>
+                </dx-tooltip>
+
+                <app-department-managers-users [key]="item.key"></app-department-managers-users>
+
+              </div>
+            </dx-data-grid>
+            <dx-popup [width]="400"
+                      [height]="150"
+                      [showTitle]="false"
+                      [dragEnabled]="true"
+                      [closeOnOutsideClick]="false"
+                      [showCloseButton]="false"
+                      [(visible)]="popupDownloadConfirmVisible">
+
+              <dxi-toolbar-item widget="dxButton"
+                                itemType="group"
+                                toolbar="bottom"
+                                location="center"
+                                [options]="yesDownloadButtonOptions">
+              </dxi-toolbar-item>
+
+              <dxi-toolbar-item widget="dxButton"
+                                itemType="group"
+                                toolbar="bottom"
+                                location="center"
+                                [options]="noDownloadButtonOptions">
+              </dxi-toolbar-item>
+
+              <dxo-position at="center"
+                            my="center"
+                            of="window">
+              </dxo-position>
+              <p style="text-align: center">
+                Are you sure you want to download this file?
+              </p>
+            </dx-popup>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

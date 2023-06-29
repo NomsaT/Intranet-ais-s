@@ -1,0 +1,41 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <h4 class="mb-0 font-size-18">Bin Overview</h4>
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">Stores → Bin Overview</li>
+            </ol>
+          </div>
+        </div>
+        <div class="table-align">
+          <div class="col-md-12 col-sm-12 col-lg-12 table-col">
+            <dx-data-grid #binoverview id="roles" [dataSource]="dataSource" [remoteOperations]="true" showBorders="true"
+                          keyExpr="id" [(selectedRowKeys)]="selectedRows" showRowLines="true" showColumnLines="true"
+                          [hoverStateEnabled]="true" class="dx-table"
+                          (onExported)="onExported($event)" [wordWrapEnabled]="true" [columnAutoWidth]="true" [showColumnLines]="true"
+                          [showRowLines]="false" [showBorders]="false"
+                          (onToolbarPreparing)="onToolbarPreparing($event)" [rowAlternationEnabled]="true">
+              <dxo-search-panel [visible]="false"></dxo-search-panel>
+              <dxo-filter-row [visible]="true"></dxo-filter-row>
+              <dxo-paging [pageSize]="15"></dxo-paging>
+              <dxo-pager [showPageSizeSelector]="true"
+                         [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                         [showInfo]="true"
+                         [showNavigationButtons]="true">
+              </dxo-pager>
+              <dxo-group-panel [visible]="false"></dxo-group-panel>
+            
+              <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+              <dxo-export [enabled]="true" fileName="Barcode-List"></dxo-export>
+
+            </dx-data-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end page title -->
+  </div> <!-- container-fluid -->
+  

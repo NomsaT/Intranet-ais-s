@@ -1,0 +1,208 @@
+/* Importing Bootstrap SCSS file. */
+@import '~bootstrap/scss/bootstrap';
+
+/* You can add global styles to this file, and also import other style files */
+
+
+  td[role=columnheader] {
+    text-align: center !important;
+  }
+
+  .modal-holder {
+    animation-name: example;
+    animation-duration: 0.3s;
+  }
+
+  @keyframes example {
+    0% {
+      transform: scale(0.5)
+    }
+
+    100% {
+      transform: scale(1)
+    }
+  }
+
+  .dx-scrollable-container{
+      overflow-x:hidden!important;
+      overflow-y:hidden !important;
+  }
+.dx-scrollable dx-scrollview dx-visibility-change-handler dx-scrollable-vertical dx-scrollable-simulated dx-list dx-widget dx-collection {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+.dx-scrollable-content {
+  overflow-x: hidden !important;
+  overflow-y: hidden!important;
+}
+.dx-overlay-content {
+  overflow-x: hidden !important;
+  max-height: 900% !important;
+  overflow-y: auto;
+}
+
+.dx-scrollable-scrollbar {
+  position: relative;
+  pointer-events: auto;
+  float: right !important;
+  margin-right: -18px !important;
+}
+
+  .carousel-item {
+    transition: opacity 0.7s ease !important;
+    position: absolute !important;
+    display: block !important;
+    opacity: 0;
+  }
+.dx-datagrid-revert-tooltip {
+  display: none !important;
+}
+
+.dx-toolbar-item-content > .dx-texteditor {
+  width: max-content !important ;
+}
+
+  .carousel-item.active {
+    position: relative !important;
+    opacity: 1;
+  }
+
+  .table-col {
+    background-color: white !important;
+    padding: 10px !important;
+  }
+
+  .table-align {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    background-color: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 4px;
+  }
+
+  .main-content {
+    background-color: #f2f2f5 !important;
+  }
+
+  html {
+    background-color: #f2f2f5 !important;
+  }
+  /*.license {
+    position: fixed;
+    bottom: 0;
+}*/
+  .dx-tabpanel .dx-tabs-wrapper {
+    background-color: #fff;
+  }
+
+  .dx-overlay-shader {
+    height: 100% !important;
+  }
+
+  .yearfooter {
+    position: fixed;
+    bottom: 5px;
+    padding: 150px 80px 0px 140px;
+  }
+
+  .dx-button[aria-label='Cancel'] {
+    background-color: #d9534f !important;
+    color: #fff;
+  }
+
+  .dx-button[aria-label='Save'] {
+    background-color: #5cb85c !important;
+    color: #fff;
+  }
+
+  .dx-button[aria-label='Submit'] {
+    background-color: #5cb85c !important;
+    color: #fff;
+  }
+
+  .dx-button[aria-label='Create'] {
+    background-color: #5cb85c !important;
+    color: #fff;
+  }
+  /* DO NOT REMOVE OR CHANGE */
+  #orders > .dx-datagrid > .dx-datagrid-header-panel {
+    padding-top: 10px !important;
+    padding-right: 10px !important;
+    border-bottom: 0px !important
+  }
+  /*.dx-overlay > .dx-overlay-wrapper > .dx-overlay-content .dx-resizable {
+  left: -12px !important;
+  top: -55px !important;
+}*/
+  /* --------------------- */
+
+  .dx-toast-message {
+    white-space: pre-line;
+  }
+
+  .dx-icon-folder {
+    color: #ef971d !important;
+  }
+
+  .dx-icon-newfolder {
+    color: #ef971d !important;
+  }
+
+  .dx-icon-upload {
+    color: #5cb85c !important;
+  }
+
+  .dx-icon-parentfolder {
+    color: #ef971d !important;
+  }
+
+  .dx-icon-mediumiconslayout {
+    color: #2a3042;
+  }
+
+  .dx-filemanager-i-refresh {
+    color: #5cb85c !important;
+  }
+
+  .dx-filemanager-i {
+    color: #5cb85c !important;
+  }
+
+  .dx-icon-txtfile {
+    color: #2a3042 !important;
+  }
+
+.dx-overlay-shader .dx-scrollable-wrapper .dx-scrollable-container {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+.dx-datagrid-header-panel {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  /*z-index is applied so that this element appears in front*/
+}
+
+.dx-datagrid-headers.dx-datagrid-nowrap {
+  position: sticky;
+  top: 70px;
+  background-color: white;
+  z-index: 1000;
+}
+
+body[data-sidebar=dark] .mm-active .active {
+  background-color: #555c73 !important;
+}
+
+body[data-sidebar=dark] #sidebar-menu ul li ul.sub-menu li a:hover {
+  background-color: #555c73 !important;
+}
+body[data-sidebar=dark] #sidebar-menu ul li a:hover {
+  background-color: #555c73 !important;
+}
+
+body[data-sidebar=dark] .mm-active > a {
+  background-color: #555c73 !important;
+}

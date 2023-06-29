@@ -1,0 +1,50 @@
+<dx-data-grid [dataSource]="dataSource" [showBorders]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true"
+              (onEditingStart)="EditStart($event)"
+              (onSaving)="SavingStart($event)"
+              (onRowInserting)="insertRow($event)"
+              (onInitNewRow)="newRow($event)"
+              [wordWrapEnabled]="true">
+  <dxo-editing mode="popup"
+               [allowAdding]="allowModify"
+               [allowUpdating]="allowModify"
+               [allowDeleting]="allowModify"
+               [useIcons]="true">
+
+    <dxo-popup title="Store Information"
+               [showTitle]="true"
+               [dragEnabled]="true"
+               [width]="600"
+               [height]="450">
+    </dxo-popup>
+    <dxo-form>
+      <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+        <dxi-item dataField="name" [editorOptions]="{hint:'Enter the name for the new store'}"></dxi-item>
+        <dxi-item dataField="description"></dxi-item>
+        <dxi-item dataField="quarantine" editorType="dxCheckBox" dataType="boolean" [editorOptions]="{hint:'Check the box if the store is a quatantine store.'}"><dxo-label [text]="'Mark as quarantine store'"></dxo-label></dxi-item>
+        <dxi-item dataField="storeTypeId" [editorOptions]="{searchEnabled:true, showClearButton:'true',hint:'Select the store type for the new store'}"></dxi-item>
+      </dxi-item>
+      <dxi-item itemtype="group" [colCount]="1" [colSpan]="2">
+        <p style="font-weight: bold; color: #333; text-align: center;">Note: Set the default store for the current plant location once all stores are added.</p>
+      </dxi-item>      
+    </dxo-form>
+  </dxo-editing>
+
+  <dxi-column dataField="name" caption="Name">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+  </dxi-column>
+  <dxi-column dataField="description" caption="Description" [spellcheck]="true">
+    <dxo-form-item editorType="dxTextArea"
+                   [editorOptions]="{ height: 70, stylingMode: 'filled', hint:'Enter the description for the new store'}">
+    </dxo-form-item>
+  </dxi-column>
+  <dxi-column dataField="quarantine" caption="Quarantine Store" dataType="boolean">
+    <dx-check-box [value]="false"></dx-check-box>
+  </dxi-column>
+  <dxi-column dataField="storeTypeId" caption="Store Type">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-lookup [dataSource]="StoreTypeForeignDataSource"
+                displayExpr="name"
+                valueExpr="id">
+    </dxo-lookup>
+  </dxi-column>
+</dx-data-grid>

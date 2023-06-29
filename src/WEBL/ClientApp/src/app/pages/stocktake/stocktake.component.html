@@ -1,0 +1,195 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Stocktake</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Masterlists → {{breadcrumbs}}</li>
+          </ol>
+        </div>
+      </div>
+      <dx-tab-panel #tabPanel [dataSource]="tabs" [selectedIndex]="0" [loop]="false" [animationEnabled]="true"
+        [swipeEnabled]="false" (onSelectionChanged)="onOptionChanged($event)">
+        <div *dxTemplate="let tab of 'title'">
+          <span>{{tab.text}}</span>
+        </div>
+        <div *dxTemplate="let tab of 'item' ">
+          <div class="tabpanel-item">
+            <div *ngIf="tab.text == 'Current Stocktake' && allowView == true">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col">
+                  <dx-data-grid id="gridContainer" [dataSource]="dataSource" (onCellClick)="stocktake($event)"
+                    (onCellPrepared)="onCellPrepared($event)" [allowColumnReordering]="true" [showBorders]="true"
+                    (onToolbarPreparing)="onToolbarPreparing($event)">
+                    <dxo-editing mode="row" [allowAdding]="false" [allowUpdating]="false" [allowDeleting]="false"
+                      [useIcons]="true">
+                    </dxo-editing>
+
+                    <dxo-filter-row [visible]="true"></dxo-filter-row>
+                    <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+                    <dxi-column dataField="plantLocationId" caption="Plant Location" [width]="150">
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                      <dxo-lookup [dataSource]="LocationForeignDataSource" displayExpr="name" valueExpr="id">
+                      </dxo-lookup>
+                    </dxi-column>
+                    <dxi-column dataField="storeId" caption="Store" [width]="200">
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                      <dxo-lookup [dataSource]="StoreForeignDataSource" displayExpr="name" valueExpr="id">
+                      </dxo-lookup>
+                    </dxi-column>
+                    <dxi-column dataField="stockId" caption="Stock">
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                      <dxo-lookup [dataSource]="StockForeignDataSource" [displayExpr]="getStock" valueExpr="id">
+                      </dxo-lookup>
+                    </dxi-column>
+
+                    <dxi-column dataField="currentQty" caption="Current Qty" [width]="150"></dxi-column>
+                    <dxi-column dataField="capturedQty" caption="Counted Qty" [width]="150"></dxi-column>
+                    <dxi-column dataField="recount" caption="Mark For Recount" [width]="150"></dxi-column>
+                    <dxi-column dataField="stockTakeDate" caption="Stocktake Date" [width]="150" dataType="date">
+                    </dxi-column>
+                    <dxi-column type="buttons" caption="Recount" cellTemplate="cellTemplate" [visible]="allowModify">
+                    </dxi-column>
+                    <div *dxTemplate="let data of 'cellTemplate'">
+                      <i class="bx bx-reset" style="font-size: large;"></i>
+                    </div>
+
+                    <dxi-column type="buttons" caption="Approve" cellTemplate="cellUpdateTemplate"
+                      [visible]="allowModify">
+                    </dxi-column>
+                    <div *dxTemplate="let data of 'cellUpdateTemplate'">
+                      <i class="bx bx-save" style="font-size: large;"></i>
+                    </div>
+                  </dx-data-grid>
+
+
+                  <dx-popup width="auto" height="200" [showTitle]="true" title="Set Recount User" dragEnabled="true"
+                    [closeOnOutsideClick]="false" [showCloseButton]="true" container=".dx-viewport"
+                    [(visible)]="popupRecountVisible">
+                    <dxi-toolbar-item widget="dxButton" toolbar="bottom" location="after" [options]="buttonRemove">
+                    </dxi-toolbar-item>
+                    <dxi-toolbar-item widget="dxButton" toolbar="bottom" location="after" [options]="buttonAdd">
+                    </dxi-toolbar-item>
+
+                    <div *dxTemplate="let data of 'content'">
+                      <div style="width: auto; height: auto">
+
+                        <dx-form id="userFormInstance" [(formData)]="user" [showValidationSummary]="false"
+                          (onInitialized)="userFormInstance($event)">
+
+                          <dxi-item dataField="id" editorType="dxSelectBox" width="150"
+                            [editorOptions]="{ dataSource: userDataSource,displayExpr:'fullName',valueExpr:'id',showClearButton:true,hint:'Select User' }">
+                            <dxo-label [text]="'Recount User'"></dxo-label>
+                            <dxi-validation-rule type="required" message="Value is required"></dxi-validation-rule>
+                          </dxi-item>
+                        </dx-form>
+                      </div>
+                    </div>
+                  </dx-popup>
+
+                  <dx-popup title="Stocktake Period" [width]="950" [height]="500" [showTitle]="true" dragEnabled="true"
+                            [closeOnOutsideClick]="false" [showCloseButton]="true" (onHidden)="onHidden($event)"
+                            [(visible)]="popupScheduleVisible">
+                    <app-stocktake-cycle></app-stocktake-cycle>
+                  </dx-popup>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="tab.text == 'Current Stocktake' && allowView == false">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col center">
+                  <p>You do not have permission to view the content.</p>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="tab.text == 'Stocktake Report' && allowReport == true">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col">
+                  <dx-data-grid id="gridContainer" [dataSource]="stocktakeReportDataSource"
+                    [allowColumnReordering]="true" [showBorders]="true">
+                    <dxo-editing mode="row" [allowAdding]="false" [allowUpdating]="false" [allowDeleting]="false"
+                      [useIcons]="false">
+                    </dxo-editing>
+
+                    <dxo-filter-row [visible]="true"></dxo-filter-row>
+                    <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+                    <dxi-column dataField="stocktakeCycleId" caption="Stocktake Period" [groupIndex]="0">
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                      <dxo-lookup [dataSource]="stocktakePeriodDataSource" displayExpr="stocktakeName" valueExpr="id">
+                      </dxo-lookup>
+                    </dxi-column>
+                    <dxi-column dataField="stockFullName" caption="Stock"></dxi-column>
+                    <dxi-column dataField="plantLocationName" caption="Plant Location"></dxi-column>
+                    <dxi-column dataField="storeName" caption="Store"></dxi-column>
+                    <dxi-column dataField="openingQty" caption="Opening Qty"></dxi-column>
+                    <dxi-column dataField="closingQty" caption="Closing Qty"></dxi-column>
+                    <dxi-column dataField="discrepancy" caption="Discrepancy"></dxi-column>
+                  </dx-data-grid>
+
+                </div>
+              </div>
+            </div>
+            <div *ngIf="tab.text == 'Stocktake Report' && allowReport == false">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col center">
+                  <p>You do not have permission to view the content.</p>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="tab.text == 'Stocktake History' && allowHistory == true">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col">
+                  <dx-data-grid id="gridContainer" [dataSource]="dataSourceHistory" [allowColumnReordering]="true"
+                    [showBorders]="true">
+                    <dxo-editing mode="row" [allowAdding]="false" [allowUpdating]="false" [allowDeleting]="false"
+                      [useIcons]="false">
+                    </dxo-editing>
+
+                    <dxo-filter-row [visible]="true"></dxo-filter-row>
+                    <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+                    <dxi-column dataField="plantLocationName" caption="Plant Location">
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                    </dxi-column>
+                    <dxi-column dataField="storeName" caption="Store">
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                    </dxi-column>
+                    <dxi-column dataField="stockFullName" caption="Stock">
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                    </dxi-column>
+
+                    <dxi-column dataField="currentQty" caption="Current Qty"></dxi-column>
+                    <dxi-column dataField="countQty" caption="Counted Qty"></dxi-column>
+                    <dxi-column dataField="recount" caption="Mark For Recount"></dxi-column>
+                    <dxi-column dataField="stockTakeDate" caption="Stocktake Date" dataType="date">
+                    </dxi-column>
+                    <dxi-column dataField="recountDate" caption="Recount Date" dataType="date">
+                    </dxi-column>
+                    <dxi-column dataField="approveDate" caption="Approve Date" dataType="date">
+                    </dxi-column>
+                    <dxi-column dataField="actions" caption="Action"></dxi-column>
+                    <dxi-column dataField="userFullName" caption="User">
+                    </dxi-column>
+                  </dx-data-grid>
+
+                </div>
+              </div>
+            </div>
+            <div *ngIf="tab.text == 'Stocktake History' && allowHistory == false">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col center">
+                  <p>You do not have permission to view the content.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </dx-tab-panel>
+    </div>
+  </div>
+  <!-- end page title 
+</div> <!-- container-fluid -->

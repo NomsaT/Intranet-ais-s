@@ -1,0 +1,60 @@
+<dx-data-grid #productstock id="productstock" [dataSource]="dataSource" [showBorders]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true"
+              (onEditingStart)="EditStart($event)"
+              (onSaving)="SavingStart($event)"
+              (onRowInserting)="insertRow($event)">
+  <dxo-editing mode="popup"
+               [allowAdding]="allowModify"
+               [allowUpdating]="allowModify"
+               [allowDeleting]="allowModify"
+               [useIcons]="true">
+
+    <dxo-popup title="Product Stock Information"
+               [showTitle]="true"
+               [dragEnabled]="true"
+               [width]="600"
+               [height]="450">
+    </dxo-popup>
+  </dxo-editing>
+
+  <dxi-column dataField="stockId" caption="Stock Item Desc" [editorOptions]="stockDropdown">
+    <dxo-lookup [dataSource]="StockForeignDataSource"
+                [displayExpr]="getStock"
+                valueExpr="id">
+    </dxo-lookup>
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+
+  <dxi-column dataField="stockId" caption="Stock Category" [editorOptions]="{ disabled: true }">
+    <dxo-lookup [dataSource]="StockForeignDataSource"
+                [displayExpr]="getStockCategory"
+                valueExpr="id">
+    </dxo-lookup>
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+
+  <dxi-column dataField="qtyPerSquareMeter" dataType="number" caption="Qty Per m2" [editorOptions]="setQtyPer" [calculateDisplayValue]="UomQtyPer">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+
+  <dxi-column dataField="squaresUsed" dataType="number" caption="Used m2" [editorOptions]="setQtyUsed" [calculateDisplayValue]="UomQtyUsed">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+
+  <dxi-column dataField="quantity" dataType="number" caption="Quantity" [editorOptions]="{ disabled: true }" [calculateDisplayValue]="UomQuantity">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+
+ <!-- <dxi-column dataField="stockId" caption="UoM" [editorOptions]="{ disabled: true }">
+    <dxo-lookup [dataSource]="StockForeignDataSource"
+                [displayExpr]="getStockUom"
+                valueExpr="id">
+    </dxo-lookup>
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>-->
+</dx-data-grid>

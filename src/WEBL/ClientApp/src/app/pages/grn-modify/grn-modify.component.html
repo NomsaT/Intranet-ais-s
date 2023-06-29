@@ -1,0 +1,345 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">{{actionDisplay}}</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Purchasing → Capture GRN</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align" [ngClass]="{'border-complete-left': data.grn.allItemsReceived === true, 'border-incomplete-left' : data.grn.allItemsReceived === false }">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Internal Order Details</h5>
+            <dx-form id="form" *ngIf="data.internalOrder != null; else DataLoading" [(formData)]="data.internalOrder">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item dataField="requestByFullName" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'Request By'"></dxo-label></dxi-item>
+                <dxi-item dataField="placedByFullName" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'Placed By'"></dxo-label></dxi-item>
+                <dxi-item dataField="supplierFullName" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'Supplier'"></dxo-label></dxi-item>
+              </dxi-item>
+            </dx-form>
+          </div>
+        </div>
+      </div>
+      <div class="table-align" [ngClass]="{'border-complete-left': data.grn.allItemsReceived === true, 'border-incomplete-left' : data.grn.allItemsReceived === false }">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <!--<h5 class="io-view-heading">Line Items</h5>-->
+            <dx-form id="form" class="invoice-form" *ngIf="data.grn != null; else DataLoading" [(formData)]="data.grn" validationGroup="grnData">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item dataField="internalOrderId" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'PO Number'"></dxo-label></dxi-item>
+                <dxi-item dataField="grnNumber" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'GRN Number'"></dxo-label></dxi-item>
+                <dxi-item dataField="capturerId" editorType="dxSelectBox" [editorOptions]="{ dataSource: UsersForeignDataSource,displayExpr:'fullName',valueExpr:'id',readOnly: true}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Captured By'"></dxo-label></dxi-item>
+                <dxi-item dataField="editorId" editorType="dxSelectBox" [visible]="editor" [editorOptions]="{ dataSource: UsersForeignDataSource,displayExpr:'fullName',valueExpr:'id',readOnly: true}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Edited By'"></dxo-label></dxi-item>
+                <dxi-item dataField="comment" editorType="dxTextArea" [editorOptions]="{ height: 70, stylingMode: 'filled'}">
+                  <dxo-label [text]="'Comment'"></dxo-label>
+                </dxi-item>
+              </dxi-item>
+              <!--*ngIf="data.grn.grnItems.length > 0"-->
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2" *ngIf="data.grn.grnItems.length > 0">
+                <h5 class="io-view-heading">Listed Items</h5>
+                <dx-data-grid #grnitems id="#grnitems" [dataSource]="data.grn.grnItems"
+                              [columnAutoWidth]="true"
+                              [hoverStateEnabled]="true"
+                              [rowAlternationEnabled]="true"
+                              (onEditorPreparing)="onEditorPreparingChild($event)"
+                              (onCellClick)="ListedCommentOnClick($event)"
+                              (onCellPrepared)="ListedCommentCellPrepared($event)"
+                              [showBorders]="true">
+                  <dxo-sorting mode="none"></dxo-sorting>
+                  <dxo-paging [enabled]="false"></dxo-paging>
+                  <dxo-search-panel [visible]="true"></dxo-search-panel>
+                  <dxo-editing mode="cell"
+                               [allowUpdating]="true"
+                               [allowDeleting]="false"
+                               [allowAdding]="false">
+                  </dxo-editing>
+                  <dxi-column caption="Item Code" dataField="manufacturerCode" [allowEditing]="false"></dxi-column>
+                  <dxi-column caption="Supplier Desc" dataField="manufacturerProductName" [allowEditing]="false" [width]="250"></dxi-column>
+                  <dxi-column caption="Ordered">
+                    <dxi-column caption="Qty" dataField="internalOrderQuantity" [allowEditing]="false"></dxi-column>
+                  </dxi-column>
+                  <dxi-column caption="Received">
+                    <dxi-column caption="UoM" dataField="uomName" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Qty" dataField="quantity" [allowEditing]="true" cssClass="cell-highlighted" [setCellValue]="setCellValueQuantity">
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                      <dxi-validation-rule type="custom" [validationCallback]="validateQty" message="Received Qty can't be more than Outstanding Qty"></dxi-validation-rule>
+                    </dxi-column>
+                    <dxi-column caption="Pack Size" dataField="packSize" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Total (UoM)" [calculateDisplayValue]="getTotalUomReceived" dataField="totalUomReceived" [allowEditing]="false" dataType="number"></dxi-column>
+                  </dxi-column>
+                  <dxi-column caption="Outstanding">
+                    <dxi-column caption="UoM" dataField="uomName" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Qty" [calculateDisplayValue]="getRemaining" dataField="requiredQuantity" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Pack Size" dataField="packSize" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Total (UoM)" [calculateDisplayValue]="getTotalUomOutstanding" dataField="totalUomOutstanding" [allowEditing]="false" dataType="number"></dxi-column>
+                  </dxi-column>
+                  <dxi-column dataField="storeLocationId" caption="Store Location" [allowEditing]="false">
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                    <dxo-lookup [dataSource]="StoreForeignDataSource"
+                                displayExpr="name"
+                                valueExpr="id">
+                    </dxo-lookup>
+                  </dxi-column>
+                  <dxi-column type="buttons" caption="Comment" dataField="comment" cellTemplate="ListedCommentCellTemplate"></dxi-column>
+                  <div *dxTemplate="let data of 'ListedCommentCellTemplate'">
+                    <i class="bx bx-comment" style="font-size: x-large;"></i>
+                  </div>
+                </dx-data-grid>
+              </dxi-item>
+
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2" *ngIf="data.grn.grnonceOffItems.length > 0">
+                <h5 class="io-view-heading">Once-Off Items</h5>
+                <dx-data-grid grnonceOffItems id="#grnonceOffItems" [dataSource]="data.grn.grnonceOffItems"
+                              [columnAutoWidth]="true"
+                              [hoverStateEnabled]="true"
+                              [rowAlternationEnabled]="true"
+                              (onCellClick)="OnceOffCommentOnClick($event)"
+                              (onCellPrepared)="OnceOffCommentCellPrepared($event)"
+                              [showBorders]="true">
+                  <dxo-sorting mode="none"></dxo-sorting>
+                  <dxo-paging [enabled]="false"></dxo-paging>
+                  <dxo-search-panel [visible]="true"></dxo-search-panel>
+                  <dxo-editing mode="cell"
+                               [allowUpdating]="true"
+                               [allowDeleting]="false"
+                               [allowAdding]="false">
+                  </dxo-editing>
+                  <dxi-column caption="Item Code" dataField="code" [allowEditing]="false"></dxi-column>
+                  <dxi-column caption="Supplier Desc" dataField="description" [allowEditing]="false"></dxi-column>
+                  <dxi-column caption="Ordered">
+                    <dxi-column caption="Qty" dataField="internalOrderQuantity" [allowEditing]="false"></dxi-column>
+                  </dxi-column>
+                  <dxi-column caption="Received">
+                    <dxi-column caption="UoM" dataField="uomName" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Qty" dataField="quantity" [allowEditing]="true" cssClass="cell-highlighted" [setCellValue]="setCellValueQuantityOnce"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                    <dxi-column caption="Pack Size" dataField="packSize" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Total (UoM)" [calculateDisplayValue]="getTotalUomReceivedOnce" dataField="totalUomReceived" [allowEditing]="false" dataType="number"></dxi-column>
+                  </dxi-column>
+                  <dxi-column caption="Outstanding">
+                    <dxi-column caption="UoM" dataField="uomName" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Qty" [calculateDisplayValue]="getRemainingOnce" dataField="requiredQuantity" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Pack Size" dataField="packSize" [allowEditing]="false"></dxi-column>
+                    <dxi-column caption="Total (UoM)" [calculateDisplayValue]="getTotalUomOutstandingOnce" dataField="totalUomOutstanding" [allowEditing]="false" dataType="number"></dxi-column>
+                  </dxi-column>
+                  <dxi-column type="buttons" caption="Comment" dataField="comment" cellTemplate="OnceOffCommentCellTemplate"></dxi-column>
+                  <div *dxTemplate="let data of 'OnceOffCommentCellTemplate'">
+                    <i class="bx bx-comment" style="font-size: x-large;"></i>
+                  </div>
+                </dx-data-grid>
+              </dxi-item>
+
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item itemType="button"
+                          horizontalAlignment="left"
+                          [buttonOptions]="AddUpdateGrnCancelBtn">
+                </dxi-item>
+                <dxi-item itemType="button"
+                          horizontalAlignment="right"
+                          [buttonOptions]="AddUpdateGrnBtn">
+                </dxi-item>
+              </dxi-item>
+
+            </dx-form>
+            <!--///////////////////-->
+            <!--<dx-tab-panel #tabPanel
+                      [dataSource]="tabs"
+                      [selectedIndex]="0"
+                      [loop]="false"
+                      [animationEnabled]="true"
+                      [swipeEnabled]="true">
+          <div *dxTemplate="let tab of 'title'">
+            <span>{{tab.text}}</span>
+          </div>
+          <div *dxTemplate="let tab of 'item'" class="tabs">
+            <div class="tabpanel-item">
+              <div *ngIf="tab.text == 'Listed Items'">
+                <div style="width: auto; height: auto">
+                  <dx-form id="form" class="invoice-form" *ngIf="data.grn != null; else DataLoading" [(formData)]="data.grn" validationGroup="grnData">
+                    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                      <dxi-item dataField="internalOrderId" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'PO Number'"></dxo-label></dxi-item>
+                      <dxi-item dataField="grnNumber"><dxo-label [text]="'GRN Number'"></dxo-label><dxi-validation-rule type="required"></dxi-validation-rule></dxi-item>
+                    </dxi-item>
+
+                    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                      <dx-data-grid #grnitems id="#grnitems" [dataSource]="data.grn.grnItems"
+                                    [columnAutoWidth]="true"
+                                    [hoverStateEnabled]="true"
+                                    [rowAlternationEnabled]="true"
+                                    (onEditorPreparing)="onEditorPreparingChild($event)"
+                                    [showBorders]="true">
+                        <dxo-sorting mode="none"></dxo-sorting>
+                        <dxo-paging [enabled]="false"></dxo-paging>
+                        <dxo-search-panel [visible]="true"></dxo-search-panel>
+                        <dxo-editing mode="cell"
+                                     [allowUpdating]="true"
+                                     [allowDeleting]="false"
+                                     [allowAdding]="false">
+                        </dxo-editing>
+                        <dxi-column caption="Item Code" dataField="manufacturerCode" [allowEditing]="false"></dxi-column>
+                        <dxi-column caption="Item Desc" dataField="manufacturerProductName" [allowEditing]="false"></dxi-column>
+                        <dxi-column caption="Ordered">
+                          <dxi-column caption="Qty" dataField="internalOrderQuantity" [allowEditing]="false"></dxi-column>
+                        </dxi-column>
+                        <dxi-column caption="Outstanding">
+                          <dxi-column caption="UoM" dataField="uomName" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Qty" [calculateDisplayValue]="getRemaining" dataField="requiredQuantity" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Pack Size" dataField="packSize" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Total (UoM)" [calculateDisplayValue]="getTotalUomOutstanding" dataField="totalUomOutstanding" [allowEditing]="false" dataType="number"></dxi-column>
+                        </dxi-column>
+                        <dxi-column caption="Received">
+                          <dxi-column caption="UoM" dataField="uomName" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Qty" dataField="quantity" [allowEditing]="true" [setCellValue]="setCellValueQuantity"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                          <dxi-column caption="Pack Size" dataField="packSize" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Total (UoM)" [calculateDisplayValue]="getTotalUomReceived" dataField="totalUomReceived" [allowEditing]="false" dataType="number"></dxi-column>
+                        </dxi-column>
+                        <dxi-column dataField="storeLocationId" caption="Store Location" [allowEditing]="true">
+                          <dxo-lookup [dataSource]="StoreForeignDataSource"
+                                      displayExpr="name"
+                                      valueExpr="id">
+                          </dxo-lookup>
+                        </dxi-column>
+                      </dx-data-grid>
+                    </dxi-item>
+                    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                      <dxi-item itemType="button"
+                                horizontalAlignment="left"
+                                [buttonOptions]="AddUpdateGrnCancelBtn">
+                      </dxi-item>
+                      <dxi-item itemType="button"
+                                horizontalAlignment="right"
+                                [buttonOptions]="AddUpdateGrnBtn">
+                      </dxi-item>
+                    </dxi-item>
+
+                  </dx-form>
+                </div>
+              </div>
+              <div *ngIf="tab.text == 'Once-Off Items'">
+                <div style="width: auto; height: auto">
+                  <dx-form id="form" class="invoice-form" *ngIf="data.grn != null; else DataLoading" [(formData)]="data.grn" validationGroup="grnData">
+                    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                      <dxi-item dataField="internalOrderId" [editorOptions]="{ readOnly: true }"><dxo-label [text]="'PO Number'"></dxo-label></dxi-item>
+                      <dxi-item dataField="grnNumber"><dxo-label [text]="'GRN Number'"></dxo-label><dxi-validation-rule type="required"></dxi-validation-rule></dxi-item>
+                    </dxi-item>
+
+                    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                      <dx-data-grid grnonceOffItems id="#grnonceOffItems" [dataSource]="data.grn.grnonceOffItems"
+                                    [columnAutoWidth]="true"
+                                    [hoverStateEnabled]="true"
+                                    [rowAlternationEnabled]="true"
+                                    [showBorders]="true">
+                        <dxo-sorting mode="none"></dxo-sorting>
+                        <dxo-paging [enabled]="false"></dxo-paging>
+                        <dxo-search-panel [visible]="true"></dxo-search-panel>
+                        <dxo-editing mode="cell"
+                                     [allowUpdating]="true"
+                                     [allowDeleting]="false"
+                                     [allowAdding]="false">
+                        </dxo-editing>
+                        <dxi-column caption="Item Desc" dataField="description" [allowEditing]="false"></dxi-column>
+                        <dxi-column caption="Ordered">
+                          <dxi-column caption="Qty" dataField="internalOrderQuantity" [allowEditing]="false"></dxi-column>
+                        </dxi-column>
+                        <dxi-column caption="Outstanding">
+                          <dxi-column caption="UoM" dataField="uomName" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Qty" [calculateDisplayValue]="getRemainingOnce" dataField="requiredQuantity" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Pack Size" dataField="packSize" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Total (UoM)" [calculateDisplayValue]="getTotalUomOutstandingOnce" dataField="totalUomOutstanding" [allowEditing]="false" dataType="number"></dxi-column>
+                        </dxi-column>
+                        <dxi-column caption="Received">
+                          <dxi-column caption="UoM" dataField="uomName" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Qty" dataField="quantity" [allowEditing]="true" [setCellValue]="setCellValueQuantityOnce"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                          <dxi-column caption="Pack Size" dataField="packSize" [allowEditing]="false"></dxi-column>
+                          <dxi-column caption="Total (UoM)" [calculateDisplayValue]="getTotalUomReceivedOnce" dataField="totalUomReceived" [allowEditing]="false" dataType="number"></dxi-column>
+                        </dxi-column>
+                      </dx-data-grid>
+                    </dxi-item>
+                    <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                      <dxi-item itemType="button"
+                                horizontalAlignment="left"
+                                [buttonOptions]="AddUpdateGrnCancelBtn">
+                      </dxi-item>
+                      <dxi-item itemType="button"
+                                horizontalAlignment="right"
+                                [buttonOptions]="AddUpdateGrnBtn">
+                      </dxi-item>
+                    </dxi-item>
+
+                  </dx-form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </dx-tab-panel>-->
+          </div>
+        </div>
+      </div>
+      <!--POPUP Barcode Void Grn-->
+      <dx-popup width="300px"
+                height="auto"
+                [showTitle]="true"
+                [title]="title"
+                dragEnabled="true"
+                [closeOnOutsideClick]="false"
+                container=".dx-viewport"
+                [showCloseButton]="true"
+                (onHiding)="Close()"
+                [(visible)]="popupVisibleBarcodeVoid">
+        <div *dxTemplate="let data of 'content'">
+          <div style="width: auto; height: auto">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <table class="table table-centered table-nowrap">
+                <tr *ngFor="let barcode of voidedBarcodes">
+                  <td>{{barcode}}</td>
+                </tr>
+              </table>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </dx-popup>
+      <!--Comment popup-->
+      <dx-popup width="600px"
+                height="auto"
+                [showTitle]="true"
+                title="Add Comment"
+                dragEnabled="true"
+                [closeOnOutsideClick]="false"
+                container=".dx-viewport"
+                [showCloseButton]="true"
+                [(visible)]="popupVisibleComment">
+        <dxi-toolbar-item widget="dxButton"
+                          itemType="group"
+                          toolbar="bottom"
+                          location="center"
+                          [options]="CancelCommentButtonOptions">
+        </dxi-toolbar-item>
+        <dxi-toolbar-item widget="dxButton"
+                          itemType="group"
+                          toolbar="bottom"
+                          location="center"
+                          [options]="SaveCommentButtonOptions">
+        </dxi-toolbar-item>
+        <div *dxTemplate="let data of 'content'">
+          <div style="width: auto; height: auto">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <dx-form id="addStockQuantityForm" [(formData)]="commentVar">
+                <dxi-item dataField="comment" [colSpan]="4" editorType="dxTextArea" [editorOptions]="{hint:'Enter Comment for selected line item.', height: 140}">
+                  <dxo-label text="Comment"></dxo-label>
+                </dxi-item>
+              </dx-form>
+            </dx-scroll-view>
+          </div>
+        </div>
+      </dx-popup>
+    </div>
+  </div>
+  <dx-load-panel #loadPanel shadingColor="rgba(0,0,0,0.4)" [(visible)]="loadingVisible" [showIndicator]="true" [showPane]="true" [shading]="true" [closeOnOutsideClick]="false"></dx-load-panel>
+  <ng-template #DataLoading>
+    Loading Data...
+  </ng-template>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

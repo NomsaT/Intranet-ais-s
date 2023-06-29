@@ -1,0 +1,245 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Quarantine Stock</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Stock Management → Quarantine Stock</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-12 table-col">
+          <dx-data-grid #status id="roles" [dataSource]="dataSource"
+                        [remoteOperations]="true"
+                        showBorders="true"
+                        keyExpr="id"
+                        showRowLines="true"
+                        showColumnLines="true"
+                        [hoverStateEnabled]="true" class="dx-table"
+                        [wordWrapEnabled]="true"
+                        [columnAutoWidth]="true"
+                        [showColumnLines]="true"
+                        [showRowLines]="false"
+                        [showBorders]="false"
+                        (onExporting)="onExporting($event)"
+                        (onExported)="onExported($event)"
+                        (onCellClick)="returnStockOnClick($event)"
+                        (onCellPrepared)="returnStockPrepared($event)"
+                        [rowAlternationEnabled]="true"
+                        (onToolbarPreparing)="onToolbarPreparing($event)">
+            <dxo-search-panel [visible]="true"></dxo-search-panel>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager [showPageSizeSelector]="true"
+                       [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                       [showInfo]="true"
+                       [showNavigationButtons]="true">
+            </dxo-pager>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+            <dxo-editing mode="form"
+                         [allowAdding]="false"
+                         [allowUpdating]="false"
+                         [allowDeleting]="false"
+                         [useIcons]="true">
+            </dxo-editing>
+            <dxo-selection selectAllMode="allPages" showCheckBoxesMode="onClick" mode="multiple"></dxo-selection>
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Department-Stock-List"></dxo-export>
+
+
+            <dxi-column dataField="barcode" caption="Barcode" [allowGrouping]="false"></dxi-column>
+            <dxi-column dataField="code" caption="Item Code"></dxi-column>
+            <dxi-column dataField="productName" caption="Item Name"></dxi-column>
+            <dxi-column dataField="internalProductName" caption="Internal Item Name"></dxi-column>
+            <dxi-column dataField="departmentId" caption="Department">
+              <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="stockCategoryId" caption="Stock Category">
+              <dxo-lookup [dataSource]="StockCategoryForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+
+            <dxi-column dataField="stockGroupId" caption="Stock Group">
+              <dxo-lookup [dataSource]="StockGroupForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+
+            <dxi-column dataField="locationId" caption="Location">
+              <dxo-lookup [dataSource]="LocationForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storeId" caption="Store">
+              <dxo-lookup [dataSource]="StoreForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storeTypeId" caption="Store Type">
+              <dxo-lookup [dataSource]="StoreTypeForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="supplierCurrencyId" caption="ISO" [visible]="false" [formItem]="{ visible: false }">
+              <dxo-lookup [dataSource]="CurrencyForeignDataSource"
+                          displayExpr="iso"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storageTypeId" caption="Storage Type">
+              <dxo-lookup [dataSource]="StorageTypeForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="price" caption="Price" alignment="right" [calculateCellValue]="priceISO"></dxi-column>
+            <dxi-column dataField="quantity" caption="Quantity" [calculateCellValue]="initialUomQuantity"></dxi-column>
+            <dxi-column dataField="uomid" caption="UoM" [visible]="false">
+              <dxo-lookup [dataSource]="UnitofMeasureForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="supplierId" caption="Supplier">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+              <dxo-lookup [dataSource]="SupplierForeignDataSource"
+                          displayExpr="companyName"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <!--<dxi-column type="buttons" caption="Return to Supplier" cellTemplate="ManagecellTemplate" [formItem]="{ visible: false }" [visible]="allowReturn">
+  </dxi-column>
+  <div *dxTemplate="let data of 'ManagecellTemplate'">Return</div>-->
+            <!--<dxo-summary>
+  <dxi-group-item column="quantity"
+                  summaryType="sum"
+                  displayFormat="{0} UoM">
+  </dxi-group-item>-->
+            <!-- <dxi-group-item column="price"
+                  summaryType="sum"
+                  [customizeText]="randFormatConversion"
+                  displayFormat="Total: R {0}">
+  </dxi-group-item>-->
+            <!--</dxo-summary>-->
+
+          </dx-data-grid>
+          <dx-popup title="Transfer Stock by Department"
+                    [width]="800"
+                    height="auto"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    container=".dx-viewport"
+                    [(visible)]="popupTransferStockDepVisible">
+
+            <dxi-toolbar-item widget="dxButton"
+                              toolbar="bottom"
+                              location="before"
+                              [options]="buttonCancelDep">
+            </dxi-toolbar-item>
+            <dxi-toolbar-item widget="dxButton"
+                              toolbar="bottom"
+                              location="after"
+                              [options]="buttonOkDep">
+            </dxi-toolbar-item>
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <table class="info" *ngIf="stockInfo">
+                <tr>
+                  <td><strong>Code: </strong>{{code}}</td>
+                  <td><strong>Item Name: </strong>{{productName}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Unit Quantity: </strong>{{unitQty}}{{uomName}}</td>
+                  <td><strong>Pack Size: </strong>{{packSize}}</td>
+                  <td><strong>Pack Quantity: </strong>{{packQty}}{{uomName}}</td>
+                </tr>
+                <tr *ngIf="totalDep" style="background-color: yellow; border-radius: 4px;">
+                  <td><strong>Total Department Quantity: </strong>{{totalDep}}{{uomName}}</td>
+                </tr>
+              </table><br />
+              <dx-form id="transferStockDepForm"
+                       [colCount]="4"
+                       [(formData)]="stockTransferDepartment"
+                       (onInitialized)="savetransferStockDepFormInstance($event)">
+                <dxi-item itemType="group" [colSpan]="4">
+                  <dxi-item dataField="stockId" [colSpan]="4" editorType="dxSelectBox" [editorOptions]="{dataSource: StockForeignDataSource,displayExpr:'internalProductName',valueExpr:'id',searchEnabled:true,showClearButton:true,hint:'Select a stock item you would like to transfer.' ,onValueChanged:setDepartments}">
+                    <dxo-label [text]="'Stock Item'"></dxo-label>
+                    <dxi-validation-rule type="required" message="UoM is required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="originDepartment" [colSpan]="4" editorType="dxSelectBox" [editorOptions]="{dataSource: FilteredDepartmentForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,hint:'Select a department you want to remove stock from.',onValueChanged:getTotalStockDep }">
+                    <dxo-label [text]="'Current Department'"></dxo-label>
+                    <dxi-validation-rule type="required" message="UoM is required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="newDepartment" [colSpan]="4" editorType="dxSelectBox" [editorOptions]="{dataSource: DepartmentForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,hint:'Select a department you want to transfer stock to.' }">
+                    <dxo-label [text]="'Receiving Department'"></dxo-label>
+                    <dxi-validation-rule type="required" message="UoM is required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="quantityOption"
+                            editorType="dxRadioGroup"
+                            [editorOptions]="{ dataSource: priorities, layout:'horizontal',value:priorities[0],hint:'Select the option you would like to transfer by.'}">
+                    <dxo-label [text]="'Transfer By'"></dxo-label>
+                    <dxi-validation-rule type="required" message="UoM is required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="packQuantityMove" [colSpan]="4" [editorOptions]="{hint:'Enter the quantity you wish to transfer.'}">
+                    <dxo-label text="Quantity Transfering"></dxo-label>
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-item>
+                  <dxi-item dataField="uomid" [colSpan]="4" editorType="dxSelectBox" [editorOptions]="{dataSource: UomRemoveForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,hint:'Select a unit of measurement (Only UoMs linked to the stock item wil display in the dropdown)' }">
+                    <dxo-label [text]="'Unit of Measurement'"></dxo-label>
+                    <dxi-validation-rule type="required" message="UoM is required"></dxi-validation-rule>
+                  </dxi-item>
+                </dxi-item>
+              </dx-form>
+            </dx-scroll-view>
+          </dx-popup>
+
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupDownloadConfirmVisible">
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center"
+                          my="center"
+                          of="window">
+            </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

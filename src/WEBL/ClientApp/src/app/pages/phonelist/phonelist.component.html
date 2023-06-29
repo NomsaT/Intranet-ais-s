@@ -1,0 +1,190 @@
+<div class="container-fluid">
+    <!-- start page title -->
+  <div class="row">    
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Phonelist</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Other → Phonelist → {{breadcrumbs}}</li>
+          </ol>
+        </div>
+      </div>
+      <dx-tab-panel #tabPanel
+                    [dataSource]="tabs"
+                    [selectedIndex]="0"
+                    [loop]="false"
+                    [animationEnabled]="true"
+                    [swipeEnabled]="true"
+                    (onSelectionChanged)="onOptionChanged($event)">
+        <div *dxTemplate="let tab of 'title'">
+          <span>{{tab.text}}</span>
+        </div>
+        <div *dxTemplate="let tab of 'item'">
+          <div class="tabpanel-item">
+            <div *ngIf="tab.text == 'Suppliers'">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col">
+                  <div class="table-align">
+                    <div class="col-md-12 col-sm-12 col-12 table-col">
+                      <dx-data-grid #status id="roles" [dataSource]="dataSourceSupplier"
+                                    [remoteOperations]="true"
+                                    showBorders="true"
+                                    keyExpr="id"
+                                    showRowLines="true"
+                                    showColumnLines="true"
+                                    [hoverStateEnabled]="true" class="dx-table"
+                                    [wordWrapEnabled]="true"
+                                    [columnAutoWidth]="true"
+                                    [showColumnLines]="true"
+                                    [showRowLines]="false"
+                                    [showBorders]="false"
+                                    (onExporting)="onExporting($event)"
+                                    (onExported)="onExported($event)"
+                                    [rowAlternationEnabled]="true">
+                        <dxo-search-panel [visible]="true"></dxo-search-panel>
+                        <dxo-paging [pageSize]="15"></dxo-paging>
+                        <dxo-pager [showPageSizeSelector]="false"
+                                   [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                                   [showInfo]="true"
+                                   [showNavigationButtons]="true">
+                        </dxo-pager>
+                        <dxo-filter-row [visible]="false"></dxo-filter-row>
+                        <dxo-group-panel [visible]="false"></dxo-group-panel>
+                        <dxo-editing mode="row"
+                                     [allowAdding]="false"
+                                     [allowUpdating]="false"
+                                     [allowDeleting]="false"
+                                     [useIcons]="true">
+                        </dxo-editing>
+                        <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+                        <dxo-export [enabled]="false" fileName="Phonelist"></dxo-export>
+                        <dxi-column dataField="supplierName" caption="Supplier Name"></dxi-column>
+                        <dxi-column dataField="personName" caption="Contact Person Name"></dxi-column>
+                        <dxi-column dataField="personPosition" caption="Contact Person Position"></dxi-column>
+                        <dxi-column dataField="contactNumber" caption="Contact Number"></dxi-column>
+                        <dxi-column dataField="workLandlineNumber" caption="Work Landline Number"></dxi-column>
+                        <dxi-column dataField="contactEmail" caption="Email"></dxi-column>
+                      </dx-data-grid>
+                    </div>
+                  </div>
+                  <dx-popup [width]="400"
+                            [height]="150"
+                            [showTitle]="false"
+                            [dragEnabled]="false"
+                            [closeOnOutsideClick]="false"
+                            [showCloseButton]="false"
+                            [(visible)]="popupDownloadConfirmVisible">
+
+                    <dxi-toolbar-item widget="dxButton"
+                                      itemType="group"
+                                      toolbar="bottom"
+                                      location="center"
+                                      [options]="yesDownloadButtonOptions">
+                    </dxi-toolbar-item>
+
+                    <dxi-toolbar-item widget="dxButton"
+                                      itemType="group"
+                                      toolbar="bottom"
+                                      location="center"
+                                      [options]="noDownloadButtonOptions">
+                    </dxi-toolbar-item>
+
+                    <dxo-position at="center"
+                                  my="center"
+                                  of="window">
+                    </dxo-position>
+                    <p style="text-align: center">
+                      Are you sure you want to download this file?
+                    </p>
+                  </dx-popup>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="tab.text == 'Customers'">
+              <div class="table-align">
+                <div class="col-md-12 col-sm-12 col-12 table-col">
+                  <div class="table-align">
+                    <div class="col-md-12 col-sm-12 col-12 table-col">
+                      <dx-data-grid #status id="roles" [dataSource]="dataSourceCustomer"
+                                    [remoteOperations]="true"
+                                    showBorders="true"
+                                    keyExpr="id"
+                                    showRowLines="true"
+                                    showColumnLines="true"
+                                    [hoverStateEnabled]="true" class="dx-table"
+                                    [wordWrapEnabled]="true"
+                                    [columnAutoWidth]="true"
+                                    [showColumnLines]="true"
+                                    [showRowLines]="false"
+                                    [showBorders]="false"
+                                    (onExporting)="onExportingCustomer($event)"
+                                    (onExported)="onExported($event)"
+                                    [rowAlternationEnabled]="true">
+                        <dxo-search-panel [visible]="true"></dxo-search-panel>
+                        <dxo-paging [pageSize]="15"></dxo-paging>
+                        <dxo-pager [showPageSizeSelector]="false"
+                                   [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                                   [showInfo]="true"
+                                   [showNavigationButtons]="true">
+                        </dxo-pager>
+                        <dxo-filter-row [visible]="false"></dxo-filter-row>
+                        <dxo-group-panel [visible]="false"></dxo-group-panel>
+                        <dxo-editing mode="row"
+                                     [allowAdding]="false"
+                                     [allowUpdating]="false"
+                                     [allowDeleting]="false"
+                                     [useIcons]="true">
+                        </dxo-editing>
+                        <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+                        <dxo-export [enabled]="false" fileName="Phonelist"></dxo-export>
+                        <dxi-column dataField="companyName" caption="Customer Name"></dxi-column>
+                        <dxi-column dataField="personName" caption="Contact Person Name"></dxi-column>
+                        <dxi-column dataField="personPosition" caption="Contact Person Position"></dxi-column>
+                        <dxi-column dataField="contactNumber" caption="Contact Number"></dxi-column>
+                        <dxi-column dataField="workLandlineNumber" caption="Work Landline Number"></dxi-column>
+                        <dxi-column dataField="contactEmail" caption="Email"></dxi-column>
+                      </dx-data-grid>
+                    </div>
+                  </div>
+                      <dx-popup [width]="400"
+                            [height]="150"
+                            [showTitle]="false"
+                            [dragEnabled]="false"
+                            [closeOnOutsideClick]="false"
+                            [showCloseButton]="false"
+                            [(visible)]="popupDownloadConfirmCustomerVisible">
+
+                    <dxi-toolbar-item widget="dxButton"
+                                      itemType="group"
+                                      toolbar="bottom"
+                                      location="center"
+                                      [options]="yesDownloadCustomerButtonOptions">
+                    </dxi-toolbar-item>
+
+                    <dxi-toolbar-item widget="dxButton"
+                                      itemType="group"
+                                      toolbar="bottom"
+                                      location="center"
+                                      [options]="noDownloadCustomerButtonOptions">
+                    </dxi-toolbar-item>
+
+                    <dxo-position at="center"
+                                  my="center"
+                                  of="window">
+                    </dxo-position>
+                    <p style="text-align: center">
+                      Are you sure you want to download this file?
+                    </p>
+                  </dx-popup>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </dx-tab-panel>      
+    </div>
+  </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

@@ -1,0 +1,212 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <div class="icon-inline">
+            <h4 class="mb-0 font-size-18">Quotations</h4>
+            <div id="info" (mouseenter)="toggleDefault()" (mouseleave)="toggleDefault()"><i class="bx bx-info-circle"></i></div>
+            <dx-tooltip target="#info"
+                        [(visible)]="defaultVisible"
+                        [closeOnOutsideClick]="false">
+              <div *dxTemplate="let data = data of 'content'">
+                This page will show all completed quotations and quotations with the draft status.
+              </div>
+            </dx-tooltip>
+          </div>            
+          <div class="page-title-right">
+            <ol class="breadcrumb m-0">
+              <li class="breadcrumb-item active">Purchasing → Quotations</li>
+            </ol>
+          </div>
+        </div>
+        <div class="table-align">
+          <dx-load-panel #loadPanel
+                         shadingColor="rgba(0,0,0,0.4)"
+                         [(visible)]="loadingVisible"
+                         [showIndicator]="true"
+                         [showPane]="true"
+                         [shading]="true"
+                         [closeOnOutsideClick]="false">
+          </dx-load-panel>
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <dx-data-grid #quote id="orders"
+                          [dataSource]="dataSource"
+                          keyExpr="id"
+                          [columnAutoWidth]="true"
+                          [showColumnLines]="true"
+                          [showRowLines]="false"
+                          [showBorders]="false"
+                          (onSelectionChanged)="selectedChanged($event)"
+                          (onCellPrepared)="onCellPrepared($event)"
+                          (onInitNewRow)="onInitNewRow($event)"
+                          (onEditorPreparing)="onEditorPreparingParent($event)"
+                          (onEditingStart)="onEditingStartParent($event)"
+                          (onToolbarPreparing)="onToolbarPreparingParent($event)"
+                          (onSaving)="onSaving($event)"
+                          (onSaved)="onSavedParent($event)"
+                          (onEditCanceled)="onEditCanceledParent($event)"
+                          rowTemplate="dataRowTemplateName"
+                          [showColumnHeaders]="false"
+                          [wordWrapEnabled]="true">
+              <dxo-selection mode="single"></dxo-selection>
+              <dxo-load-panel [enabled]="false"></dxo-load-panel>
+              <dxo-search-panel [visible]="true" [width]="250"></dxo-search-panel>
+              <dxo-editing mode="popup">
+                <dxo-texts saveRowChanges="Submit">
+                </dxo-texts>
+                <dxo-popup [title]="heading"
+                           [showTitle]="true"
+                           dragEnabled="true"
+                           [width]="'70%'"
+                           [height]="'90%'">
+                </dxo-popup>
+                <dxo-form id="form" scrollingEnabled="true">
+                  <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                    <dxi-item dataField="requestedById"></dxi-item>
+                    <dxi-item dataField="placedById" [editorOptions]="{ readOnly: true }"></dxi-item>
+                    <dxi-item dataField="quotationNumber"></dxi-item>
+                    <dxi-item dataField="customerId"></dxi-item>
+                    <dxi-item dataField="submissionDate"></dxi-item>
+                    <dxi-item dataField="validFor"></dxi-item>
+                    <dxi-item dataField="daysFrom"></dxi-item>/dxi-item>
+                    <dxi-item dataField="onDelivery"></dxi-item>
+                    <dxi-item dataField="onOrder"></dxi-item>
+                    <dxi-item dataField="total" [editorOptions]="{ readOnly: true,format:currencyZAR}"></dxi-item>
+                  </dxi-item>
+                  <!-- #region Internal Order Items-->
+                  <dxi-item itemType="group" caption="Products" [colSpan]="2">
+                    <dxi-item dataField="quoteItems"><dxo-label [visible]="false"></dxo-label> </dxi-item>
+                  </dxi-item>
+                </dxo-form>
+              </dxo-editing>
+              <!-- #endregion -->
+              <!--#region Internal Order-->
+              <dxi-column dataField="id" [visible]="false" dataType="int"></dxi-column>
+              <dxi-column dataField="requestedById" caption="Requested By">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="UsersForeignDataSource"
+                            displayExpr="fullName"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="placedById" caption="Placed By">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="UsersForeignDataSource"
+                            displayExpr="fullName"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="quotationNumber"></dxi-column>
+              <dxi-column dataField="customerId" caption="Supplier">
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+                <dxo-lookup [dataSource]="SupplierForeignDataSource"
+                            [displayExpr]="getFullName"
+                            valueExpr="id">
+                </dxo-lookup>
+              </dxi-column>
+              <dxi-column dataField="submissionDate" dataType="date">
+              </dxi-column>
+              <dxi-column dataField="validFor" caption="Valid For x (day/s)" dataType="number"></dxi-column>
+              <dxi-column dataField="daysFrom" caption="Days from Invoice" dataType="number" ></dxi-column>
+              <dxi-column dataField="onDelivery" caption="On Delivery (%)" dataType="number"></dxi-column>
+              <dxi-column dataField="onOrder" caption="On Order (%)" dataType="number" >
+                <dxi-validation-rule type="required"></dxi-validation-rule>
+              </dxi-column>
+              <dxi-column dataField="internalOrderItems" [visible]="false" editCellTemplate="editCellTemplateInternalOrderItems" >
+              </dxi-column>
+              <div *dxTemplate="let cellInfo of 'editCellTemplateInternalOrderItems'">
+                <dx-data-grid #OrderItem id="OrderItem"
+                              [dataSource]="cellInfo.value"
+                              (onKeyDown)="onKeyDown($event)"
+                              (onFocusedCellChanged)="onFocusedCellChanged($event)"
+                              (onToolbarPreparing)="onToolbarPreparing($event)"
+                              (onEditorPreparing)="onEditorPreparingChild($event)"
+                              (onSaved)="onSavedChild(cellInfo)"
+                              (onInitNewRow)="onInitNewRowChild($event)"
+                              [showRowLines]="false"
+                              [showBorders]="false"
+                              [wordWrapEnabled]="true"
+                              [height]="300"
+                              [columnAutoWidth]="true">
+                  <dxo-editing mode="row"
+                               [allowAdding]="true"
+                               [allowUpdating]="true"
+                               [allowDeleting]="true"
+                               [useIcons]="true">
+                  </dxo-editing>
+                  <dxo-scrolling mode="infinite"></dxo-scrolling>
+                  <dxi-column dataField="id" [visible]="false" dataType="int"></dxi-column>
+                  <dxi-column dataField="productId" caption="Product Description" [setCellValue]="setCellValueItemPrice">
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                    <dxo-lookup #productId [dataSource]="ProductForeignDataSource"
+                                [displayExpr]="getProduct"
+                                valueExpr="id">
+                    </dxo-lookup>
+                  </dxi-column>
+                  <dxi-column dataField="width" caption="Width" dataType="number"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                  <dxi-column dataField="length" caption="Length" dataType="number" >
+                    <dxi-validation-rule type="required"></dxi-validation-rule>
+                  </dxi-column>
+                  <dxi-column dataField="coilTotal" caption="m2/Coil" dataType="number" ></dxi-column>
+                  <dxi-column dataField="coilPrice" caption="Price/m2" dataType="number" ></dxi-column>
+                  <dxi-column dataField="quantity" caption="Qty" dataType="number" ></dxi-column>
+                  <dxi-column dataField="total" caption="Total (Vat Excl.)" dataType="number" [format]="currencyZAR" [editorOptions]="{ disabled: true,format:currencyZAR }"></dxi-column>
+                  <dxo-summary>
+                    <dxi-total-item column="stockId" displayFormat="Total Items: {0}" summaryType="count"> </dxi-total-item>
+                  </dxo-summary>
+                </dx-data-grid>
+              </div>
+              <!--#endregion-->
+              <!--#region Internal Order Tile View-->
+              <tbody class="dx-row" *dxTemplate="let quote of 'dataRowTemplateName'">
+                <tr class="blanks" style="border-left: 10px solid #f2f2f5 !important;">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <!------------------Completed------------------>
+                <tr class="border-approve-left io-header" *ngIf="quote.data.quoteStatusDisplay == 'Completed'">
+                  <td colspan="12"><strong>Quotation #{{quote.data.id}}</strong></td>
+                  <td colspan="3" class="float-right"><span class="badge bg-success">{{quote.data.quoteStatusDisplay}}</span><span class="badge bg-warning edit-badge"><i class="bx bx-edit"></i>Revise Quote</span></td>
+                </tr>
+                <tr class="main-row border-approve-left" *ngIf="quote.data.quoteStatusDisplay == 'Completed'">
+                  <td colspan="12"><strong>Customer: </strong>{{ quote.data.companyName }}</td>
+                  <td colspan="3" class="float-right"><strong>Requested By: </strong>{{ quote.data.requestByFullName }}</td>
+                </tr>
+                <tr class="notes-row border-approve-left" *ngIf="quote.data.quoteStatusDisplay == 'Completed'">
+                  <td colspan="15" class="float-right"><strong>Date Created: </strong>{{ quote.data.submissionDate | date: 'dd MMMM yy' }}</td>
+                </tr>
+                <!------------------DRAFT------------------>
+                <tr class="border-draft-left io-header" *ngIf="quote.data.quoteStatusDisplay == 'Draft'">
+                  <td colspan="12"><strong>Quotation #{{quote.data.id}}</strong></td>
+                  <td colspan="3" class="float-right"><span class="badge bg-draft">{{quote.data.quoteStatusDisplay}}</span><span class="badge bg-warning edit-badge"><i class="bx bx-edit"></i>Edit Quote</span></td>
+                </tr>
+                <tr class="main-row border-draft-left" *ngIf="quote.data.quoteStatusDisplay == 'Draft'">
+                  <td colspan="12"><strong>Customer: </strong>{{ quote.data.companyName }}</td>
+                  <td colspan="3" class="float-right"><strong>Requested By: </strong>{{ quote.data.requestByFullName }}</td>
+                </tr>
+                <tr class="notes-row border-draft-left" *ngIf="quote.data.quoteStatusDisplay == 'Draft'">
+                  <td colspan="15" class="float-right"><strong>Date Created: </strong>{{ quote.data.submissionDate | date: 'dd MMMM yy' }}</td>
+                </tr>
+              </tbody>
+              <!--#endregion-->
+            </dx-data-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

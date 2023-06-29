@@ -1,0 +1,58 @@
+<dx-data-grid #profitcenterUsers [dataSource]="dataSource" [showBorders]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true"
+              (onEditingStart)="EditStart($event)"
+              (onSaving)="SavingStart($event)"
+              (onSaved)="onSaved($event)"
+              (onRowInserting)="insertRow($event)">
+  <dxo-editing mode="popup"
+               [allowAdding]="allowModify"
+               [allowUpdating]="allowModify"
+               [allowDeleting]="allowModify"
+               [useIcons]="true">
+
+    <dxo-popup title="Allocate Department"
+               [showTitle]="true"
+               [dragEnabled]="true"
+               [width]="600"
+               [height]="360">
+    </dxo-popup>
+    <dxo-form>
+      <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+        <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+          <dxi-item dataField="departmentId" [editorOptions]="{searchEnabled:true, showClearButton:'true',width: '260%'}"></dxi-item>
+          <dxi-item itemType="button"
+                    alignment="left"
+                    [buttonOptions]="buttonOptions"
+                    [editorOptions]="{ width: '20%' }">
+          </dxi-item>
+        </dxi-item>
+          <dxi-item dataField="percentage"></dxi-item>
+      </dxi-item>
+</dxo-form>
+  </dxo-editing>
+
+  <dxi-column dataField="departmentId" caption="Department" [editorOptions]="{searchEnabled:true, showClearButton:'true'}">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                displayExpr="abbAndName"
+                valueExpr="id">
+    </dxo-lookup>
+  </dxi-column>
+
+  <dxi-column dataField="percentage" caption="Percentage (%)">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+  </dxi-column>
+
+</dx-data-grid>
+<dx-popup title="Department"
+          [width]="750"
+          [height]="550"
+          [showTitle]="true"
+          dragEnabled="true"
+          [closeOnOutsideClick]="false"
+          [showCloseButton]="true"
+          (onHidden)="onHidden($event)"
+          [(visible)]="popupVisible">
+  <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+    <app-department></app-department>
+  </dx-scroll-view>
+</dx-popup>

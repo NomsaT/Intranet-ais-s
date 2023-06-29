@@ -1,0 +1,134 @@
+.button{
+    color: #fff !important;
+}
+
+.mb-5 {
+  margin-bottom: 1rem !important;
+}
+
+.dash-data{
+    font-weight:bold;
+    font-size:25px !important;
+}
+
+.align-left{
+    float:left;
+}
+
+.align-right {
+  float: right;
+  color: white;
+  background-color: #1a5f76;
+  padding: 20px;
+  border-radius: 35px;
+}
+
+.icon {
+  font-size: xx-large;
+}
+
+.font-size{
+    font-size:25px;
+}
+
+.text-primary {
+  color:#1a5f76 !important;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1a5f76;
+  border-color: #1a5f76;
+}
+
+.verti-timeline .event-list.active .event-timeline-dot {
+  color: #1a5f76;
+}
+
+.department-parent {
+  height: 100%;
+  width: 100%;
+/*  margin-left: 50%;
+  margin-right: 50%;*/
+}
+
+.department-child {
+  height: 15px;
+  width: 15px;
+  border-radius: 50%;
+  border: 1px solid;
+}
+
+.navigation {
+  cursor: pointer;
+  color: #1a5f76;
+  text-decoration: underline !important;
+  text-align: right;
+  font-size: 15px;
+}
+
+.total {
+  background-color: #ffff0091;
+  border-radius: 4px;
+}
+
+.totalsame {
+  background-color: #ffff0091;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.totaldifferent {
+  background-color: #aded92;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.io-view-heading {
+  border: 1px solid #2a3042;
+  padding: 4px;
+  border-radius: 4px;
+  text-align: center;
+  background-color: #2a304226;
+  color: #2a3042;
+}
+
+.verti-timeline .event-list {
+  position: relative;
+  padding: 0px 0px 5px 30px !important;
+}
+
+.iflowstockNot {
+  height: 200px !important;
+  margin-top: 8px !important;
+}
+
+.ifdepartmentstock {
+  //height: 360px !important;
+  margin-top: 8px !important;
+}
+
+.internalOrder tr {
+  border-style: hidden !important;
+}
+
+.hr-split {
+  width: 60%;
+  margin: auto;
+  margin-top: 12px;
+}
+/*.card-body{
+    text-align:center;
+}
+
+.heading-4 {
+  margin-bottom: 0px !important;
+  margin-top: 10px !important;
+}*/
+
+/*.card:hover {
+  cursor: pointer;
+  padding-top: 12px;
+  height: 135px;
+}*/
+

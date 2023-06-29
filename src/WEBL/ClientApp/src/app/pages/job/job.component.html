@@ -1,0 +1,145 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Jobs</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Masterlists → Jobs</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+</div> <!-- container-fluid -->
+
+
+<form _ngcontent-yrm-c118 class="app-search d-none d-xl-block">
+  <div _ngcontent-yrm-c118 class="position-relative">
+    <input _ngcontent-yrm-c118 type="text" class="form-control" placeholder="Search...">
+    <span _ngcontent-yrm-c118 class="bx bx-search-alt"></span>
+  </div>
+</form>
+
+<table class="table project-list-table table-nowrap align-middle table-borderless"> <caption>Jobs</caption>
+
+  <thead>
+    <tr>
+      <th scope="col">Job #</th>
+      <th scope="col">Job Name</th>
+      <th scope="col">Customer</th>
+      <th scope="col">Date Created</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let data of Data" (click)=showInfo(data)>
+      <td>{{data.jobNr}}</td>
+      <td>{{data.jobName}}</td>
+      <td>{{data.jobFor}}</td>
+      <td>{{data.jobDateCreated}}</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<div id="container">
+  <dx-popup [width]="800"
+            [height]="500"
+            [showTitle]="true"
+            title={{currentJob.jobName}}
+            [dragEnabled]="false"
+            [closeOnOutsideClick]="false"
+            [showCloseButton]="true"
+            container=".dx-viewport"
+            [(visible)]="popupVisible">
+
+
+    <div class="_ngcontent-syu-c381" *dxTemplate="let data of 'content'">
+
+      <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+
+        <div class="row">
+          <div class="col-6 bold">Job Number:</div>
+          <div class="col-6">{{currentJob.jobNr}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Description:</div>
+          <div class="col-6">{{currentJob.jobDescription}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Status:</div>
+          <div class="col-6">{{currentJob.jobStatus}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Notes:</div>
+          <div class="col-6">{{currentJob.statusNote}}</div>
+        </div>
+
+
+        <div class="row">
+          <div class="col-6 bold"> Date Created:</div>
+          <div class="col-6">{{currentJob.jobDateCreated}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Completed:</div>
+          <div class="col-6">{{currentJob.jobDateCompleted}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Transporter:</div>
+          <div class="col-6">{{currentJob.transporter}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Transport Order Number Required:</div>
+          <div class="col-6">{{currentJob.transportOrderNoReq}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Load Size:</div>
+          <div class="col-6">{{currentJob.loadSize}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold"> Payment Terms:</div>
+          <div class="col-6">{{currentJob.paymentTerms}}</div>
+        </div>
+
+
+        <div class="row">
+          <div class="col-6 bold">Payee:</div>
+          <div class="col-6">{{currentJob.payee}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold"> Delivery Address:</div>
+          <div class="col-6">{{currentJob.deliveryAddress}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Contact Person:</div>
+          <div class="col-6">{{currentJob.contactPerson}}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 bold">Contact number:</div>
+          <div class="col-6">{{currentJob.contactNo}}</div>
+        </div>
+
+      </dx-scroll-view>
+
+    </div>
+  </dx-popup>
+
+</div>
+
+
+
+

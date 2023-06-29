@@ -1,0 +1,218 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Production Store Stock</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">
+              Stock Management → Production Store Stock
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-12 table-col">
+          <dx-data-grid #status
+                        id="roles"
+                        [dataSource]="dataSource"
+                        [remoteOperations]="true"
+                        showBorders="true"
+                        keyExpr="id"
+                        showRowLines="true"
+                        showColumnLines="true"
+                        [hoverStateEnabled]="true"
+                        class="dx-table"
+                        [wordWrapEnabled]="true"
+                        [columnAutoWidth]="true"
+                        [showColumnLines]="true"
+                        [showRowLines]="false"
+                        [showBorders]="false"
+                        (onExporting)="onExporting($event)"
+                        (onExported)="onExported($event)"
+                        [rowAlternationEnabled]="true"
+                        (onCellClick)="manageStockOnClick($event)">
+            <dxo-search-panel [visible]="true"></dxo-search-panel>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager [showPageSizeSelector]="true"
+                       [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                       [showInfo]="true"
+                       [showNavigationButtons]="true">
+            </dxo-pager>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+            <dxo-editing mode="form"
+                         [allowAdding]="false"
+                         [allowUpdating]="false"
+                         [allowDeleting]="false"
+                         [useIcons]="true">
+            </dxo-editing>
+
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Location-List"></dxo-export>
+
+            <dxi-column dataField="code" caption="Item Code" [formItem]="{ disabled: true }"></dxi-column>
+            <dxi-column dataField="productName" caption="Item Name" [formItem]="{ disabled: true }"></dxi-column>
+            <dxi-column dataField="internalProductName" caption="Internal Item Name" [formItem]="{ disabled: true }"></dxi-column>
+            <dxi-column dataField="stockCategoryId" caption="Stock Category" [formItem]="{ disabled: true }">
+              <dxo-lookup [dataSource]="StockCategoryForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+
+            <dxi-column dataField="stockGroupId" caption="Stock Group" [formItem]="{ disabled: true }">
+              <dxo-lookup [dataSource]="StockGroupForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+
+            <dxi-column dataField="departmentId" caption="Department" [formItem]="{ disabled: true }">
+              <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="locationId" caption="Plant Location">
+              <dxo-lookup [dataSource]="LocationForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storeId" caption="Store">
+              <dxo-lookup [dataSource]="StoreForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="storeTypeId" caption="Store Type">
+              <dxo-lookup [dataSource]="StoreTypeForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="supplierCurrencyId" caption="ISO" [visible]="false" [formItem]="{ visible: false }">
+              <dxo-lookup [dataSource]="CurrencyForeignDataSource"
+                          displayExpr="iso"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="quantity" caption="Quantity" [formItem]="{ disabled: true }" [calculateCellValue]="initialUomQuantity"></dxi-column>
+            <dxi-column dataField="uomid"
+                        caption="UoM"
+                        [formItem]="{ disabled: true }"
+                        [visible]="false">
+              <dxo-lookup [dataSource]="UnitofMeasureForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column type="buttons" [allowGrouping]="false" caption="Consume Stock" cellTemplate="ManagecellTemplate" [formItem]="{ visible: false }" [visible]="allowManage">
+            </dxi-column>
+            <div *dxTemplate="let data of 'ManagecellTemplate'">
+              <i class="bx bx-trash" style="font-size: x-large;"></i>
+            </div>
+            <dxo-summary>
+              <dxi-group-item column="code"
+                              summaryType="count"
+                              displayFormat="{0} items">
+              </dxi-group-item>
+              <!--<dxi-group-item column="price"
+                      summaryType="sum"
+                      [customizeText]="randFormatConversion"
+                      displayFormat="Total: R {0}">
+      </dxi-group-item>-->
+            </dxo-summary>
+          </dx-data-grid>
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupDownloadConfirmVisible">
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center" my="center" of="window"> </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+          <dx-popup title="Manage Stock for: {{CodeAndName}}"
+                    [width]="750"
+                    height="auto"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    container=".dx-viewport"
+                    [(visible)]="popupManageStockVisible">
+
+            <dxi-toolbar-item widget="dxButton"
+                              toolbar="bottom"
+                              location="before"
+                              [options]="buttonCancel">
+            </dxi-toolbar-item>
+            <dxi-toolbar-item widget="dxButton"
+                              toolbar="bottom"
+                              location="after"
+                              [options]="buttonOk">
+            </dxi-toolbar-item>
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <dx-tab-panel #tabPanel
+                            [dataSource]="tabs"
+                            [selectedIndex]="0"
+                            [loop]="false"
+                            [animationEnabled]="true"
+                            [swipeEnabled]="true"
+                            (onSelectionChanged)="onOptionChanged($event)">
+                <div *dxTemplate="let tab of 'title'">
+                  <span>{{tab.text}}</span>
+                </div>
+                <div *dxTemplate="let tab of 'item'" class="tabs">
+                  <div class="tabpanel-item">
+                    <div *ngIf="tab.text == 'Remove Stock'">
+                      <div style="width: auto; height: auto">
+                        <label>{{managestockinfo}}</label>
+                        <dx-form id="removeStockQuantityForm"
+                                 [colCount]="4"
+                                 [(formData)]="stockQuantity"
+                                 (onInitialized)="saveRemoveStockQuantityFormInstance($event)">
+                          <dxi-item dataField="uomid" [colSpan]="4" editorType="dxSelectBox" [editorOptions]="{dataSource: UomRemoveForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,hint:'Select a unit of measurement (Only UoMs linked to the stock item wil display in the dropdown)' }">
+                            <dxo-label [text]="'Unit of Measurement'"></dxo-label>
+                            <dxi-validation-rule type="required" message="UoM is required"></dxi-validation-rule>
+                          </dxi-item>
+                          <dxi-item dataField="itemQuantity" [colSpan]="4" [editorOptions]="{hint:'Enter the pack size/units you have received. The system will work out the total UoM quantity' }">
+                            <dxi-validation-rule type="required" message="Quantity is required"></dxi-validation-rule>
+                            <dxo-label text="Quantity"></dxo-label>
+                          </dxi-item>
+                        </dx-form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </dx-tab-panel>
+            </dx-scroll-view>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+</div>
+<!-- container-fluid -->

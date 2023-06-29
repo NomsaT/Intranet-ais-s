@@ -1,0 +1,116 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Once Off Items Report</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Reports → Once Off Items Report</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-12 table-col">
+          <dx-data-grid #status id="roles" [dataSource]="dataSource"
+                        [remoteOperations]="true"
+                        showBorders="true"
+                        keyExpr="id"
+                        showRowLines="true"
+                        showColumnLines="true"
+                        [hoverStateEnabled]="true" class="dx-table"
+                        [wordWrapEnabled]="true"
+                        [columnAutoWidth]="true"
+                        [showColumnLines]="true"
+                        [showRowLines]="false"
+                        [showBorders]="false"
+                        (onExporting)="onExporting($event)"
+                        (onExported)="onExported($event)"
+                        [rowAlternationEnabled]="true">
+            <dxo-search-panel [visible]="true"></dxo-search-panel>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager [showPageSizeSelector]="true"
+                       [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                       [showInfo]="true"
+                       [showNavigationButtons]="true">
+            </dxo-pager>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+            <dxo-editing mode="form"
+                         [allowAdding]="false"
+                         [allowUpdating]="false"
+                         [allowDeleting]="false"
+                         [useIcons]="true">
+            </dxo-editing>
+
+            <dxo-grouping [autoExpandAll]="true"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Once-Off-Items-Report"></dxo-export>
+            <dxi-column dataField="dateCreated" caption="Date Approved" dataType="date"></dxi-column>
+            <dxi-column dataField="description" caption="Supplier Desc"></dxi-column>
+            <dxi-column dataField="value" caption="Service Price" [calculateCellValue]="priceISO"></dxi-column>
+            <dxi-column dataField="quantity" caption="Quantity"></dxi-column>
+            <dxi-column dataField="total" caption="Total" [calculateCellValue]="priceISO"></dxi-column>
+            <dxi-column dataField="departmentId" caption="Department">
+              <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="uomid" caption="UoM">
+              <dxo-lookup [dataSource]="UnitofMeasureForeignDataSource"
+                          displayExpr="name"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="packSize" caption="Pack Size"></dxi-column>
+            <dxi-column dataField="vatAppl" caption="VAT Appl" dataType="boolean">
+              <dx-check-box [value]="false"></dx-check-box>
+            </dxi-column>
+            <dxi-column dataField="grnAppl" caption="GRN Appl" dataType="boolean">
+              <dx-check-box [value]="false"></dx-check-box>
+            </dxi-column>
+            <dxi-column dataField="glcodeId" caption="GL Code">
+              <dxo-lookup [dataSource]="GLCodeForeignDataSource"
+                          [displayExpr]="getGLName"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+
+          </dx-data-grid>
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupDownloadConfirmVisible">
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center"
+                          my="center"
+                          of="window">
+            </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

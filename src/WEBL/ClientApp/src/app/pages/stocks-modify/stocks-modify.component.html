@@ -1,0 +1,276 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">{{actionDisplay}}</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Stock Management → Stock Modify</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align border-add-left">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Stock Item Details</h5>
+            <dx-form id="form" class="invoice-form" *ngIf="data != null; else DataLoading" [(formData)]="data" validationGroup="stockData">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item dataField="code" [editorOptions]="{hint:'Enter item code for the new stock item',readOnly:isRecipe }">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Item Code'"></dxo-label>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="supplierId" editorType="dxSelectBox" [editorOptions]="{dataSource: SupplierForeignDataSource,displayExpr:'companyName',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a supplier for the new stock item',onValueChanged:setCurrency}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Supplier'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsS"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="productName" [editorOptions]="{hint:'Enter item name for the new stock item'}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Item Name'"></dxo-label></dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="stockCategoryId" editorType="dxSelectBox" [editorOptions]="{dataSource: StockCategoryForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a stock category for the new stock item',onValueChanged:stockCategory}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Stock Category'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsSC"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="internalProductName" [editorOptions]="{hint:'Enter internal item name for the new stock item (what the item is called internally)'}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Internal Item Name'"></dxo-label></dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="stockGroupId" editorType="dxSelectBox" [editorOptions]="{dataSource: StockGroupForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a supplier for the new stock group',onValueChanged:setMinThreshold}"><dxo-label [text]="'Stock Group'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptions"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="monitored" editorType="dxCheckBox" dataType="boolean" [editorOptions]="{hint:'Check the box if the stock item should be monitored (Requires a barcode)'}"><dxo-label [text]="'Pending Price Approval'"></dxo-label></dxi-item>
+                  <dxi-item dataField="currency" [editorOptions]="{hint:'Current currency linked to the selected supplier', readOnly:true}"><dxo-label [text]="'Currency'"></dxo-label></dxi-item>
+                </dxi-item>
+
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="defaultDepartmentId" editorType="dxSelectBox" [editorOptions]="{dataSource: DepartmentForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a department for the new stock item (Default Department initially selected)'}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Department'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsDepartment"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="currentPrice" [editorOptions]="{readOnly:!editingMode,format:{ type: 'currency',currency: currency, precision: 2 }, hint:'Enter the price for the new stock item',onValueChanged:changeCurrentPrice}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label text="Unit Price"></dxo-label></dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="defaultLocationId" editorType="dxSelectBox" [editorOptions]="{dataSource: LocationForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a location for the new stock item',onValueChanged:setStoreValue}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Location'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsLocation"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="packSize" [editorOptions]="{dataType:'number',hint:'Enter the pack size of the new stock item (How many items are in the pack)',onValueChanged:setChangePack}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Pack Size (Barcode)'"></dxo-label></dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="defaultStoreId" editorType="dxSelectBox" [editorOptions]="{dataSource: StoreForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a store for the new stock item',onValueChanged:setBinValue}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Store'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsStore"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="itemQuantity" [editorOptions]="{dataType:'number',hint:'Enter the quantity (L, KG) of the item in the pack',onValueChanged:setChangeQuantity}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label text="Unit Quantity (UoM)"></dxo-label></dxi-item>
+                <!--start-->
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="binId" editorType="dxSelectBox" [editorOptions]="{dataSource: BinForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a bin for the new stock item'}"><dxo-label [text]="'Bin'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsBin"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <!--end-->
+
+                <dxi-item dataField="minThreshold" [editorOptions]="{hint:'Enter the stock amount you wish to trigger the low stock notification'}"><dxo-label [text]="'Min Threshold (UoM)'"></dxo-label></dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="uomid" editorType="dxSelectBox" [editorOptions]="{dataSource: UnitofMeasureForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a UoM for the new stock item',onValueChanged:setUomValue}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Unit of Measurement'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsU"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+
+                <dxi-item dataField="packQuantity" [editorOptions]="{dataType:'number',hint:'The pack quantity. (what is the total UoM of items in pack)', readOnly:true}"><dxo-label text="Pack Quantity (UoM)"></dxo-label></dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                  <dxi-item dataField="storageTypeId" editorType="dxSelectBox" [editorOptions]="{dataSource: StorageTypeForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,width: '260%',hint:'Select a storage type for the new stock item'}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Storage Type'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonOptionsStorageType"
+                            [editorOptions]="{ width: '20%' }">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item dataField="itemPrice" [editorOptions]="{format:{ type: 'currency',currency: currency, precision: 2 },hint:'The price per item in a pack. (If the stock item is a pack that contains individual items)', readOnly:true}"><dxo-label text="Pack Price"></dxo-label></dxi-item>
+                <dxi-item itemType="empty"></dxi-item>
+
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="2" caption="Internal Calculation">
+                  <dxi-item dataField="secondaryUomid" editorType="dxSelectBox" [editorOptions]="{dataSource: UnitofMeasureForeignDataSource,displayExpr:'name',valueExpr:'id',searchEnabled:true,showClearButton:true,hint:'Select a second UoM for the new stock item if needed'}"><dxo-label [text]="'Calculated UoM'"></dxo-label></dxi-item>
+                  <dxi-item dataField="totalweight" [editorOptions]="{dataType:'number',hint:'Enter the second value linked to the second UoM',onValueChanged:ChangedTotal}"><dxo-label [text]="'Calculated Value (UoM)'"></dxo-label></dxi-item>
+                  <dxi-item dataField="deductedValue" [editorOptions]="{hint:'Enter the weight of the pallet/core',onValueChanged:ChangedDeductedValue}"><dxo-label [text]="'Pallet/Core Weight (UoM)'"></dxo-label></dxi-item>
+                  <dxi-item dataField="comparisonSecondValue" [editorOptions]="{searchEnabled:true,showClearButton:true,hint:'The value of the material after the pallet/core is deducted', readOnly:true,onValueChanged:setCalculatedRatio}"><dxo-label [text]="'Actual Material'"></dxo-label></dxi-item>
+                  <dxi-item dataField="calculatedRatio" [editorOptions]="{searchEnabled:true,showClearButton:true,hint:'The ratio of the first UoM to the Second UoM', readOnly:true}"><dxo-label [text]="'Calculated Ratio'"></dxo-label></dxi-item>
+                  <dxi-item itemType="button"
+                            [buttonOptions]="buttonClear">
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="2" caption="Shelf Life">
+                  <dxi-item dataField="shelfLifeDays" [editorOptions]="{placeholder:'Duration',hint:'Enter the duration of the shelf life'}"><dxo-label [visible]="false"></dxo-label></dxi-item>
+                  <dxi-item dataField="shelfLifeTypeId" editorType="dxSelectBox" [editorOptions]="{placeholder:'Duration Format',dataSource: ShelfLifeTypeForeignDataSource,displayExpr:'type',valueExpr:'id',searchEnabled:true,showClearButton:true,hint:'Select a duration format for the shelf life'}"><dxo-label [visible]="false"></dxo-label></dxi-item>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="2" caption="Initial Pack Stock Quantity" [visible]="allowAddingQuantity && editingMode">
+                  <dxi-item dataField="initialQuantity" [editorOptions]="{hint:'Enter the initial quantity of the stock item you have available'}"><dxo-label [text]="'Initial Pack Stock Quantity'"></dxo-label></dxi-item>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="3" [colSpan]="2" caption="Product/Packaging Information">
+                  <dxi-item dataField="productWeight" [editorOptions]="{placeholder:'Weight (KG)',hint:'Enter the product weight.'}"><dxo-label [text]="'Product Dimensions'"></dxo-label></dxi-item>
+                  <dxi-item itemType="group" [colCount]="3" [colSpan]="2">
+                    <dxi-item dataField="productDimensionsLength" [editorOptions]="{placeholder:'Length (mm)',hint:'Enter the product length.'}"><dxo-label [visible]="false"></dxo-label></dxi-item>
+                    <dxi-item dataField="productDimensionsWidth" [editorOptions]="{placeholder:'Width (mm)',hint:'Enter the product width.'}"><dxo-label [visible]="false"></dxo-label></dxi-item>
+                    <dxi-item dataField="productDimensionsHeight" [editorOptions]="{placeholder:'Height (mm)',hint:'Enter the product height.'}"><dxo-label [visible]="false"></dxo-label></dxi-item>
+                  </dxi-item>
+                  <dxi-item dataField="shippingWeight" [editorOptions]="{placeholder:'Weight (KG)',hint:'Enter the packaging weight.'}"><dxo-label [text]="'Shipping Dimensions'"></dxo-label></dxi-item>
+                  <dxi-item itemType="group" [colCount]="3" [colSpan]="2">
+                    <dxi-item dataField="shippingDimensionsLength" [editorOptions]="{placeholder:'Length (mm)',hint:'Enter the packaging length.'}"><dxo-label [visible]="false"></dxo-label></dxi-item>
+                    <dxi-item dataField="shippingDimensionsWidth" [editorOptions]="{placeholder:'Width (mm)',hint:'Enter the packaging width.'}"><dxo-label [visible]="false"></dxo-label></dxi-item>
+                    <dxi-item dataField="shippingDimensionsHeight" [editorOptions]="{placeholder:'Height (mm)',hint:'Enter the packaging height.'}"><dxo-label [visible]="false"></dxo-label></dxi-item>
+                  </dxi-item>
+                </dxi-item>
+              </dxi-item>
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item itemType="button"
+                          horizontalAlignment="left"
+                          [buttonOptions]="AddUpdateStockCancelBtn">
+                </dxi-item>
+                <dxi-item itemType="button"
+                          horizontalAlignment="right"
+                          [buttonOptions]="AddUpdateStockBtn">
+                </dxi-item>
+              </dxi-item>
+            </dx-form>
+            <div *ngIf="showError" class="error">
+              <p>Please fill in all the Internal Calculation fields or clear them if you don't want to add internal calculations.</p>
+            </div>
+            <div *ngIf="data" class="formulas">
+              <h5>Formulas:</h5>
+              <p>
+                Pack Quantity = Pack Size (Amount of units in a pack) * Unit Quantity (Size of each unit)<br />
+                Unit Price = Price / Pack Size
+              </p>
+              <h5>Internal Calculations:</h5>
+              <p>
+                Calculated Ratio = Pack Quantity / Actual Material (1 : x)<br />
+                Actual Material = Calculated Value - Pallet/Core Weight
+              </p>
+            </div>
+          </div>
+          <dx-popup title="Stock Group"
+                    [width]="750"
+                    [height]="550"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddencallstockgroup($event)"
+                    [(visible)]="popupVisible">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-stock-group></app-stock-group>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Supplier"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddencallsuppliers($event)"
+                    [(visible)]="popupVisibleS">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-supplier></app-supplier>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Stock Category"
+                    [width]="750"
+                    [height]="550"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddencallstockcategory($event)"
+                    [(visible)]="popupVisibleSC">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-stock-category></app-stock-category>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Unit of Measurement"
+                    [width]="750"
+                    [height]="550"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddencalluom($event)"
+                    [(visible)]="popupVisibleU">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-unit-of-measurement></app-unit-of-measurement>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Department"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddencalldepartment($event)"
+                    [(visible)]="popupVisibleDepartment">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-department></app-department>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Storage Types"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddencallstoragetype($event)"
+                    [(visible)]="popupVisibleStorage">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-storage-type></app-storage-type>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Plant Location & Store Configuration"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddencallstoreandlocation($event)"
+                    [(visible)]="popupVisibleLocationStore">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-plant-location></app-plant-location>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup title="Bin Configuration"
+                    [width]="950"
+                    [height]="'100%'"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHiddencallbin($event)"
+                    [(visible)]="popupVisibleBin">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-bins></app-bins>
+            </dx-scroll-view>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+  <dx-load-panel #loadPanel shadingColor="rgba(0,0,0,0.4)" [(visible)]="loadingVisible" [showIndicator]="true" [showPane]="true" [shading]="true" [closeOnOutsideClick]="false"></dx-load-panel>
+  <ng-template #DataLoading>
+    Loading Data...
+  </ng-template>
+  <!-- end page title -->
+</div> <!-- container-fluid -->

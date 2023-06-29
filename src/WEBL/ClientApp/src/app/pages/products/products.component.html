@@ -1,0 +1,296 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div
+        class="page-title-box d-flex align-items-center justify-content-between"
+      >
+        <h4 class="mb-0 font-size-18">Products</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">ACS → Products</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-12 table-col">
+          <dx-data-grid #product
+                        id="product"
+                        [dataSource]="dataSource"
+                        [remoteOperations]="true"
+                        showBorders="true"
+                        keyExpr="id"
+                        showRowLines="true"
+                        showColumnLines="true"
+                        [hoverStateEnabled]="true"
+                        class="dx-table"
+                        [wordWrapEnabled]="true"
+                        [columnAutoWidth]="true"
+                        [showColumnLines]="true"
+                        [showRowLines]="false"
+                        [showBorders]="false"
+                        [rowAlternationEnabled]="true"
+                        (onCellClick)="barcodeOnClick($event)"
+                        (onExporting)="onExporting($event)"
+                        (onExported)="onExported($event)"
+                        (onEditingStart)="EditStart($event)"
+                        (onSaving)="SavingStart($event)"
+                        (onSelectionChanged)="selectionChanged($event)"
+                        (onRowExpanding)="rowChanged($event)">
+            <dxo-search-panel [visible]="true"></dxo-search-panel>
+            <dxo-selection mode="single"></dxo-selection>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager [showPageSizeSelector]="true"
+                       [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                       [showInfo]="true"
+                       [showNavigationButtons]="true">
+            </dxo-pager>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-group-panel [visible]="true"></dxo-group-panel>
+
+            <dxo-editing mode="popup"
+                         [allowAdding]="allowModify"
+                         [allowUpdating]="allowModify"
+                         [allowDeleting]="allowModify"
+                         [useIcons]="true">
+              <dxo-popup title="Product Information"
+                         [showTitle]="true"
+                         dragEnabled="true"
+                         [width]="500"
+                         [height]="500">
+              </dxo-popup>
+              <dxo-form>
+                <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+                  <dxi-item dataField="productCode"
+                            [editorOptions]="{
+                      hint: 'Enter the product code for the new product'
+                    }"></dxi-item>
+                  <dxi-item dataField="productName"
+                            [editorOptions]="{
+                      hint: 'Enter the product name for the new product'
+                    }"></dxi-item>
+                  <dxi-item dataField="description"></dxi-item>
+                  <dxi-item itemType="group" [colCount]="2" [colSpan]="1">
+                    <dxi-item dataField="departmentId"
+                              [editorOptions]="{
+                        searchEnabled: true,
+                        showClearButton: true,
+                        width: '280%',
+                        hint: 'Select a department for the new product'
+                      }"></dxi-item>
+                    <dxi-item itemType="button"
+                              alignment="left"
+                              [buttonOptions]="buttonOptions"
+                              [editorOptions]="{ width: '20%' }">
+                    </dxi-item>
+                  </dxi-item>
+                </dxi-item>
+              </dxo-form>
+            </dxo-editing>
+
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Products-List"></dxo-export>
+
+            <dxi-column dataField="productCode" caption="Product Code">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+
+            <dxi-column dataField="productName" caption="Product Name">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+
+            <dxi-column dataField="description"
+                        caption="Description"
+                        [spellcheck]="true">
+              <dxo-form-item editorType="dxTextArea"
+                             [editorOptions]="{
+                  height: 70,
+                  stylingMode: 'filled',
+                  hint: 'Enter a description for the new product'
+                }">
+              </dxo-form-item>
+            </dxi-column>
+
+            <dxi-column dataField="departmentId"
+                        caption="Department"
+                        [editorOptions]="{ showClearButton: true }">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+              <dxo-lookup [dataSource]="DepartmentForeignDataSource"
+                          displayExpr="abbAndName"
+                          valueExpr="id">
+              </dxo-lookup>
+            </dxi-column>
+            <dxi-column dataField="quantity" caption="Product Qty"></dxi-column>
+
+            <dxi-column dataField="barcode" caption="Barcode"></dxi-column>
+
+            <dxi-column type="buttons"
+                        cellTemplate="BarcodecellTemplate"
+                        [formItem]="{ visible: false }"
+                        dataField="barcode"
+                        caption="Print Barcode"></dxi-column>
+            <div *dxTemplate="let data of 'BarcodecellTemplate'">
+              <i class="bx bx-barcode" style="font-size: x-large"></i>
+            </div>
+
+            <dxi-column type="buttons"
+                        cellTemplate="BarcodepdfcellTemplate"
+                        [formItem]="{ visible: false }"
+                        dataField="barcode"
+                        caption="Download Barcode"></dxi-column>
+            <div *dxTemplate="let data of 'BarcodepdfcellTemplate'">
+              <i class="bx bxs-file-pdf" style="font-size: x-large"></i>
+            </div>
+
+            <dxi-column type="buttons" [visible]="allowModify">
+              <dxi-button name="edit"></dxi-button>
+              <dxi-button name="delete"></dxi-button>
+            </dxi-column>
+
+            <!--MasterList-->
+            <dxo-master-detail [enabled]="true" template="productstock"></dxo-master-detail>
+
+            <div *dxTemplate="let item of 'productstock'">
+              <!--checbox-->
+              <dx-form id="form">
+                <dxi-item itemType="group" cssClass="first-group" [colCount]="4">
+                  <dxi-item itemType="group" [colSpan]="3">
+                    <br />
+                    <dx-check-box text="Stock Component" hint="Stock Component" [(value)]="showStock" (onValueChanged)="handleValueChangeStock($event)" style="margin-right:10px"></dx-check-box>
+                    <dx-check-box text="Product Component" hint="Product Component" [(value)]="showProduct" (onValueChanged)="handleValueChangeProduct($event)"></dx-check-box>
+                  </dxi-item>
+                </dxi-item>
+              </dx-form>
+              <!--checbox-->
+              <!--Stock Components-->
+              <div class="master-detail-caption icon-inline" style="margin-top:20px" *ngIf="showStock">
+                <h4 class="mb-0 font-size-18">Stock Component</h4>
+                <div id="info" (mouseenter)="toggleDefault()" (mouseleave)="toggleDefault()">
+                  <i class="bx bx-info-circle"></i>
+                </div>
+              </div>
+              <dx-tooltip target="#info" [(visible)]="defaultVisible" [closeOnOutsideClick]="false">
+                <div *dxTemplate="let data = data; of: 'content'">Below is a list of stock items needed to make/assemble the product.</div>
+              </dx-tooltip>
+              <app-product-stock [key]="item.key" *ngIf="showStock"></app-product-stock>
+              <!--Product Components-->
+              <div class="master-detail-caption icon-inline" style="margin-top:30px" *ngIf="showProduct">
+                <h4 class="mb-0 font-size-18">Product Component</h4>
+                <div id="info" (mouseenter)="toggleDefault2()" (mouseleave)="toggleDefault2()">
+                  <i class="bx bx-info-circle"></i>
+                </div>
+              </div>
+              <dx-tooltip target="#info" [(visible)]="defaultVisible2" [closeOnOutsideClick]="false">
+                <div *dxTemplate="let data = data; of: 'content'">Below is a list of product items needed to make/assemble the product.</div>
+              </dx-tooltip>
+              <app-product-item [key]="item.key" *ngIf="showProduct"></app-product-item>
+            </div>
+          </dx-data-grid>
+          <!--POPUP Remove Stock Components-->
+          <dx-popup width="auto"
+                    height="150px"
+                    [showTitle]="false"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    container=".dx-viewport"
+                    [(visible)]="popupVisibleRemove">
+            <dxi-toolbar-item widget="dxButton"
+                              toolbar="bottom"
+                              location="after"
+                              [options]="ComponentRemove">
+            </dxi-toolbar-item>
+            <dxi-toolbar-item widget="dxButton"
+                              toolbar="bottom"
+                              location="before"
+                              [options]="CancelRemove">
+            </dxi-toolbar-item>
+            <div *dxTemplate="let data of 'content'">
+              <div style="width: auto; height: auto">
+                <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+                  <table class="table table-centered table-nowrap">
+                    <tr>
+                      <td class="tr-top-padding">Are you sure you want to remove all stock components for this product.</td>
+                    </tr>
+                  </table>
+                </dx-scroll-view>
+              </div>
+            </div>
+          </dx-popup>
+          <!---->
+          <!--POPUP Remove Product Components-->
+          <dx-popup width="auto"
+                    height="150px"
+                    [showTitle]="false"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    container=".dx-viewport"
+                    [(visible)]="popupVisibleRemoveProd">
+            <dxi-toolbar-item widget="dxButton"
+                              toolbar="bottom"
+                              location="after"
+                              [options]="ProdComponentRemove">
+            </dxi-toolbar-item>
+            <dxi-toolbar-item widget="dxButton"
+                              toolbar="bottom"
+                              location="before"
+                              [options]="ProdCancelRemove">
+            </dxi-toolbar-item>
+            <div *dxTemplate="let data of 'content'">
+              <div style="width: auto; height: auto">
+                <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+                  <table class="table table-centered table-nowrap">
+                    <tr>
+                      <td class="tr-top-padding">Are you sure you want to remove all product components for this product.</td>
+                    </tr>
+                  </table>
+                </dx-scroll-view>
+              </div>
+            </div>
+          </dx-popup>
+          <!---->
+          <dx-popup title="Department"
+                    [width]="750"
+                    [height]="550"
+                    [showTitle]="true"
+                    dragEnabled="true"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="true"
+                    (onHidden)="onHidden($event)"
+                    [(visible)]="popupVisible">
+            <dx-scroll-view width="100%" height="100%" showScrollbar="never">
+              <app-department></app-department>
+            </dx-scroll-view>
+          </dx-popup>
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupDownloadConfirmVisible">
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center" my="center" of="window"> </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+</div>
+<!-- container-fluid -->

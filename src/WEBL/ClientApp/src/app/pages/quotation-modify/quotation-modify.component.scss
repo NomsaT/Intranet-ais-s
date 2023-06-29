@@ -1,0 +1,97 @@
+.io-view-heading {
+  border: 1px solid #2a3042;
+  padding: 4px;
+  border-radius: 4px;
+  text-align: center;
+  background-color: #2a304226;
+  color: #2a3042;
+}
+
+.io-view-heading-preview {
+  border: 1px solid #2a3042;
+  padding: 4px;
+  border-radius: 4px;
+  text-align: center;
+  background-color: #2a304226;
+  color: #2a3042;
+}
+
+.internalOrder tr {
+  border-style: hidden !important;
+}
+
+.invoice-form {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  margin-bottom: 20px;
+}
+
+.sub-heading{
+    text-align:center !important;
+}
+
+.table-align {
+  margin-bottom: 25px !important;
+}
+
+.button-align-left{
+    float:left !important;
+}
+
+.border-add-left {
+  border-left: 10px solid #337ab7 !important;
+}
+
+.border-pending-left {
+  border-left: 10px solid #f1b44c !important;
+}
+
+.border-revision-left {
+  border-left: 10px solid #06a32d !important;
+}
+
+.highlight {
+  background-color: yellow !important;
+  padding: 3px !important;
+  border-radius: 4px !important;
+}
+
+.tabs {
+  padding: 5px;
+}
+.dx-box-item-content {
+  -webkit-flex-direction: column !important;
+  -ms-flex-direction: column !important;
+  flex-direction: column !important;
+  font-size: 14px !important;
+  /* flex: 1 1 0px !important;*/
+  width: 18px !important;
+  /* max-width: auto !important;*/
+}
+
+.myoffer4 {
+  display: inline;
+  padding: 0 20px;
+}
+
+.dx-button-mode-contained {
+  align-items: self-end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.dx-button dx-button-default {
+  float: right;
+}
+
+.dx-item.dx-box-item.submit {
+  display: flex !important;
+  min-width: 0px !important;
+}
+
+::ng-deep .dx-data-row .cell-highlighted {
+  border: 1.5px solid rgba(92,184,92,.5) !important;
+}

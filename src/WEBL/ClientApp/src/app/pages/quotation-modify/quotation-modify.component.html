@@ -1,0 +1,249 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">{{ actionDisplay }}</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">
+              Purchasing → Capture Quotation
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align"
+           [ngClass]="{
+          'border-add-left': newState === true,
+          'border-pending-left': newState === false
+       }">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Quotation Details</h5>
+            <h6 style="color:grey;font-weight: lighter;padding-left: 90%;">Revision Number: {{revisionNumber}}</h6>
+            <dx-form #mainform id="mainform" class="invoice-form" [(formData)]="data">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                <dxi-item dataField="requestById" editorType="dxSelectBox" [editorOptions]="{dataSource: UsersForeignDataSource,displayExpr: 'fullName',valueExpr: 'id',searchEnabled: true,showClearButton: true, width: '100%',onValueChanged: setRequested,onOptionChanged: setRequested}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Requested By'"></dxo-label></dxi-item>
+                <dxi-item dataField="placedById" editorType="dxSelectBox" [editorOptions]="{dataSource: UsersForeignDataSource,displayExpr: 'fullName',valueExpr: 'id',searchEnabled: true,showClearButton: true, width: '100%', readOnly: true,onValueChanged: setPlaced,onOptionChanged: setPlaced}"><dxo-label [text]="'Placed By'"></dxo-label></dxi-item>
+                <dxi-item dataField="customerId" editorType="dxSelectBox" [editorOptions]="{dataSource: CustomerForeignDataSource,displayExpr: 'companyName',valueExpr: 'id',searchEnabled: true,showClearButton: true, width: '100%'}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Customer'"></dxo-label></dxi-item>
+                <dxi-item dataField="submissionDate" editorType="dxDateBox" [editorOptions]="{width: '100%', value: now, disabled:true}"><dxo-label [text]="'Submission Date'"></dxo-label></dxi-item>
+                <dxi-item itemType="group" [colCount]="4" [colSpan]="2">
+                  <dxi-item dataField="validFor" editorType="dxNumberBox" dataType="number" [editorOptions]="{format: {precision: 2}}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Quote Valid for x day(s)'"></dxo-label></dxi-item>
+                  <dxi-item dataField="daysFrom" editorType="dxNumberBox" dataType="number" [editorOptions]="{format: {precision: 2}}"><dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Days from Invoice'"></dxo-label></dxi-item>
+                  <dxi-item dataField="onOrder" editorType="dxNumberBox" dataType="number" [editorOptions]="{onValueChanged: setDelivery,format: {precision: 2}}"><dxi-validation-rule type="required" ></dxi-validation-rule><dxo-label [text]="'On Order (%)'">     </dxo-label></dxi-item>
+                  <dxi-item dataField="onDelivery" editorType="dxNumberBox" dataType="number" [editorOptions]="{onValueChanged: setOrder,format: {precision: 2}}"><dxi-validation-rule type="required" ></dxi-validation-rule><dxo-label [text]="'On Delivery (%)'"></dxo-label></dxi-item>
+                </dxi-item>
+              </dxi-item>
+            </dx-form>
+          </div>
+        </div>
+      </div>
+      <div class="table-align"
+           [ngClass]="{
+          'border-add-left': newState === true,
+          'border-pending-left': newState === false
+       }">
+        <div class="row">
+          <div class="table-align">
+            <dx-form id="form" style="padding-bottom:10px">
+              <dxi-item itemType="group" cssClass="first-group" [colCount]="1">
+                <dxi-item itemType="group" [colSpan]="3" style="margin-left: 90%;">
+                  <dx-check-box text="Add Transport Cost" [(value)]="transport" (onValueChanged)="handleTransport($event)"></dx-check-box>
+                </dxi-item>
+              </dxi-item>
+            </dx-form>
+            <div style="width: auto; height: auto">
+              <h5 class="io-view-heading"> Products </h5>
+              <dx-form id="form" class="invoice-form" *ngIf="data != null; else DataLoading" [(formData)]="data.quoteItems" validationGroup="quotationData">
+                <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                  <dx-data-grid #products id="products" [dataSource]="data.quoteItems"
+                                [columnAutoWidth]="true"
+                                [hoverStateEnabled]="true"
+                                [rowAlternationEnabled]="true"
+                                [showBorders]="true"
+                                [wordWrapEnabled]="true"
+                                (onFocusedCellChanged)="onFocusedCellChanged($event)"
+                                (onSaved)="onSaved($event)"
+                                (onRowRemoved)="onRowRemoved($event)"
+                                (onCellClick)="startEdit($event)"
+                                (onEditorPreparing)="onEditorPreparingChild($event)"
+                                (onCellPrepared)="OnCellPrepared($event)">
+                    <dxo-sorting mode="none"></dxo-sorting>
+                    <dxo-paging [enabled]="false"></dxo-paging>
+                    <dxo-search-panel [visible]="true"></dxo-search-panel>
+                    <dxo-editing mode="cell"
+                                 [useIcons]="true"
+                                 [allowUpdating]="allowModify"
+                                 [allowDeleting]="allowModify"
+                                 [allowAdding]="allowModify">
+                    </dxo-editing>
+
+                    <dxi-column dataField="productId" caption="Product Description" [setCellValue]="setCellValueItemPrice">
+                      <dxo-lookup [dataSource]="ProductForeignDataSource"
+                                  [displayExpr]="getProduct"
+                                  valueExpr="id">
+                      </dxo-lookup>
+                      <dxi-validation-rule type="required"></dxi-validation-rule>
+                      <dxo-form-item [colSpan]="2"></dxo-form-item>
+                    </dxi-column>
+                    <dxi-column dataField="width" caption="Width" cssClass="cell-highlighted" dataType="number" [width]="70" [setCellValue]="setCoilWidth"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                    <dxi-column dataField="length" caption="Length" cssClass="cell-highlighted" dataType="number" [setCellValue]="setCoilLength"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                    <dxi-column dataField="coilTotal" caption="m2/coil" [editorOptions]="{disabled: true}" [format]="{precision: 2}" dataType="number"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                    <dxi-column dataField="coilPrice" caption="Price/m2" cssClass="cell-highlighted" dataType="number" [setCellValue]="setCoilPrice" [format]="{type: 'currency',currency: currency,precision: 2}"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                    <dxi-column dataField="price" caption="Coil Price" [editorOptions]="{disabled: true}" dataType="number" [calculateDisplayValue]="getCoilPrice" [format]="{type: 'currency',currency: currency,precision: 2}" [width]="100"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                    <dxi-column dataField="quantity" caption="Qty" cssClass="cell-highlighted" dataType="number" [width]="100" [setCellValue]="setTotal" [format]="{precision: 1}"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                    <dxi-column dataField="total" caption="Total (Vat Excl.)" dataType="number" [calculateDisplayValue]="getTotalPrice" [format]="{type: 'currency',currency: currency,precision: 2}" [editorOptions]="{disabled: true,format: {type: 'currency',currency: currency,precision: 2}}"></dxi-column>
+                    <dxo-summary>
+                      <dxi-total-item column="productId"
+                                      displayFormat="Total Items: {0}"
+                                      summaryType="count">
+                      </dxi-total-item>
+                    </dxo-summary>
+                  </dx-data-grid>
+                </dxi-item>
+              </dx-form>
+              <div style="width: auto; height: auto">
+                <h5 class="io-view-heading" *ngIf="transport == true;">Transport</h5>
+                <dx-form id="form" class="invoice-form" *ngIf="data != null; else DataLoading" [(formData)]="data.quoteTransports" validationGroup="quotationData">
+                  <dxi-item itemType="group" [colCount]="2" [colSpan]="2">
+                    <dx-data-grid #trans id="trans" [dataSource]="data.quoteTransports"
+                                  [(visible)]="transport"
+                                  [columnAutoWidth]="true"
+                                  [hoverStateEnabled]="true"
+                                  [rowAlternationEnabled]="true"
+                                  [showBorders]="true"
+                                  [wordWrapEnabled]="true"
+                                  (onFocusedCellChanged)="onFocusedCellChanged($event)"
+                                  (onSaved)="onSaved($event)"
+                                  (onCellClick)="startEditTransport($event)"
+                                  (onRowRemoved)="onRowRemoved($event)"
+                                  (onEditorPreparing)="onEditorPreparingTransport($event)"
+                                  (onCellPrepared)="OnCellPrepared($event)">
+                      <dxo-sorting mode="none"></dxo-sorting>
+                      <dxo-paging [enabled]="false"></dxo-paging>
+                      <dxo-search-panel [visible]="true"></dxo-search-panel>
+                      <dxo-editing mode="cell"
+                                   [useIcons]="true"
+                                   [allowUpdating]="allowModify"
+                                   [allowDeleting]="allowModify"
+                                   [allowAdding]="allowModify">
+                      </dxo-editing>
+
+                      <dxi-column dataField="description" caption="Transport" cssClass="cell-highlighted" dataType="string"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                      <dxi-column dataField="price" caption="Unit Price" cssClass="cell-highlighted" dataType="number" [format]="{type: 'currency',currency: currency,precision: 2}" [width]="120"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                      <dxi-column dataField="quantity" caption="Qty" cssClass="cell-highlighted" dataType="number" [format]="{precision: 0}" [setCellValue]="setTransportTotalByQty" [width]="120"><dxi-validation-rule type="required" ></dxi-validation-rule></dxi-column>
+                      <dxi-column dataField="total" caption="Total (Vat Excl.)" dataType="number" [calculateDisplayValue]="getTotalTransport" [format]="{type: 'currency',currency: currency,precision: 2}" [width]="120"><dxi-validation-rule type="required"></dxi-validation-rule></dxi-column>
+                      <dxo-summary>
+                        <dxi-total-item column="productId"
+                                        displayFormat="Total Items: {0}"
+                                        summaryType="count">
+                        </dxi-total-item>
+                      </dxo-summary>
+                    </dx-data-grid>
+                  </dxi-item>
+                </dx-form>
+              </div>
+              <dx-tooltip [(visible)]="defaultVisible"
+                          [closeOnOutsideClick]="false">
+                <div *dxTemplate="let data = data; of: 'content'">
+                  {{ toolTipText }}
+                </div>
+              </dx-tooltip>
+            </div>
+          </div>
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupClearItems">
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesRemoveItemsOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noRemoveItemsOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center" my="center" of="window"> </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to uncheck?
+              The transport items will be removed.
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+      <div class="table-align"
+           [ngClass]="{
+          'border-add-left': newState === true,
+          'border-pending-left': newState === false
+        }">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-12 table-col">
+            <h5 class="io-view-heading">Total</h5>
+            <dx-form id="form" *ngIf="data != null; else DataLoading" [(formData)]="data" validationGroup="quotationData">
+              <dxi-item itemType="group" [colCount]="2" [colSpan]="3">
+                <dxi-item itemType="empty"></dxi-item>
+                <dxi-item dataField="total" editorType="dxNumberBox" [editorOptions]="{readOnly: true,format: {type: 'currency',currency: currency,precision: 2},dataType: 'number'}">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Total (Excl. VAT)'"></dxo-label>
+                </dxi-item>
+                <dxi-item itemType="empty"></dxi-item>
+                <dxi-item dataField="vat" editorType="dxNumberBox" [editorOptions]="{readOnly: true,format: {type: 'currency',currency: currency,precision: 2},dataType: 'number'}">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'VAT'"></dxo-label>
+                </dxi-item>
+                <dxi-item itemType="empty"></dxi-item>
+                <dxi-item dataField="totalInclVat" editorType="dxNumberBox" [editorOptions]="{readOnly: true,format: {type: 'currency',currency: currency,precision: 2},dataType: 'number'}">
+                  <dxi-validation-rule type="required"></dxi-validation-rule><dxo-label [text]="'Total (Incl. VAT)'"></dxo-label>
+                </dxi-item>
+                <dxi-item itemType="group" [colCount]="6" [colSpan]="2">
+                  <dxi-item itemType="button"
+                            horizontalAlignment="left"
+                            [buttonOptions]="AddUpdateQuotationCancelBtn">
+                  </dxi-item>
+                  <dxi-item itemType="empty"></dxi-item>
+                  <dxi-item itemType="empty"></dxi-item>
+                  <dxi-item itemType="empty"></dxi-item>
+                  <dxi-item itemType="empty"></dxi-item>
+                  <dxi-item itemType="group" [colCount]="2">
+                    <dxi-item itemType="empty"
+                              *ngIf="!(newState || data.quoteStatusId == 2)"></dxi-item>
+                    <dxi-item [colSpan]="1"
+                              itemType="button"
+                              *ngIf="newState || data.quoteStatusId == 2"
+                              horizontalAlignment="right"
+                              [buttonOptions]="AddUpdateDraftQuotationBtn">
+                    </dxi-item>
+
+                    <dxi-item [colSpan]="1"
+                              itemType="button"
+                              horizontalAlignment="right"
+                              [buttonOptions]="AddUpdateQuotationBtn">
+                    </dxi-item>
+                  </dxi-item>
+                </dxi-item>
+              </dxi-item>
+
+            </dx-form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <dx-load-panel #loadPanel
+                 shadingColor="rgba(0,0,0,0.4)"
+                 [(visible)]="loadingVisible"
+                 [showIndicator]="true"
+                 [showPane]="true"
+                 [shading]="true"
+                 [closeOnOutsideClick]="false"></dx-load-panel>
+  <ng-template #DataLoading> Loading Data... </ng-template>
+  <!-- end page title -->
+</div>
+<!-- container-fluid -->

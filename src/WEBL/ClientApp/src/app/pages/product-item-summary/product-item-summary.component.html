@@ -1,0 +1,51 @@
+<dx-data-grid #productitem id="#productitem" [dataSource]="dataSource" [showBorders]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true"
+              (onEditingStart)="EditStart($event)"
+              (onSaving)="SavingStart($event)"
+              (onRowInserting)="insertRow($event)">
+  <dxo-editing mode="popup"
+               [allowAdding]="false"
+               [allowUpdating]="false"
+               [allowDeleting]="false"
+               [useIcons]="true">
+
+    <dxo-popup title="Product Item Information"
+               [showTitle]="true"
+               [dragEnabled]="true"
+               [width]="600"
+               [height]="400">
+    </dxo-popup>
+  </dxo-editing>
+
+  <dxi-column dataField="itemId" caption="Product Item Desc" [editorOptions]="DepartmentDropdown">
+    <dxo-lookup [dataSource]="ProductForeignDataSource"
+                [displayExpr]="getProduct"
+                valueExpr="id">
+    </dxo-lookup>
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+
+  <dxi-column dataField="itemId" caption="Department" [editorOptions]="{ disabled: true }">
+    <dxo-lookup [dataSource]="ProductForeignDataSource"
+                [displayExpr]="getDepartment"
+                valueExpr="id">
+    </dxo-lookup>
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+
+<!--  <dxi-column dataField="qtyPerSquareMeter" dataType="number" caption="Qty Per m2" [editorOptions]="setQtyPer">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+
+  <dxi-column dataField="squaresUsed" dataType="number" caption="Used m2" [editorOptions]="setQtyUsed">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>-->
+
+  <dxi-column dataField="quantity" dataType="number" caption="Quantity" [editorOptions]="{ disabled: true }">
+    <dxi-validation-rule type="required"></dxi-validation-rule>
+    <dxo-form-item [colSpan]="2"></dxo-form-item>
+  </dxi-column>
+</dx-data-grid>

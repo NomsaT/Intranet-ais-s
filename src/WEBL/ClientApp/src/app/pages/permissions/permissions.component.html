@@ -1,0 +1,74 @@
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+          <div class="icon-inline">
+            <h4 class="mb-0 font-size-18">Assign Permissions</h4>
+            <div id="info" (mouseenter)="toggleDefault()" (mouseleave)="toggleDefault()"><em class="bx bx-info-circle"></em></div>
+            <dx-tooltip target="#info"
+                        [(visible)]="defaultVisible"
+                        [closeOnOutsideClick]="false">
+              <div *dxTemplate="let data = data of 'content'">
+                <div class="green">In role blueprint and permission selected</div>
+                <div class="yellow">In role blueprint but permission not selected</div>
+                <div class="blue">Not in role blueprint but permission selected</div>
+                <div class="white">Not in role blueprint and permission not selected</div>
+              </div>
+            </dx-tooltip>
+          </div>
+            <div class="page-title-right">
+              <ol class="breadcrumb m-0">
+                <li class="breadcrumb-item active">User Management → Assign Permissions</li>
+              </ol>
+            </div>
+          </div>
+          <div class="table-align">
+            <div class="col-md-12 col-sm-12 col-12 table-col">
+              <!--Roles dropdown-->
+              <dx-form id="form">
+                <dxi-item itemType="group" cssClass="first-group">
+                  <dxi-item>
+                    <dxo-label [text]="'User'"></dxo-label>
+                    <dx-select-box [dataSource]="users"
+                                   [displayExpr]="userDisplay"
+                                   valueExpr="id"
+                                   showClearButton="true"  
+                                   [value]="selectedUser"
+                                   (onValueChanged)="userChanges($event)"></dx-select-box>
+                  </dxi-item>
+                  <dxi-item>
+                    <dxo-label [text]="'Role Blueprint'"></dxo-label>
+                    <dx-select-box [dataSource]="roles"
+                                   displayExpr="name"
+                                   valueExpr="id"
+                                   showClearButton="true"  
+                                   [value]="selectedRole"
+                                   (onValueChanged)="roleChanges($event)"></dx-select-box>
+                  </dxi-item>
+                  <dxi-item>
+                    <div *dxTemplate>
+                      <div style="display:flex; column-gap:5px; float:right">
+                        <dx-button icon="selectall" hint="Select all permissions based on the role blueprint" (onClick)="selectAllClick()"></dx-button>
+                        <dx-button icon="unselectall" hint="Unselect all permissions" (onClick)="unselectAllClick()"></dx-button>
+                      </div>
+                    </div>
+                  </dxi-item>
+                </dxi-item>
+              </dx-form>
+              <!--role permissions checkboxes-->
+              <dx-form id="form">
+                <dxi-item itemType="group" cssClass="first-group" [colCount]="4">
+                  <dxi-item itemType="group" [colSpan]="2" *ngFor="let singlepermissions of permissionsUser; let i = index">
+                    <br />
+                    <dx-check-box text="{{singlepermissions.page}} - {{singlepermissions.component}}" hint="{{singlepermissions.description}}" [(value)]="singlepermissions.permissionChecked" [class]="backgroundColour(i)"></dx-check-box>
+                  </dxi-item>
+                </dxi-item>
+                <dxi-item itemType="button" horizontalAlignment="right" [buttonOptions]="buttonOptions" [visible]="allowModify"></dxi-item>
+              </dx-form>
+            </div>
+          </div>
+        </div>
+    </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

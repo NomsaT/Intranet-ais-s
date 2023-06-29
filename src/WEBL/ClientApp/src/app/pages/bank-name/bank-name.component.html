@@ -1,0 +1,105 @@
+<div class="container-fluid">
+    <!-- start page title -->
+  <div class="row">    
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Bank Names</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Settings → System Config → Bank Names</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-12 table-col">
+          <dx-data-grid #status id="roles" [dataSource]="dataSource"
+                        [remoteOperations]="true"
+                        showBorders="true"
+                        keyExpr="id"
+                        showRowLines="true"
+                        showColumnLines="true"
+                        [hoverStateEnabled]="true" class="dx-table"
+                        (onExporting)="onExporting($event)"
+                        (onExported)="onExported($event)"
+                        [wordWrapEnabled]="true"
+                        [columnAutoWidth]="true"
+                        [showColumnLines]="true"
+                        [showRowLines]="false"
+                        [showBorders]="false"
+                        [rowAlternationEnabled]="true">
+            <dxo-search-panel [visible]="true"></dxo-search-panel>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager [showPageSizeSelector]="true"
+                       [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                       [showInfo]="true"
+                       [showNavigationButtons]="true">
+            </dxo-pager>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-group-panel [visible]="false"></dxo-group-panel>
+            <dxo-editing mode="popup"
+                         [allowAdding]="allowModify"
+                         [allowUpdating]="allowModify"
+                         [allowDeleting]="allowModify"
+                         [useIcons]="true">
+
+              <dxo-popup title="Bank Name"
+                         [showTitle]="true"
+                         dragEnabled="true"
+                         [width]="500"
+                         [height]="450">
+              </dxo-popup>
+
+              <dxo-form>
+                <dxi-item itemType="group" [colCount]="1" [colSpan]="2">
+                  <dxi-item dataField="bankName1" [editorOptions]="{hint:'Enter the name of the new Bank'}"></dxi-item>
+                  <dxi-item dataField="description"></dxi-item>
+                </dxi-item>
+              </dxo-form>
+            </dxo-editing>
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Bank-Name-List"></dxo-export>
+            <dxi-column dataField="bankName1" caption="Bank Name">
+              <dxi-validation-rule type="required"></dxi-validation-rule>
+            </dxi-column>
+            <dxi-column dataField="description" caption="Description" [spellcheck]="true">
+              <dxo-form-item editorType="dxTextArea"
+                             [editorOptions]="{ height: 70, stylingMode: 'filled',hint:'Enter a description for the new Bank Name record'}">
+              </dxo-form-item>
+            </dxi-column>
+          </dx-data-grid>
+          <dx-popup [width]="400"
+                    [height]="150"
+                    [showTitle]="false"
+                    [dragEnabled]="false"
+                    [closeOnOutsideClick]="false"
+                    [showCloseButton]="false"
+                    [(visible)]="popupDownloadConfirmVisible">
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="yesDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton"
+                              itemType="group"
+                              toolbar="bottom"
+                              location="center"
+                              [options]="noDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center"
+                          my="center"
+                          of="window">
+            </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- end page title -->
+</div> <!-- container-fluid -->

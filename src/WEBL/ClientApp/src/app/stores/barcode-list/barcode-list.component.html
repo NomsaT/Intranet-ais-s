@@ -1,0 +1,65 @@
+<div class="container-fluid">
+  <!-- start page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0 font-size-18">Print Barcodes</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item active">Stores → Print Barcodes</li>
+          </ol>
+        </div>
+      </div>
+      <div class="table-align">
+        <div class="col-md-12 col-sm-12 col-lg-12 table-col">
+          <dx-data-grid #barcodes id="roles" [dataSource]="dataSource" [remoteOperations]="true" showBorders="true"
+                        keyExpr="id" [(selectedRowKeys)]="selectedRows" showRowLines="true" showColumnLines="true"
+                        [hoverStateEnabled]="true" class="dx-table" (onExporting)="onExporting($event)"
+                        (onExported)="onExported($event)" [wordWrapEnabled]="true" [columnAutoWidth]="true" [showColumnLines]="true"
+                        [showRowLines]="false" [showBorders]="false" (onCellClick)="barcodeOnClick($event)"
+                        (onToolbarPreparing)="onToolbarPreparing($event)" [rowAlternationEnabled]="true">
+            <dxo-search-panel [visible]="false"></dxo-search-panel>
+            <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dxo-paging [pageSize]="15"></dxo-paging>
+            <dxo-pager [showPageSizeSelector]="true"
+                       [allowedPageSizes]="[10, 15, 20, 25, 50]"
+                       [showInfo]="true"
+                       [showNavigationButtons]="true">
+            </dxo-pager>
+            <dxo-group-panel [visible]="false"></dxo-group-panel>
+            <dxo-selection selectAllMode="allPages" showCheckBoxesMode="onClick" mode="multiple"></dxo-selection>
+            <dxo-grouping [autoExpandAll]="false"></dxo-grouping>
+            <dxo-export [enabled]="true" fileName="Barcode-List"></dxo-export>
+            <dxi-column dataField="grnNumber" caption="PO/GRN Nr"></dxi-column>
+            <dxi-column dataField="dateCreated" caption="Date Created" dataType="date"></dxi-column>
+            <dxi-column dataField="stockFullName" caption="Stock Item"></dxi-column>
+            <dxi-column dataField="barcode" caption="Barcode"  [calculateCellValue]="calculateCellValue"></dxi-column>
+            <dxi-column type="buttons" cellTemplate="BarcodecellTemplate" [formItem]="{ visible: false }"
+                        dataField="barcode" caption="Print Barcode"></dxi-column>
+            <div *dxTemplate="let data of 'BarcodecellTemplate'">
+              <i class="bx bx-barcode" style="font-size: x-large;"></i>
+            </div>
+          </dx-data-grid>
+          <dx-popup [width]="400" [height]="150" [showTitle]="false" [dragEnabled]="false" [closeOnOutsideClick]="false"
+            [showCloseButton]="false" [(visible)]="popupDownloadConfirmVisible">
+
+            <dxi-toolbar-item widget="dxButton" itemType="group" toolbar="bottom" location="center"
+              [options]="yesDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxi-toolbar-item widget="dxButton" itemType="group" toolbar="bottom" location="center"
+              [options]="noDownloadButtonOptions">
+            </dxi-toolbar-item>
+
+            <dxo-position at="center" my="center" of="window">
+            </dxo-position>
+            <p style="text-align: center">
+              Are you sure you want to download this file?
+            </p>
+          </dx-popup>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end page title -->
+</div> <!-- container-fluid -->
